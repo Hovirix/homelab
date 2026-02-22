@@ -1,0 +1,32 @@
+---
+title: "Inventory"
+description: "What's currently running in the homelab"
+---
+
+## Services
+
+| Service | Description | Auth | Access |
+|---------|-------------|------|--------|
+| Immich | Photo & video backup | Authentik | External |
+| Paperless-ngx | Document management | Authentik | External |
+| Linkwarden | Bookmark manager | Authentik | External |
+| Vaultwarden | Password manager | Built-in | External |
+| n8n | Workflow automation | Built-in | External |
+| Authentik | Identity provider | - | External |
+| Grafana | Monitoring dashboards | Authentik | External |
+| Caddy | Reverse proxy | - | Internal |
+
+## Databases
+
+| Service | Used by |
+|---------|---------|
+| PostgreSQL | Immich, Authentik, Paperless-ngx, Linkwarden, n8n, Grafana |
+| Valkey | Paperless-ngx |
+
+## Infrastructure
+
+| Service | Role |
+|---------|------|
+| cloudflared | Cloudflare Tunnel |
+| AdGuard Home | DNS (on OpenWrt) |
+| Tailscale | Admin SSH access |

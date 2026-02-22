@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Defaults
+uci set firewall.@defaults[0].custom_chains='1'
+uci set firewall.@defaults[0].drop_invalid='1'
+uci set firewall.@defaults[0].forward='REJECT'
+uci set firewall.@defaults[0].input='REJECT'
+uci set firewall.@defaults[0].output='ACCEPT'
+uci set firewall.@defaults[0].synflood_burst='50'
+uci set firewall.@defaults[0].synflood_protect='1'
+uci set firewall.@defaults[0].synflood_rate='25/s'
+uci set firewall.@defaults[0].tcp_ecn='1'
+uci set firewall.@defaults[0].tcp_syncookies='1'
+uci set firewall.@defaults[0].tcp_window_scaling='1'
+
+# WAN zone
+uci set firewall.wan=zone
+uci set firewall.wan.name='wan'
+uci set firewall.wan.forward='REJECT'
+uci set firewall.wan.input='REJECT'
+uci set firewall.wan.output='ACCEPT'
+uci set firewall.wan.masq='1'
+uci set firewall.wan.mtu_fix='1'
+uci delete firewall.wan.network 2>/dev/null
+uci add_list firewall.wan.network='ip4'
+uci add_list firewall.wan.network='wan'
+
+# LAN zone
+uci set firewall.lan=zone
+uci set firewall.lan.name='lan'
+uci set firewall.lan.forward='ACCEPT'
+uci set firewall.lan.input='ACCEPT'
+uci set firewall.lan.output='ACCEPT'
+uci set firewall.lan.network='lan'
+
+# LAN => WAN forwarding
+uci set firewall.lan_wan=forwarding
+uci set firewall.lan_wan.src='lan'
+uci set firewall.lan_wan.dest='wan'
+
+uci commit firewall

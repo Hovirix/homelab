@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# dnsmasq - DNS server disabled
+uci set dhcp.@dnsmasq[0].port='0'
+
+# LAN DHCP
+uci set dhcp.lan=dhcp
+uci set dhcp.lan.interface='lan'
+uci set dhcp.lan.dhcpv4='server'
+uci set dhcp.lan.dhcpv6='disabled'
+uci set dhcp.lan.leasetime='12h'
+uci set dhcp.lan.limit='150'
+uci set dhcp.lan.ndp='disabled'
+uci set dhcp.lan.ra='disabled'
+uci set dhcp.lan.start='100'
+# Advertise AdGuard Home as DNS
+uci delete dhcp.lan.dhcp_option 2>/dev/null
+uci add_list dhcp.lan.dhcp_option='6,192.168.1.1'
+
+# Static lease for fcos
+uci set dhcp.fcos=host
+uci set dhcp.fcos.name='fcos'
+uci set dhcp.fcos.ip='192.168.1.226'
+uci set dhcp.fcos.leasetime='infinite'
+uci delete dhcp.fcos.mac 2>/dev/null
+uci add_list dhcp.fcos.mac='E8:FF:1E:DA:E0:E7'
+
+uci commit dhcp

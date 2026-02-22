@@ -1,0 +1,79 @@
+---
+title: "Hardware"
+description: "Servers, devices, and physical equipment powering the homelab"
+---
+
+## Current Setup
+
+<Columns cols={2}>
+  <Card title="Primary Server" icon="server">
+    Beelink S12 Pro running Fedora CoreOS with all containers.
+  </Card>
+  <Card title="Network" icon="router">
+    GL.iNet Flint 2 router with OpenWrt + managed switch.
+  </Card>
+</Columns>
+
+## Servers
+
+### Beelink S12 Pro (Active)
+
+The main server running all homelab services.
+
+| Spec | Details |
+|------|---------|
+| CPU | Intel N100 (4 cores, 3.4GHz) |
+| RAM | 16GB DDR4 |
+| Storage | 500GB NVMe + 2TB SSD |
+| OS | Fedora CoreOS |
+| Role | Primary server (Podman containers) |
+
+<Tip>
+The N100 is power-efficient (~6W idle) and handles containerized workloads well. Perfect for a 24/7 homelab.
+</Tip>
+
+### Beelink EQR6 (Future)
+
+Reserved for future expansion, still in the box.
+
+| Spec | Details |
+|------|---------|
+| CPU | AMD Ryzen 5 6600H (6 cores) |
+| RAM | 24GB DDR5 |
+| Storage | 500GB NVMe |
+| OS | TBD |
+| Role | Planned for future use |
+
+## Network Equipment
+
+### GL.iNet Flint 2 (Router)
+
+| Spec | Details |
+|------|---------|
+| Firmware | OpenWrt |
+| Role | Main router, AdGuard Home |
+| Features | WiFi 6, VPN client/server capable |
+
+### TP-Link TL-SG105E (Switch)
+
+| Spec | Details |
+|------|---------|
+| Ports | 5x Gigabit |
+| Type | Managed (VLAN capable) |
+| Role | Connects server, router, other devices |
+
+<Info>
+The managed switch supports VLANs for future network segmentation.
+</Info>
+
+## Power & Environment
+
+<Note>
+WIP: UPS, power consumption, cooling, physical location.
+</Note>
+
+## Future Plans
+
+- Deploy the Beelink EQR6 for additional workloads
+- Add VLAN segmentation using the managed switch
+- Buy NAS for central backups

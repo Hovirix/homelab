@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Enable radio0
+uci set wireless.radio0.disabled='0'
+
+# Provisioning wifi interface
+uci set wireless.provisioning=wifi-iface
+uci set wireless.provisioning.device='radio0'
+uci set wireless.provisioning.mode='ap'
+uci set wireless.provisioning.network='lan'
+uci set wireless.provisioning.ssid='PROVISIONING'
+uci set wireless.provisioning.encryption='none'
+
+uci commit wireless

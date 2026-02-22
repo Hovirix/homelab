@@ -1,0 +1,11 @@
+{
+  "name": "homelab-docs",
+  "type": "module",
+  "private": false,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "dependencies": {
+    "mint": "^4.2.332"
+  }
+}

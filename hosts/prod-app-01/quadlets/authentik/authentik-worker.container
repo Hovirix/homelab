@@ -1,0 +1,31 @@
+[Unit]
+Description=Authentik Worker
+Requires=authentik-server.container
+After=authentik-server.container
+
+[Container]
+Image=ghcr.io/goauthentik/server@sha256:c2f132826e5b33629800cdd045a33ed9d80599538aaa49ad290397399539be9d
+Exec=worker
+
+Environment=AUTHENTIK_POSTGRESQL__HOST=postgres
+Environment=AUTHENTIK_POSTGRESQL__NAME=authentik
+Environment=AUTHENTIK_POSTGRESQL__USER=authentik
+
+Secret=AUTHENTIK_SECRET_KEY,type=env,target=AUTHENTIK_SECRET_KEY
+Secret=AUTHENTIK_POSTGRESQL__PASSWORD,type=env,target=AUTHENTIK_POSTGRESQL__PASSWORD
+
+Network=db.network
+Network=apps.network
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+HealthCmd=ak healthcheck
+HealthInterval=30s
+HealthTimeout=10s
+HealthRetries=3
+HealthStartPeriod=60s
+
+[Install]
+WantedBy=default.target

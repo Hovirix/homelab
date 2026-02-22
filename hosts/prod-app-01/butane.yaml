@@ -1,0 +1,46 @@
+variant: fcos
+version: 1.6.0
+
+boot_device:
+  luks:
+    tpm2: true
+    discard: true
+
+storage:
+  files:
+    - path: /etc/sysctl.d/99-custom.conf
+      mode: 0644
+      contents:
+        inline: |
+          # Allow unprivileged ports >= 80
+          net.ipv4.ip_unprivileged_port_start = 80
+
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB"
+
+kernel_arguments:
+  should_exist:
+    # Hardening
+    - debugfs=off
+    - hibernate=no
+    - init_on_alloc=1
+    - init_on_free=1
+    - lockdown=confidentiality
+    - module.sig_enforce=1
+    - oops=panic
+    - page_alloc.shuffle=1
+    - pti=on
+    - randomize_kstack_offset=on
+    - slab_nomerge
+    - vsyscall=none
+
+    # Panic handling
+    - panic=1
+    - boot.panic_on_fail
+
+    # Power saving
+    - intel_pstate=active
+    - rcutree.enable_rcu_lazy=1

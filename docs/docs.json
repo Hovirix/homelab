@@ -1,0 +1,64 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Hovirix Homelab Docs",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D"
+  },
+  "description": "Documentation for my homelab setup",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "anchors": [
+      {
+        "anchor": "Overview",
+        "icon": "house",
+        "groups": [
+          {
+            "group": "About",
+            "pages": [
+              "overview/about-me",
+              "overview/philosophy",
+              "overview/hardware"
+            ]
+          },
+          {
+            "group": "Start here",
+            "pages": [
+              "overview/overview",
+              "overview/architecture",
+              "overview/inventory",
+              "overview/backups",
+              "overview/runbooks"
+            ]
+          }
+        ]
+      },
+      {
+        "anchor": "Networking",
+        "icon": "network-wired",
+        "groups": [
+          {
+            "group": "Networking",
+            "pages": [
+              "networking/dns",
+              "networking/vlans",
+              "networking/reverse-proxy",
+              "networking/firewall",
+              "networking/cloudflare-tunnel",
+              "networking/tailscale"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {}
+  }
+}

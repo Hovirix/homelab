@@ -1,0 +1,28 @@
+[Unit]
+Description=Immich Server
+Requires=valkey.container postgres.container immich-machine-learning.container
+After=valkey.container postgres.container immich-machine-learning.container
+
+[Container]
+Image=ghcr.io/immich-app/immich-server@sha256:8b14246ee4c53e39191a54279f8c72f3eed3c026c5b23d0f7e4ab5e69e3aac4a
+
+Environment=DB_HOSTNAME=postgres
+Environment=DB_USERNAME=immich
+Environment=DB_DATABASE_NAME=immich
+Environment=DB_VECTOR_EXTENSION=pgvector
+Environment=REDIS_HOSTNAME=valkey
+
+Secret=IMMICH_POSTGRESQL__PASSWORD,type=env,target=DB_PASSWORD
+
+Network=db.network
+Network=apps.network
+NetworkAlias=immich-server
+
+Volume=immich-library.volume:/data
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+[Install]
+WantedBy=default.target

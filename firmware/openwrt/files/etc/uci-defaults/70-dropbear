@@ -1,0 +1,8 @@
+#!/bin/sh
+
+uci set dropbear.main=dropbear
+uci set dropbear.main.enable='1'
+uci set dropbear.main.PasswordAuth='off'
+uci set dropbear.main.RootPasswordAuth='off'
+
+uci commit dropbear
