@@ -1,5 +1,5 @@
 {
-  description = "Terraform dev shell";
+  description = "Homelab dev shell";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -13,10 +13,8 @@
     {
       devShells.${system}.default = pkgs.mkShell {
         packages = with pkgs; [
-          yq
-          age
           sops
-          just
+          butane
           opentofu
           tofu-ls
         ];
