@@ -2,7 +2,7 @@
 Description=Caddy reverse proxy
 
 [Container]
-Image=docker.io/caddybuilds/caddy-cloudflare@sha256:d81ee34d06745f8e34e647519820a7c2f8e0d6901641b6df40e85e1f376e5dec
+Image=docker.io/caddybuilds/caddy-cloudflare@sha256:34eb54922fce79cfa285b9177116f7a19295080878a2c7ea62f880c6d712991b
 
 Network=proxy.network
 Network=apps.network
