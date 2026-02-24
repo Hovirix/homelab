@@ -1,0 +1,139 @@
+variant: fcos
+version: 1.6.0
+
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB"
+
+storage:
+  filesystems:
+    - device: /dev/disk/by-id/scsi-prod-db-01-data
+      format: xfs
+      path: /var/lib/postgres-data
+      with_mount_unit: true
+
+  directories:
+    - path: /var/lib/postgres-data
+      mode: 0755
+      user:
+        name: core
+      group:
+        name: core
+
+  files:
+    - path: /etc/zincati/config.d/90-update-strategy.toml
+      mode: 0644
+      contents:
+        inline: |
+          [updates]
+          strategy = "periodic"
+
+          [updates.periodic]
+          time_zone = "UTC"
+
+          [[updates.periodic.window]]
+          days = ["Sat", "Sun"]
+          start_time = "23:30"
+          length_minutes = 60
+
+          [[updates.periodic.window]]
+          days = ["Wed"]
+          start_time = "01:00"
+          length_minutes = 30
+
+    - path: /var/home/core/.config/containers/systemd/valkey.container
+      mode: 0644
+      contents:
+        inline: |
+          [Container]
+          Image=docker.io/valkey/valkey@sha256:138afc759e46b92d99b9eae76e1bc1203bb5dcac8579473a30102f38fd2c12fb
+
+          Exec=valkey-server --supervised systemd --appendonly yes --maxmemory 400mb --maxmemory-policy allkeys-lru
+
+          Network=host
+
+          HealthCmd=valkey-cli ping || exit 1
+          HealthInterval=30s
+          HealthTimeout=5s
+          HealthRetries=3
+
+          [Service]
+          MemoryMax=512M
+          TasksMax=256
+          LimitNOFILE=65536
+          Restart=on-failure
+          RestartSec=5
+
+          [Install]
+          WantedBy=default.target
+
+    - path: /var/home/core/.config/containers/systemd/postgres.container
+      mode: 0644
+      contents:
+        inline: |
+          [Container]
+          Image=docker.io/pgvector/pgvector@sha256:137f044b0efe3d57f39b972b9b53641b1f2045b99d879e298bbf514a25787dcf
+
+          Environment=POSTGRES_PASSWORD=${postgres_password}
+          Environment=POSTGRES_IMMICH_PASSWORD=${postgres_immich_password}
+          Environment=POSTGRES_GRAFANA_PASSWORD=${postgres_grafana_password}
+          Environment=POSTGRES_PAPERLESS_PASSWORD=${postgres_paperless_password}
+          Environment=POSTGRES_AUTHENTIK_PASSWORD=${postgres_authentik_password}
+          Environment=POSTGRES_VAULTWARDEN_PASSWORD=${postgres_vaultwarden_password}
+
+          Network=host
+
+          Volume=./init:/docker-entrypoint-initdb.d:Z
+          Volume=/var/lib/postgres-data:/var/lib/postgresql/data:Z
+
+          HealthCmd=pg_isready -U postgres
+          HealthInterval=30s
+          HealthTimeout=5s
+          HealthRetries=5
+
+          [Service]
+          MemoryMax=3G
+          TasksMax=1024
+          LimitNOFILE=65536
+          Restart=on-failure
+          RestartSec=5
+
+          [Install]
+          WantedBy=default.target
+
+    - path: /var/home/core/.config/containers/systemd/init/01-init-databases.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/sh
+          set -eu
+
+          psql -v ON_ERROR_STOP=1 <<SQL
+          CREATE ROLE authentik LOGIN PASSWORD '$${POSTGRES_AUTHENTIK_PASSWORD}';
+          CREATE DATABASE authentik OWNER authentik;
+          REVOKE ALL ON DATABASE authentik FROM PUBLIC;
+
+          CREATE ROLE immich LOGIN PASSWORD '$${POSTGRES_IMMICH_PASSWORD}';
+          CREATE DATABASE immich OWNER immich;
+          REVOKE ALL ON DATABASE immich FROM PUBLIC;
+          \c immich
+          CREATE EXTENSION IF NOT EXISTS cube;
+          CREATE EXTENSION IF NOT EXISTS vector;
+          CREATE EXTENSION IF NOT EXISTS earthdistance;
+
+          CREATE ROLE paperless LOGIN PASSWORD '$${POSTGRES_PAPERLESS_PASSWORD}';
+          CREATE DATABASE paperless OWNER paperless;
+          REVOKE ALL ON DATABASE paperless FROM PUBLIC;
+
+          CREATE ROLE grafana LOGIN PASSWORD '$${POSTGRES_GRAFANA_PASSWORD}';
+          CREATE DATABASE grafana OWNER grafana;
+          REVOKE ALL ON DATABASE grafana FROM PUBLIC;
+
+          CREATE ROLE vaultwarden LOGIN PASSWORD '$${POSTGRES_VAULTWARDEN_PASSWORD}';
+          CREATE DATABASE vaultwarden OWNER vaultwarden;
+          REVOKE ALL ON DATABASE vaultwarden FROM PUBLIC;
+          SQL
+
+

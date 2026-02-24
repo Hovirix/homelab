@@ -1,0 +1,96 @@
+variant: fcos
+version: 1.6.0
+
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB
+
+storage:
+  files:
+    - path: /etc/zincati/config.d/90-update-strategy.toml
+      mode: 0644
+      contents:
+        inline: |
+          [updates]
+          strategy = "periodic"
+
+          [updates.periodic]
+          time_zone = "UTC"
+
+          [[updates.periodic.window]]
+          days = ["Sat", "Sun"]
+          start_time = "23:30"
+          length_minutes = 60
+
+          [[updates.periodic.window]]
+          days = ["Wed"]
+          start_time = "01:00"
+          length_minutes = 30
+
+    - path: /var/home/core/.config/containers/systemd/authentik-server.container
+      mode: 0644
+      contents:
+        inline: |
+          [Container]
+          Image=ghcr.io/goauthentik/server@sha256:c2f132826e5b33629800cdd045a33ed9d80599538aaa49ad290397399539be9d
+          Exec=server
+
+          Environment=AUTHENTIK_POSTGRESQL__NAME=authentik
+          Environment=AUTHENTIK_POSTGRESQL__USER=authentik
+          Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.lab.nemnix.site
+          Environment=AUTHENTIK_POSTGRESQL__PASSWORD=${postgres_authentik_password}
+          Environment=AUTHENTIK_SECRET_KEY=${authentik_secret_key}
+
+          Network=host
+
+          HealthCmd=curl -fsS http://127.0.0.1:9000/-/health/ready/ || exit 1
+          HealthInterval=30s
+          HealthTimeout=5s
+          HealthRetries=3
+
+          [Service]
+          MemoryMax=1G
+          TasksMax=1024
+          LimitNOFILE=65536
+          Restart=on-failure
+          RestartSec=5
+
+          [Install]
+          WantedBy=default.target
+
+    - path: /var/home/core/.config/containers/systemd/authentik-worker.container
+      mode: 0644
+      contents:
+        inline: |
+          [Container]
+          Image=ghcr.io/goauthentik/server@sha256:c2f132826e5b33629800cdd045a33ed9d80599538aaa49ad290397399539be9d
+          Exec=worker
+
+          Environment=AUTHENTIK_POSTGRESQL__NAME=authentik
+          Environment=AUTHENTIK_POSTGRESQL__USER=authentik
+          Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.lab.nemnix.site
+          Environment=AUTHENTIK_POSTGRESQL__PASSWORD=${postgres_authentik_password}
+          Environment=AUTHENTIK_SECRET_KEY=${authentik_secret_key}
+
+          Environment=AUTHENTIK_BOOTSTRAP_PASSWORD=${authentik_bootstrap_password}
+          Environment=AUTHENTIK_BOOTSTRAP_TOKEN=${authentik_bootstrap_token}
+          Environment=AUTHENTIK_BOOTSTRAP_EMAIL=${authentik_bootstrap_email}
+
+          Network=host
+
+          HealthCmd=ak healthcheck || exit 1
+          HealthInterval=30s
+          HealthTimeout=5s
+          HealthRetries=3
+
+          [Service]
+          MemoryMax=1G
+          TasksMax=1024
+          LimitNOFILE=65536
+          Restart=on-failure
+          RestartSec=5
+
+          [Install]
+          WantedBy=default.target
