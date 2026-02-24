@@ -4,7 +4,7 @@ Requires=postgres.container
 After=postgres.container
 
 [Container]
-Image=docker.n8n.io/n8nio/n8n@sha256:53004142b0e93de1e9e31943e601ed9bd4b24ca82a307864ccadf1820b627e5e
+Image=docker.n8n.io/n8nio/n8n@sha256:52bc65540cbfb6f8b5320bafaf28bcc018ae08124bb0a7cbf5ca7f044b54d698
 
 Environment=GENERIC_TIMEZONE=UTC
 Environment=TZ=UTC
