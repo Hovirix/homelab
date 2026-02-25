@@ -20,4 +20,17 @@ locals {
       postgres_authentik_password  = data.sops_file.postgres.data["postgres.authentik_password"]
     }
   )
+  butane_prod_app_01 = templatefile(
+    "${path.module}/../../hosts/prod-app-01.tftpl",
+    {
+      postgres_immich_password    = data.sops_file.postgres.data["postgres.immich_password"]
+      postgres_paperless_password = data.sops_file.postgres.data["postgres.paperless_password"]
+      postgres_vaultwarden_password = data.sops_file.postgres.data["postgres.vaultwarden_password"]
+      paperless_secret_key        = data.sops_file.paperless.data["paperless_secret_key"]
+      paperless_client_id         = data.sops_file.oauth_clients.data["oauth.paperless.client_id"]
+      paperless_client_secret     = data.sops_file.oauth_clients.data["oauth.paperless.client_secret"]
+      installation_id             = data.sops_file.vaultwarden.data["installation_id"]
+      installation_key            = data.sops_file.vaultwarden.data["installation_key"]
+    }
+  )
 }
