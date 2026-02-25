@@ -1,0 +1,30 @@
+<svg viewBox="0 0 34000000 9000000" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Rack Frame -->
+  <rect x="2000000" y="1500000" width="6000000" height="6000000" rx="600000"
+        fill="none" stroke="#fe640b" stroke-width="400000"/>
+
+  <!-- Rack Rails -->
+  <line x1="3000000" y1="2000000" x2="3000000" y2="7000000"
+        stroke="#fe640b" stroke-width="300000"/>
+  <line x1="7000000" y1="2000000" x2="7000000" y2="7000000"
+        stroke="#fe640b" stroke-width="300000"/>
+
+  <!-- Rack Units -->
+  <rect x="3400000" y="2500000" width="3200000" height="800000" rx="200000"
+        fill="#fe640b"/>
+  <rect x="3400000" y="3800000" width="3200000" height="800000" rx="200000"
+        fill="#fe640b"/>
+  <rect x="3400000" y="5100000" width="3200000" height="800000" rx="200000"
+        fill="#fe640b"/>
+
+  <!-- Text -->
+  <text x="10500000" y="5500000"
+        font-family="Inter, ui-sans-serif, system-ui, -apple-system, sans-serif"
+        font-size="3000000"
+        font-weight="600"
+        fill="#111111">
+    HX Lab
+  </text>
+
+</svg>
