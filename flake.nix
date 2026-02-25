@@ -11,13 +11,21 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
-        packages = with pkgs; [
-          sops
-          butane
-          opentofu
-          tofu-ls
-        ];
+      devShells.${system} = {
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            sops
+            butane
+            opentofu
+            tofu-ls
+          ];
+        };
+
+        docs = pkgs.mkShell {
+          packages = with pkgs; [
+            nodejs
+          ];
+        };
       };
     };
 }
