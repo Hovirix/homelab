@@ -101,7 +101,7 @@ storage:
 
           Network=host
 
-          Environment=DOMAIN=https://vault.home.hovirix.com
+          Environment=DOMAIN=https://vaultwarden.home.hovirix.dev
           Environment=SIGNUPS_ALLOWED=false
           Environment=LOG_LEVEL=warn
           Environment=ROCKET_WORKERS=10
@@ -110,7 +110,7 @@ storage:
           Environment=PUSH_INSTALLATION_KEY=${installation_key}
           Environment=PUSH_RELAY_URI=https://api.bitwarden.eu
           Environment=PUSH_IDENTITY_URI=https://identity.bitwarden.eu
-          Environment=DATABASE_URL=postgresql://vaultwarden:${postgres_vaultwarden_password}@postgres.home.hovirix.com/vaultwarden
+          Environment=DATABASE_URL=postgresql://vaultwarden:${postgres_vaultwarden_password}@postgres.home.hovirix.dev/vaultwarden
 
           Volume=/var/lib/app-data/vaultwarden:/data:Z
 
@@ -162,8 +162,8 @@ storage:
           Environment=DB_DATABASE_NAME=immich
           Environment=DB_PASSWORD=${postgres_immich_password}
           Environment=DB_VECTOR_EXTENSION=pgvector
-          Environment=DB_HOSTNAME=postgres.home.hovirix.com
-          Environment=REDIS_HOSTNAME=valkey.home.hovirix.com
+          Environment=DB_HOSTNAME=postgres.home.hovirix.dev
+          Environment=REDIS_HOSTNAME=valkey.home.hovirix.dev
 
           Volume=/var/lib/app-data/immich:/usr/src/app/upload:Z
 
@@ -186,22 +186,22 @@ storage:
 
           Network=host
 
-          Environment=PAPERLESS_REDIS=redis://valkey.home.hovirix.com:6379
-          Environment=PAPERLESS_DBHOST=postgres.home.hovirix.com
+          Environment=PAPERLESS_REDIS=redis://valkey.home.hovirix.dev:6379
+          Environment=PAPERLESS_DBHOST=postgres.home.hovirix.dev
           Environment=PAPERLESS_DBNAME=paperless
           Environment=PAPERLESS_DBUSER=paperless
           Environment=PAPERLESS_DBPASS=${postgres_paperless_password}
           Environment=PAPERLESS_SECRET_KEY=${paperless_secret_key}
-          Environment=PAPERLESS_URL=https://paperless.home.hovirix.com
+          Environment=PAPERLESS_URL=https://paperless.home.hovirix.dev
 
           Environment=PAPERLESS_APPS=allauth.socialaccount.providers.openid_connect
           Environment=PAPERLESS_SOCIAL_AUTO_SIGNUP=true
           Environment=PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS=true
           Environment=PAPERLESS_DISABLE_REGULAR_LOGIN=true
           Environment=PAPERLESS_REDIRECT_LOGIN_TO_SSO=true
-          Environment=PAPERLESS_LOGOUT_REDIRECT_URL=https://authentik.home.hovirix.site/application/o/paperless/end-session/
+          Environment=PAPERLESS_LOGOUT_REDIRECT_URL=https://authentik.home.hovirix.dev/application/o/paperless/end-session/
 
-          Environment=PAPERLESS_SOCIALACCOUNT_PROVIDERS={"openid_connect":{"OAUTH_PKCE_ENABLED":true,"APPS":[{"provider_id":"authentik","name":"authentik","client_id":"${paperless_client_id}","secret":"${paperless_client_secret}","settings":{"server_url":"https://authentik.home.hovirix.site/application/o/<application_slug>/.well-known/openid-configuration","fetch_userinfo":true}}],"SCOPE":["openid","profile","email"]}}
+          Environment=PAPERLESS_SOCIALACCOUNT_PROVIDERS={"openid_connect":{"OAUTH_PKCE_ENABLED":true,"APPS":[{"provider_id":"authentik","name":"authentik","client_id":"${paperless_client_id}","secret":"${paperless_client_secret}","settings":{"server_url":"https://authentik.home.hovirix.dev/application/o/<application_slug>/.well-known/openid-configuration","fetch_userinfo":true}}],"SCOPE":["openid","profile","email"]}}
 
           Volume=/var/lib/app-data/paperless/data:/usr/src/paperless/data:Z
           Volume=/var/lib/app-data/paperless/media:/usr/src/paperless/media:Z

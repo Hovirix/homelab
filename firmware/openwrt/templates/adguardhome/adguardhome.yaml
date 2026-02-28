@@ -38,10 +38,7 @@ filtering:
   blocking_mode: refused
 
   rewrites:
-    - domain: '*.nemnix.site'
-      answer: 192.168.1.20
-      enabled: true
-    - domain: '*.hovirix.site'
+    - domain: 'home.hovirix.dev'
       answer: 192.168.1.20
       enabled: true
   rewrites_enabled: true

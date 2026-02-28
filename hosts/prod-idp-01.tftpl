@@ -39,11 +39,7 @@ storage:
 
           Environment=AUTHENTIK_POSTGRESQL__NAME=authentik
           Environment=AUTHENTIK_POSTGRESQL__USER=authentik
-          Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.lab.nemnix.site
-          Environment=AUTHENTIK_POSTGRESQL__PASSWORD=${postgres_authentik_password}
-          Environment=AUTHENTIK_SECRET_KEY=${authentik_secret_key}
-
-          Network=host
+          Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.home.hovirix.dev
 
           HealthCmd=curl -fsS http://127.0.0.1:9000/-/health/ready/ || exit 1
           HealthInterval=30s
@@ -70,7 +66,7 @@ storage:
 
           Environment=AUTHENTIK_POSTGRESQL__NAME=authentik
           Environment=AUTHENTIK_POSTGRESQL__USER=authentik
-          Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.lab.nemnix.site
+          Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.home.hovirix.dev
           Environment=AUTHENTIK_POSTGRESQL__PASSWORD=${postgres_authentik_password}
           Environment=AUTHENTIK_SECRET_KEY=${authentik_secret_key}
 
