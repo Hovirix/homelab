@@ -26,6 +26,18 @@
             nodejs
           ];
         };
+
+        openwrt = pkgs.mkShell {
+          packages = with pkgs; [
+            just
+            wget
+            gnumake
+            gzip
+            unzip
+            python3
+            python3Packages.distutils
+          ];
+        };
       };
     };
 }
