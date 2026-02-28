@@ -8,7 +8,7 @@ resource "authentik_provider_oauth2" "grafana" {
 
   allowed_redirect_uris = [{
     matching_mode = "strict",
-    url           = "https://grafana.nemnix.site/login/generic_oauth",
+    url           = "https://grafana.home.hovirix.dev/login/generic_oauth",
   }]
 }
 

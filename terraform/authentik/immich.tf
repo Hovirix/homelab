@@ -13,11 +13,11 @@ resource "authentik_provider_oauth2" "immich" {
     },
     {
       matching_mode = "strict"
-      url           = "https://immich.nemnix.site/auth/login"
+      url           = "https://immich.home.hovirix.dev/auth/login"
     },
     {
       matching_mode = "strict"
-      url           = "https://immich.nemnix.site/user-settings"
+      url           = "https://immich.home.hovirix.dev/user-settings"
     }
   ]
 }

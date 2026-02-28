@@ -8,7 +8,7 @@ resource "authentik_provider_oauth2" "paperless" {
 
   allowed_redirect_uris = [{
     matching_mode = "strict"
-    url           = "https://paperless.nemnix.site/accounts/oidc/authentik/login/callback/"
+    url           = "https://paperless.home.hovirix.dev/accounts/oidc/authentik/login/callback/"
   }]
 }
 
