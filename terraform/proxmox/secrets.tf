@@ -1,3 +1,7 @@
+data "sops_file" "caddy" {
+  source_file = "${path.module}/../../secrets/prod-proxy-01/caddy.yaml"
+}
+
 data "sops_file" "postgres" {
   source_file = "${path.module}/../../secrets/prod-db-01/postgres.yaml"
 }
@@ -16,5 +20,9 @@ data "sops_file" "vaultwarden" {
 
 data "sops_file" "oauth_clients" {
   source_file = "${path.module}/../../secrets/prod-idp-01/oauth-clients.yaml"
+}
+
+data "sops_file" "proxmox" {
+  source_file = "${path.module}/../../secrets/terraform/proxmox.yaml"
 }
 
