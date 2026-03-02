@@ -1,0 +1,38 @@
+---
+title: "IP Addressing Plan"
+description: "CIDR allocation, gateway assignment, and structured address management aligned with RFC standards."
+---
+
+The HX Lab network uses private IPv4 address space defined by [**RFC 1918**](https://datatracker.ietf.org/doc/html/rfc1918) for internal addressing.\
+Subnet prefixes are expressed in CIDR notation in accordance with **CIDR specifications** (e.g., [RFC 4632](https://datatracker.ietf.org/doc/html/rfc4632)).
+
+## CIDR Allocation
+
+Each VLAN is assigned a dedicated CIDR block to establish distinct broadcast domains and avoid overlap.\
+All default gateways are implemented as Layer 3 interfaces on the centralized routing point (OpenWRT).
+
+| VLAN    | Purpose           | CIDR           | Default Gateway |
+| ------- | ----------------- | -------------- | --------------- |
+| VLAN 10 | Management Plane  | `10.10.0.0/24` | `10.10.0.1`     |
+| VLAN 20 | Application Plane | `10.20.0.0/24` | `10.20.0.1`     |
+| VLAN 30 | Client Plane      | `10.30.0.0/24` | `10.30.0.1`     |
+
+## Address Block Structure
+
+Within each `/24` allocation block, address assignments follow a consistent structure:
+
+| Block       | Allocation Purpose        |
+| ----------- | ------------------------- |
+| `.1`        | Default gateway interface |
+| `.10–.49`   | Infrastructure services   |
+| `.50–.199`  | Workload hosts            |
+| `.200–.254` | Reserved for expansion    |
+
+## Assignment Policy
+
+Addressing choices follow a controlled model:
+
+- **Management and Server VLANs:** Static addressing or DHCP reservations only.
+- **Client VLAN:** Dynamic allocation via DHCP.
+- DHCP reservations should be tied to device MAC addresses to ensure consistency.
+- Unmanaged dynamic addressing is not permitted in infrastructure segments.

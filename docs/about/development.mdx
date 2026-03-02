@@ -1,0 +1,37 @@
+---
+title: "Development"
+icon: "laptop-code"
+---
+
+HX Lab is maintained as a single monorepository structured around three primary domains: documentation, infrastructure, and network image configuration.
+
+## Domain Separation
+
+<Steps>
+  <Step title="Documentation">
+    Maintained on the [docs branch](https://github.com/Hovirix/homelab/tree/docs).\
+    Contains the Mintlify site covering architecture, operations, governance, and reference material.
+  </Step>
+  <Step title="Infrastructure">
+    Maintained on the [infra branch](https://github.com/Hovirix/homelab/tree/infra).\
+    Defines Terraform provisioning, CoreOS host templates, and encrypted secret management.
+  </Step>
+  <Step title="Network Image Build">
+    Maintained on the [openwrt branch.](https://github.com/Hovirix/homelab/tree/openwrt)\
+    Contains OpenWRT image configuration used to produce reproducible, sysupgrade-ready router builds.
+  </Step>
+</Steps>
+
+<Note>
+  Each domain has a distinct responsibility but remains part of the same repository to maintain a unified platform lifecycle.
+</Note>
+
+## Tooling
+
+The development environment is standardized using [Nix](https://nix.dev/):
+
+- `flake.nix` defines the reproducible development shell
+- `flake.lock` pins toolchain versions
+- Ensures consistent Terraform, SOPS, Butane, and supporting tools
+
+This eliminates local environment drift and ensures deterministic builds.
