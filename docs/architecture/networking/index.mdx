@@ -1,0 +1,76 @@
+---
+title: "Networking Architecture"
+sidebarTitle: "Overview"
+description: "Segmented network architecture with centralized routing, policy enforcement, and controlled ingress."
+---
+
+---
+
+## Architecture Model
+
+The network architecture is structured around three core layers:
+
+- **Physical Topology** — Connectivity and switching fabric
+- **Logical Segmentation** — VLAN-based trust boundaries
+- **Policy Enforcement** — Centralized routing, firewalling, and VPN control
+
+Each layer is documented independently to maintain separation of concerns and architectural clarity.
+
+---
+
+## Control Model
+
+All [Layer 3](https://osi-model.com/network-layer/) routing, firewall policy enforcement, and VPN termination are handled exclusively by the OpenWRT gateway.
+
+All [Layer 2](https://osi-model.com/data-link-layer/) connectivity is provided by a managed switch acting as the central switching fabric.
+
+No internal system performs independent routing or bypasses the primary control plane.
+
+---
+
+## Design Objectives
+
+The architecture separates physical topology from logical segmentation in order to:
+
+- Enforce isolation between trust zones
+- Eliminate implicit east-west trust
+- Reduce public exposure
+- Centralize policy enforcement
+- Enable comprehensive monitoring
+
+---
+
+## Explore the Network Design
+
+<Columns cols={2}>
+  <Column>
+    <Card icon="chart-network" href="/architecture/networking/topology" title="Physical Topology">
+      Physical layout of the network including gateway, switching fabric, and infrastructure nodes.
+    </Card>
+  </Column>
+  <Column>
+    <Card icon="diagram-sankey" href="/architecture/networking/vlans" title="VLAN Segmentation">
+      Trust zones, subnet allocation, and logical separation of Management, Server, and Client networks.
+    </Card>
+  </Column>
+  <Column>
+    <Card icon="route" href="/architecture/networking/routing" title="Routing Model">
+      Inter-VLAN routing behavior and centralized gateway responsibilities.
+    </Card>
+  </Column>
+  <Column>
+    <Card icon="shield" href="/architecture/networking/firewall-policy" title="Firewall Policy">
+      Zone-based access control model and allowed traffic flows.
+    </Card>
+  </Column>
+  <Column>
+    <Card icon="chart-tree-map" href="/architecture/networking/ip-addressing" title="IP Addressing Plan">
+      Subnet structure and address allocation standards.
+    </Card>
+  </Column>
+  <Column>
+    <Card icon="tv" href="/architecture/networking/monitoring-design" title="Monitoring Design">
+      Network telemetry integration and Security Onion visibility model.
+    </Card>
+  </Column>
+</Columns>

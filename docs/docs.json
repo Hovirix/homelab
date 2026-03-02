@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "aspen",
-  "name": "Hovirix Homelab",
+  "name": "HX Lab",
   "description": "Official documentation for the Hovirix Homelab infrastructure, services, automation, and deployment guides.",
 
   "colors": {
@@ -12,7 +12,7 @@
 
   "logo": {
     "light": "/light.svg",
-    "dark": "/dark.svg"
+    "dark": "/light.svg"
   },
 
   "favicon": {
@@ -26,176 +26,176 @@
   },
 
   "navigation": {
-        "groups": [
+    "groups": [
+      {
+        "group": "About",
+        "pages": [
+          "about/welcome",
+          "about/quickstart",
+          "about/development"
+        ]
+      },
+      {
+        "group": "Architecture",
+        "pages": [
+          "architecture/system-overview",
           {
-            "group": "About",
+            "group": "Networking",
+            "icon": "network-wired",
             "pages": [
-              "about/welcome",
-              "about/quickstart",
-              "about/development"
+              "architecture/networking/topology",
+              "architecture/networking/vlans",
+              "architecture/networking/ip-addressing",
+              "architecture/networking/routing",
+              "architecture/networking/firewall-policy",
+              "architecture/networking/monitoring-design"
             ]
           },
           {
-            "group": "Architecture",
+            "group": "Compute",
+            "icon": "server",
             "pages": [
-              "architecture/system-overview",
-              {
-                "group": "Networking",
-                "icon": "network-wired",
-                "pages": [
-                  "architecture/networking/topology",
-                  "architecture/networking/vlans",
-                  "architecture/networking/ip-addressing",
-                  "architecture/networking/routing",
-                  "architecture/networking/firewall-policy",
-                  "architecture/networking/monitoring-design"
-                ]
-              },
-              {
-                "group": "Compute",
-                "icon": "server",
-                "pages": [
-                  "architecture/compute/hypervisors",
-                  "architecture/compute/cluster-design",
-                  "architecture/compute/workload-placement"
-                ]
-              },
-              {
-                "group": "Storage",
-                "icon": "database",
-                "pages": [
-                  "architecture/storage/storage-architecture",
-                  "architecture/storage/backup-architecture",
-                  "architecture/storage/retention-policy"
-                ]
-              },
-              {
-                "group": "Identity & Access",
-                "icon": "id-card",
-                "pages": [
-                  "architecture/iam/identity-architecture",
-                  "architecture/iam/authentication-flows",
-                  "architecture/iam/authorization-model"
-                ]
-              },
-              {
-                "group": "Security",
-                "icon": "shield",
-                "pages": [
-                  "architecture/security/network-segmentation",
-                  "architecture/security/threat-model",
-                  "architecture/security/hardening-standards",
-                  "architecture/security/zero-trust-design"
-                ]
-              },
-              {
-                "group": "Observability",
-                "icon": "chart-bar",
-                "pages": [
-                  "architecture/observability/logging-architecture",
-                  "architecture/observability/metrics-architecture",
-                  "architecture/observability/alerting-design",
-                  "architecture/observability/siem-architecture"
-                ]
-              }
+              "architecture/compute/hypervisors",
+              "architecture/compute/cluster-design",
+              "architecture/compute/workload-placement"
             ]
           },
           {
-            "group": "Platform",
+            "group": "Storage",
+            "icon": "database",
             "pages": [
-              {
-                "group": "Provisioning",
-                "icon": "rocket",
-                "pages": [
-                  "platform/provisioning/terraform-standards",
-                  "platform/provisioning/proxmox-provisioning",
-                  "platform/provisioning/fedora-coreos-deployment"
-                ]
-              },
-              {
-                "group": "Automation",
-                "icon": "gear",
-                "pages": [
-                  "platform/automation/configuration-management",
-                  "platform/automation/ci-cd-pipelines",
-                  "platform/automation/secret-management"
-                ]
-              },
-              {
-                "group": "Workloads",
-                "icon": "box",
-                "pages": [
-                  "platform/workloads/service-catalog",
-                  "platform/workloads/deployment-patterns",
-                  "platform/workloads/dependency-mapping"
-                ]
-              }
+              "architecture/storage/storage-architecture",
+              "architecture/storage/backup-architecture",
+              "architecture/storage/retention-policy"
             ]
           },
           {
-            "group": "Operations",
+            "group": "Identity & Access",
+            "icon": "id-card",
             "pages": [
-              {
-                "group": "Runbooks",
-                "icon": "book",
-                "pages": [
-                  "operations/runbooks/incident-response",
-                  "operations/runbooks/restore-from-backup",
-                  "operations/runbooks/certificate-rotation",
-                  "operations/runbooks/node-replacement",
-                  "operations/runbooks/service-outage-handling"
-                ]
-              },
-              {
-                "group": "Maintenance",
-                "icon": "wrench",
-                "pages": [
-                  "operations/maintenance/patch-management",
-                  "operations/maintenance/upgrade-procedures",
-                  "operations/maintenance/health-checks"
-                ]
-              },
-              {
-                "group": "Backup & DR",
-                "icon": "cloud",
-                "pages": [
-                  "operations/backup-dr/disaster-recovery-plan",
-                  "operations/backup-dr/restore-testing",
-                  "operations/backup-dr/rto-rpo-definitions"
-                ]
-              }
+              "architecture/iam/identity-architecture",
+              "architecture/iam/authentication-flows",
+              "architecture/iam/authorization-model"
             ]
           },
           {
-            "group": "Governance",
+            "group": "Security",
+            "icon": "shield",
             "pages": [
-              "governance/change-management",
-              "governance/access-control-policy",
-              "governance/naming-conventions",
-              "governance/documentation-standards",
-              "governance/risk-management"
+              "architecture/security/network-segmentation",
+              "architecture/security/threat-model",
+              "architecture/security/hardening-standards",
+              "architecture/security/zero-trust-design"
             ]
           },
           {
-            "group": "Strategy",
+            "group": "Observability",
+            "icon": "chart-bar",
             "pages": [
-              "strategy/roadmap",
-              "strategy/technical-debt",
-              "strategy/future-architecture"
-            ]
-          },
-          {
-            "group": "Reference",
-            "pages": [
-              "reference/ip-ranges",
-              "reference/vlan-ids",
-              "reference/port-allocations",
-              "reference/dns-records",
-              "reference/hardware-inventory",
-              "reference/external-dependencies"
+              "architecture/observability/logging-architecture",
+              "architecture/observability/metrics-architecture",
+              "architecture/observability/alerting-design",
+              "architecture/observability/siem-architecture"
             ]
           }
         ]
+      },
+      {
+        "group": "Platform",
+        "pages": [
+          {
+            "group": "Provisioning",
+            "icon": "rocket",
+            "pages": [
+              "platform/provisioning/terraform-standards",
+              "platform/provisioning/proxmox-provisioning",
+              "platform/provisioning/fedora-coreos-deployment"
+            ]
+          },
+          {
+            "group": "Automation",
+            "icon": "gear",
+            "pages": [
+              "platform/automation/configuration-management",
+              "platform/automation/ci-cd-pipelines",
+              "platform/automation/secret-management"
+            ]
+          },
+          {
+            "group": "Workloads",
+            "icon": "box",
+            "pages": [
+              "platform/workloads/service-catalog",
+              "platform/workloads/deployment-patterns",
+              "platform/workloads/dependency-mapping"
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Operations",
+        "pages": [
+          {
+            "group": "Runbooks",
+            "icon": "book",
+            "pages": [
+              "operations/runbooks/incident-response",
+              "operations/runbooks/restore-from-backup",
+              "operations/runbooks/certificate-rotation",
+              "operations/runbooks/node-replacement",
+              "operations/runbooks/service-outage-handling"
+            ]
+          },
+          {
+            "group": "Maintenance",
+            "icon": "wrench",
+            "pages": [
+              "operations/maintenance/patch-management",
+              "operations/maintenance/upgrade-procedures",
+              "operations/maintenance/health-checks"
+            ]
+          },
+          {
+            "group": "Backup & DR",
+            "icon": "cloud",
+            "pages": [
+              "operations/backup-dr/disaster-recovery-plan",
+              "operations/backup-dr/restore-testing",
+              "operations/backup-dr/rto-rpo-definitions"
+            ]
+          }
+        ]
+      },
+      {
+        "group": "Governance",
+        "pages": [
+          "governance/change-management",
+          "governance/access-control-policy",
+          "governance/naming-conventions",
+          "governance/documentation-standards",
+          "governance/risk-management"
+        ]
+      },
+      {
+        "group": "Strategy",
+        "pages": [
+          "strategy/roadmap",
+          "strategy/technical-debt",
+          "strategy/future-architecture"
+        ]
+      },
+      {
+        "group": "Reference",
+        "pages": [
+          "reference/ip-ranges",
+          "reference/vlan-ids",
+          "reference/port-allocations",
+          "reference/dns-records",
+          "reference/hardware-inventory",
+          "reference/external-dependencies"
+        ]
+      }
+    ]
   },
 
   "navbar": {
@@ -210,5 +210,8 @@
       "github": "https://github.com/Hovirix",
       "website": "https://hovirix.dev"
     }
+  },
+  "interaction": {
+    "drilldown": false
   }
 }

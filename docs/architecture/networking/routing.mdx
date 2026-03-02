@@ -1,0 +1,68 @@
+---
+title: "Routing Model"
+description: "Layer 3 routing behavior, inter-VLAN routing model, and enforced forwarding policies."
+icon: "network-wired"
+---
+
+<Info>
+  This page explains how IPv4 routing works in the HX Lab network, how VLANs are routed centrally through the OpenWRT gateway, and how inter-VLAN forwarding policies are enforced.
+
+  Refer to the [VLAN](/architecture/networking/vlans) page for the topology diagram.
+</Info>
+
+## Standards and References
+
+Routing of IPv4 packets is conforms to these Internet standards:
+
+- [**RFC 791**](https://datatracker.ietf.org/doc/rfc791): Internet Protocol
+- [**RFC 1812**](https://datatracker.ietf.org/doc/rfc1812/): Requirements for IPv4 Routers
+- [**RFC 4632**](https://datatracker.ietf.org/doc/rfc4632/): CIDR notation for subnet prefixes
+
+## Centralized Routing
+
+<Note>
+  Routing between VLANs is centralized at the OpenWRT gateway; hosts and switches do not perform autonomous routing.
+</Note>
+
+Each VLAN is a separate IPv4 broadcast domain with a distinct CIDR block. The VLAN interfaces on OpenWRT are implemented as **802.1Q subinterfaces** on a trunk link to the core switch.
+
+## Inter-VLAN Routing
+
+Traffic between VLANs must traverse the centralized router on OpenWRT.
+
+Switches operate at Layer 2 and do not forward traffic between VLANs without a Layer 3 router.
+
+### How routing works
+
+- A host sends a packet to its **default gateway** when the destination is outside its subnet.
+- The router checks the destination address using **longest-prefix match** and forwards the packet to the correct VLAN interface.
+
+<Tip>
+  Example: A host in **VLAN 10 (10.10.0.0/24)** sends traffic to **10.20.0.15**. The packet goes to the default gateway, which matches **10.20.0.0/24** and forwards it to VLAN 20.
+</Tip>
+
+The VLAN segmentation and logical network layout are illustrated on the [VLANs](/architecture/networking/vlans) page.
+
+## Static Routing
+
+<Warning>
+  No dynamic routing protocols (e.g., OSPF, BGP, RIP) are used in this environment.
+</Warning>
+
+Routes on the OpenWRT gateway are statically configured, which provides predictability and control.
+
+In this model:
+
+- Each VLAN’s subnet is directly connected to an OpenWRT interface.
+- A default route (`0.0.0.0/0`) points to the WAN interface for internet egress.
+- Static routes do not change unless manually updated.
+
+## Enforcement and Policy
+
+Inter-VLAN forwarding and access control are enforced at the centralized routing point.
+
+Firewalls and ACLs determine what cross-segment traffic is permitted.
+
+<Note>
+  All traffic between VLAN segments must pass through the policy enforcement point on the OpenWRT router.
+</Note>
