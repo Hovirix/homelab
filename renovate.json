@@ -7,8 +7,8 @@
     {
       "customType": "regex",
       "description": "Update container images in Terraform template files",
-      "fileMatch": [
-        "\\.tftpl$"
+      "managerFilePatterns": [
+        "/\\.tftpl$/"
       ],
       "matchStrings": [
         "Image=(?<depName>[\\w./-]+):(?<currentValue>[\\w.-]+)@sha256:(?<currentDigest>[a-f0-9]{64})"
@@ -19,8 +19,12 @@
   ],
   "packageRules": [
     {
-      "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["digest"]
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchUpdateTypes": [
+        "digest"
+      ]
     }
   ]
 }
