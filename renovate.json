@@ -2,5 +2,25 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update container images in Terraform template files",
+      "fileMatch": [
+        "\\.tftpl$"
+      ],
+      "matchStrings": [
+        "Image=(?<depName>[\\w./-]+):(?<currentValue>[\\w.-]+)@sha256:(?<currentDigest>[a-f0-9]{64})"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"]
+    }
   ]
 }
