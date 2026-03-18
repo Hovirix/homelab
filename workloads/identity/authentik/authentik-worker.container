@@ -1,5 +1,5 @@
 [Container]
-Image=ghcr.io/goauthentik/server@sha256:c2f132826e5b33629800cdd045a33ed9d80599538aaa49ad290397399539be9d
+Image=ghcr.io/goauthentik/server@sha256:9acdd30afe91a0015e31d7fdfe118880197b4bc16be1d8645a809ac5d0d22fc1
 Exec=worker
 
 EnvironmentFile=./authentik.env
