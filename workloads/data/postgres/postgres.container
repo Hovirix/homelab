@@ -1,0 +1,24 @@
+[Container]
+Image=docker.io/pgvector/pgvector@sha256:137f044b0efe3d57f39b972b9b53641b1f2045b99d879e298bbf514a25787dcf
+
+EnvironmentFile=./postgres.env
+
+Network=host
+
+Volume=./init:/docker-entrypoint-initdb.d:Z
+Volume=/var/lib/postgres-data:/var/lib/postgresql/data:Z
+
+HealthCmd=pg_isready -U postgres
+HealthInterval=30s
+HealthTimeout=5s
+HealthRetries=5
+
+[Service]
+MemoryMax=3G
+TasksMax=1024
+LimitNOFILE=65536
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,49 @@
+{
+    admin off
+    email hovirix@tutanota.com
+    acme_dns cloudflare {env.CLOUDFLARE_API_TOKEN}
+}
+
+(security_headers) {
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    }
+}
+
+authentik.home.hovirix.dev {
+    encode zstd gzip
+    import security_headers
+    reverse_proxy http://authentik.home.hovirix.dev:9000
+}
+
+vaultwarden.home.hovirix.dev {
+    encode zstd gzip
+    import security_headers
+    reverse_proxy http://vaultwarden.home.hovirix.dev:8000
+}
+
+immich.home.hovirix.dev {
+    encode zstd gzip
+    import security_headers
+    reverse_proxy http://immich.home.hovirix.dev:2283
+}
+
+grafana.home.hovirix.dev {
+    encode zstd gzip
+    import security_headers
+    reverse_proxy http://grafana.home.hovirix.dev:3000
+}
+
+paperless.home.hovirix.dev {
+    encode zstd gzip
+    import security_headers
+
+    handle_path /admin* {
+        respond 403
+    }
+
+    reverse_proxy http://paperless.home.hovirix.dev:8000
+}
