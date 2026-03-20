@@ -1,0 +1,64 @@
+variant: fcos
+version: 1.6.0
+
+passwd:
+  users:
+    - name: core
+      ssh_authorized_keys:
+        - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB"
+
+storage:
+  filesystems:
+    - device: /dev/disk/by-id/scsi-prod-db-01-data
+      format: xfs
+      path: /var/lib/postgres-data
+      with_mount_unit: true
+
+  directories:
+    - path: /var/lib/postgres-data
+      mode: 0755
+      user:
+        name: core
+      group:
+        name: core
+
+  files:
+    - path: /etc/zincati/config.d/90-update-strategy.toml
+      mode: 0644
+      contents:
+        inline: |
+          [updates]
+          strategy = "periodic"
+
+          [updates.periodic]
+          time_zone = "UTC"
+
+          [[updates.periodic.window]]
+          days = ["Sat", "Sun"]
+          start_time = "23:30"
+          length_minutes = 60
+
+          [[updates.periodic.window]]
+          days = ["Wed"]
+          start_time = "01:00"
+          length_minutes = 30
+
+    - path: /var/home/core/.config/containers/systemd/valkey.container
+      mode: 0644
+      contents:
+        local: "../../workloads/data/valkey/valkey.container"
+
+    - path: /var/home/core/.config/containers/systemd/postgres.container
+      mode: 0644
+      contents:
+        local : "../../workloads/data/postgres/postgres.container"
+
+    - path: /var/home/core/.config/containers/systemd/postgres.env
+      mode: 0644
+      contents:
+        local : "../../workloads/data/postgres/postgres.env"
+
+    - path: /var/home/core/.config/containers/systemd/init/01-init-databases.sh
+      mode: 0755
+      contents:
+        local : "../../workloads/data/postgres/init/init-databases.sh"

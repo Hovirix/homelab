@@ -18,7 +18,6 @@
             butane
             opentofu
             tofu-ls
-            yamlfmt
             yaml-language-server
           ];
         };
