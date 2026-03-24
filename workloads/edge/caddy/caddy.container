@@ -1,5 +1,5 @@
 [Container]
-Image=docker.io/caddybuilds/caddy-cloudflare@sha256:d81ee34d06745f8e34e647519820a7c2f8e0d6901641b6df40e85e1f376e5dec
+Image=docker.io/caddybuilds/caddy-cloudflare@sha256:ca4994490b97c91d8cbce89ff9e3d3aa458e46fd489c43299bcca157a2ddd336
 
 Network=host
 
