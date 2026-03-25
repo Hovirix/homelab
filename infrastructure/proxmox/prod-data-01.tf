@@ -32,7 +32,8 @@ resource "proxmox_virtual_environment_vm" "prod_data_01" {
   }
 
   network_device {
-    bridge = "vmbr0"
+    bridge  = "vmbr0"
+    vlan_id = 20
   }
 
   operating_system {
