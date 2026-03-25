@@ -45,7 +45,8 @@ resource "proxmox_virtual_environment_vm" "prod_data_01" {
 
     ip_config {
       ipv4 {
-        address = "dhcp"
+        address = "10.20.0.20/24"
+        gateway = "10.20.0.1"
       }
     }
 
