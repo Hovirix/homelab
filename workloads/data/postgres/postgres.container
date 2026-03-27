@@ -1,7 +1,17 @@
 [Container]
 Image=docker.io/pgvector/pgvector@sha256:137f044b0efe3d57f39b972b9b53641b1f2045b99d879e298bbf514a25787dcf
 
-EnvironmentFile=./postgres.env
+Secret=postgres_admin_password,type=env,target=POSTGRES_PASSWORD
+Secret=postgres_authentik_username,type=env,target=POSTGRES_AUTHENTIK_USERNAME
+Secret=postgres_authentik_password,type=env,target=POSTGRES_AUTHENTIK_PASSWORD
+Secret=postgres_grafana_username,type=env,target=POSTGRES_GRAFANA_USERNAME
+Secret=postgres_grafana_password,type=env,target=POSTGRES_GRAFANA_PASSWORD
+Secret=postgres_immich_username,type=env,target=POSTGRES_IMMICH_USERNAME
+Secret=postgres_immich_password,type=env,target=POSTGRES_IMMICH_PASSWORD
+Secret=postgres_paperless_username,type=env,target=POSTGRES_PAPERLESS_USERNAME
+Secret=postgres_paperless_password,type=env,target=POSTGRES_PAPERLESS_PASSWORD
+Secret=postgres_vaultwarden_username,type=env,target=POSTGRES_VAULTWARDEN_USERNAME
+Secret=postgres_vaultwarden_password,type=env,target=POSTGRES_VAULTWARDEN_PASSWORD
 
 Network=host
 
