@@ -1,7 +1,21 @@
 [Container]
 Image=ghcr.io/paperless-ngx/paperless-ngx@sha256:7b937cb2fa2885ab0ecfceb8c7e8827e2312472d9d897a270097ba7f5522dcdc
 
-EnvironmentFile=./paperless.env
+Environment=PAPERLESS_REDIS=redis://valkey.internal.home.hovirix.dev:6379/1
+Environment=PAPERLESS_DBENGINE=postgresql
+Environment=PAPERLESS_DBHOST=postgres.internal.home.hovirix.dev
+Environment=PAPERLESS_DBPORT=5432
+Environment=PAPERLESS_DBNAME=paperless
+Environment=PAPERLESS_SOCIAL_AUTO_SIGNUP=true
+Environment=PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS=true
+Environment=PAPERLESS_DISABLE_REGULAR_LOGIN=true
+Environment=PAPERLESS_REDIRECT_LOGIN_TO_SSO=true
+Environment=PAPERLESS_APPS=allauth.socialaccount.providers.openid_connect
+
+Secret=postgres_paperless_username,type=env,target=PAPERLESS_DBUSER
+Secret=postgres_paperless_password,type=env,target=PAPERLESS_DBPASS
+Secret=paperless_secret_key,type=env,target=PAPERLESS_SECRET_KEY
+Secret=paperless_socialaccount_providers,type=env,target=PAPERLESS_SOCIALACCOUNT_PROVIDERS
 
 Network=host
 

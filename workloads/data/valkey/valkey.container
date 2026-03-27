@@ -3,6 +3,9 @@ Image=docker.io/valkey/valkey@sha256:138afc759e46b92d99b9eae76e1bc1203bb5dcac857
 
 Exec=valkey-server --supervised systemd --appendonly yes --maxmemory 400mb --maxmemory-policy allkeys-lru
 
+Secret=valkey_username,type=env,target=VALKEY_USERNAME
+Secret=valkey_password,type=env,target=VALKEY_PASSWORD
+
 Network=host
 
 HealthCmd=valkey-cli ping || exit 1
