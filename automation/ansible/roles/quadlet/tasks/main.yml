@@ -1,0 +1,20 @@
+---
+- name: Ensure user quadlet directory exists
+  ansible.builtin.file:
+    path: "{{ quadlet_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Install quadlet applications
+  ansible.posix.synchronize:
+    src: "{{ item.src }}"
+    dest: "{{ quadlet_dir }}"
+    archive: true
+    delete: false
+  loop: "{{ quadlet_workloads }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Load quadlet applications
+  ansible.builtin.systemd_service:
+    daemon_reload: true

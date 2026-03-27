@@ -1,0 +1,36 @@
+---
+- name: Deploy apps workloads
+  hosts: apps
+  become: true
+  gather_facts: false
+
+  pre_tasks:
+    - name: Load postgres workload secrets
+      community.sops.load_vars:
+        file: "{{ apps_secret_files.postgres }}"
+        name: sops_postgres
+
+    - name: Load valkey workload secrets
+      community.sops.load_vars:
+        file: "{{ apps_secret_files.valkey }}"
+        name: sops_valkey
+
+    - name: Load paperless workload secrets
+      community.sops.load_vars:
+        file: "{{ apps_secret_files.paperless }}"
+        name: sops_paperless
+
+    - name: Load vaultwarden workload secrets
+      community.sops.load_vars:
+        file: "{{ apps_secret_files.vaultwarden }}"
+        name: sops_vaultwarden
+
+  roles:
+    - role: podman_secrets
+      vars:
+        podman_secrets_items: "{{ apps_podman_secrets }}"
+
+    - role: quadlet
+      vars:
+        quadlet_dir: "{{ apps_quadlet_dir }}"
+        quadlet_workloads: "{{ apps_quadlet }}"

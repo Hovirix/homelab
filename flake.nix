@@ -18,6 +18,7 @@
             butane
             opentofu
             tofu-ls
+            ansible
             yaml-language-server
           ];
         };
