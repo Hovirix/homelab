@@ -32,7 +32,8 @@ resource "proxmox_virtual_environment_vm" "prod_apps_01" {
   }
 
   network_device {
-    bridge = "vmbr0"
+    bridge  = "vmbr0"
+    vlan_id = 20
   }
 
   operating_system {
@@ -44,7 +45,8 @@ resource "proxmox_virtual_environment_vm" "prod_apps_01" {
 
     ip_config {
       ipv4 {
-        address = "dhcp"
+        address = "10.20.0.50/24"
+        gateway = "10.20.0.1"
       }
     }
 
