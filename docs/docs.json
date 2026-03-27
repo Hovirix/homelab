@@ -1,28 +1,18 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "maple",
+  "theme": "willow",
   "name": "HX Lab",
   "description": "Official documentation for the HX Lab infrastructure, services, automation, and deployment guides.",
+
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
 
   "colors": {
     "primary": "#fe640b",
     "light": "#fe640b",
     "dark": "#fe640b"
-  },
-
-  "logo": {
-    "light": "/light.svg",
-    "dark": "/light.svg"
-  },
-
-  "favicon": {
-    "light": "/favicon.svg",
-    "dark": "/favicon.svg"
-  },
-
-  "appearance": {
-    "default": "system",
-    "strict": true
   },
 
   "navigation": {
@@ -49,24 +39,8 @@
               "architecture/01-networking/04-application-and-services"
             ]
           },
-          {
-            "group": "Compute",
-            "icon": "server",
-            "pages": [
-              "architecture/02-compute/hypervisors",
-              "architecture/02-compute/cluster-design",
-              "architecture/02-compute/workload-placement"
-            ]
-          },
-          {
-            "group": "Storage",
-            "icon": "database",
-            "pages": [
-              "architecture/03-storage/storage-architecture",
-              "architecture/03-storage/backup-architecture",
-              "architecture/03-storage/retention-policy"
-            ]
-          },
+          "architecture/02-compute/compute",
+          "architecture/03-storage/storage",
           {
             "group": "Identity & Access",
             "icon": "id-card",
@@ -181,3 +155,4 @@
     }
   }
 }
+
