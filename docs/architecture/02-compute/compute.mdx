@@ -1,0 +1,54 @@
+---
+title: "Compute Architecture"
+description: "Proxmox nodes, cluster model, and workload placement."
+icon: server
+sidebarTitle: "Compute"
+---
+
+## Platform
+
+Proxmox VE cluster with two nodes:
+
+- `infra-01`
+- `compute-01`
+
+Shared management plane. Nodes run workloads independently.
+
+---
+
+## Nodes and cluster
+
+<Columns cols={3}>
+  <Card title="infra-01" icon="server">
+    **Role:** infrastructure
+
+    **Runs:**
+    - Monitoring
+    - Reverse proxy
+    - Core services
+  </Card>
+
+  <Card title="compute-01" icon="server">
+    **Role:** application
+
+    **Runs:**
+    - Application VMs
+    - Databases
+    - Security workloads
+  </Card>
+
+  <Card title="Cluster" icon="boxes-stacked">
+    - Single Proxmox cluster
+    - No shared storage
+    - No high availability
+    - Manual failover
+  </Card>
+</Columns>
+
+---
+
+## Workload placement
+
+- Infrastructure workloads run on `infra-01`
+- Application workloads run on `compute-01`
+- Workloads are statically placed

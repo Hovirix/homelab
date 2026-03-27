@@ -1,8 +1,13 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "aspen",
+  "theme": "willow",
   "name": "HX Lab",
   "description": "Official documentation for the HX Lab infrastructure, services, automation, and deployment guides.",
+
+  "appearance": {
+    "default": "system",
+    "strict": false
+  },
 
   "colors": {
     "primary": "#fe640b",
@@ -10,25 +15,10 @@
     "dark": "#fe640b"
   },
 
-  "logo": {
-    "light": "/light.svg",
-    "dark": "/light.svg"
-  },
-
-  "favicon": {
-    "light": "/favicon.svg",
-    "dark": "/favicon.svg"
-  },
-
-  "appearance": {
-    "default": "system",
-    "strict": true
-  },
-
   "navigation": {
     "groups": [
       {
-        "group": "About",
+        "group": "Get started",
         "pages": [
           "about/welcome",
           "about/quickstart",
@@ -38,64 +28,46 @@
       {
         "group": "Architecture",
         "pages": [
-          "architecture/system-overview",
+          "architecture/intro",
           {
             "group": "Networking",
             "icon": "network-wired",
             "pages": [
-              "architecture/networking/topology",
-              "architecture/networking/vlans",
-              "architecture/networking/ip-addressing",
-              "architecture/networking/routing",
-              "architecture/networking/firewall-policy",
-              "architecture/networking/monitoring-design"
+              "architecture/01-networking/01-physical-and-data-link",
+              "architecture/01-networking/02-network-layer",
+              "architecture/01-networking/03-transport-layer",
+              "architecture/01-networking/04-application-and-services"
             ]
           },
-          {
-            "group": "Compute",
-            "icon": "server",
-            "pages": [
-              "architecture/compute/hypervisors",
-              "architecture/compute/cluster-design",
-              "architecture/compute/workload-placement"
-            ]
-          },
-          {
-            "group": "Storage",
-            "icon": "database",
-            "pages": [
-              "architecture/storage/storage-architecture",
-              "architecture/storage/backup-architecture",
-              "architecture/storage/retention-policy"
-            ]
-          },
+          "architecture/02-compute/compute",
+          "architecture/03-storage/storage",
           {
             "group": "Identity & Access",
             "icon": "id-card",
             "pages": [
-              "architecture/iam/identity-architecture",
-              "architecture/iam/authentication-flows",
-              "architecture/iam/authorization-model"
+              "architecture/04-iam/identity-architecture",
+              "architecture/04-iam/authentication-flows",
+              "architecture/04-iam/authorization-model"
             ]
           },
           {
             "group": "Security",
             "icon": "shield",
             "pages": [
-              "architecture/security/network-segmentation",
-              "architecture/security/threat-model",
-              "architecture/security/hardening-standards",
-              "architecture/security/zero-trust-design"
+              "architecture/05-security/network-segmentation",
+              "architecture/05-security/threat-model",
+              "architecture/05-security/hardening-standards",
+              "architecture/05-security/zero-trust-design"
             ]
           },
           {
             "group": "Observability",
             "icon": "chart-bar",
             "pages": [
-              "architecture/observability/logging-architecture",
-              "architecture/observability/metrics-architecture",
-              "architecture/observability/alerting-design",
-              "architecture/observability/siem-architecture"
+              "architecture/06-observability/logging-architecture",
+              "architecture/06-observability/metrics-architecture",
+              "architecture/06-observability/alerting-design",
+              "architecture/06-observability/siem-architecture"
             ]
           }
         ]
@@ -165,35 +137,6 @@
             ]
           }
         ]
-      },
-      {
-        "group": "Governance",
-        "pages": [
-          "governance/change-management",
-          "governance/access-control-policy",
-          "governance/naming-conventions",
-          "governance/documentation-standards",
-          "governance/risk-management"
-        ]
-      },
-      {
-        "group": "Strategy",
-        "pages": [
-          "strategy/roadmap",
-          "strategy/technical-debt",
-          "strategy/future-architecture"
-        ]
-      },
-      {
-        "group": "Reference",
-        "pages": [
-          "reference/ip-ranges",
-          "reference/vlan-ids",
-          "reference/port-allocations",
-          "reference/dns-records",
-          "reference/hardware-inventory",
-          "reference/external-dependencies"
-        ]
       }
     ]
   },
@@ -210,8 +153,6 @@
       "github": "https://github.com/Hovirix",
       "website": "https://hovirix.dev"
     }
-  },
-  "interaction": {
-    "drilldown": false
   }
 }
+
