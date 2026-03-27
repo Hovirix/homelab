@@ -6,7 +6,7 @@ Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.internal.home.hovirix.dev
 Environment=AUTHENTIK_POSTGRESQL__PORT=5432
 Environment=AUTHENTIK_POSTGRESQL__NAME=authentik
 
-Secret=authentik_bootstrap_username,type=env,target=AUTHENTIK_POSTGRESQL__USER
+Secret=postgres_authentik_username,type=env,target=AUTHENTIK_POSTGRESQL__USER
 Secret=authentik_bootstrap_password,type=env,target=AUTHENTIK_POSTGRESQL__PASSWORD
 Secret=authentik_secret_key,type=env,target=AUTHENTIK_SECRET_KEY
 Secret=authentik_bootstrap_token,type=env,target=AUTHENTIK_BOOTSTRAP_TOKEN
