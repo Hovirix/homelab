@@ -1,0 +1,21 @@
+---
+- name: Deploy edge workloads
+  hosts: edge
+  become: true
+  gather_facts: false
+
+  pre_tasks:
+    - name: Load caddy workload secrets
+      community.sops.load_vars:
+        file: "{{ edge_secret_files.caddy }}"
+        name: sops_caddy
+
+  roles:
+    - role: podman_secrets
+      vars:
+        podman_secrets_items: "{{ edge_podman_secrets }}"
+
+    - role: quadlet
+      vars:
+        quadlet_dir: "{{ edge_quadlet_dir }}"
+        quadlet_workloads: "{{ edge_quadlet }}"
