@@ -7,12 +7,6 @@ resource "proxmox_virtual_environment_vm" "prod_apps_01" {
   protection      = false
   stop_on_destroy = true
 
-  startup {
-    order      = "1"
-    up_delay   = "60"
-    down_delay = "60"
-  }
-
   cpu {
     cores = 2
     type  = "host"
