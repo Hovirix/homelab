@@ -1,0 +1,13 @@
+inputFiles:
+  - ./templates/network.tmpl
+  - ./templates/wireless.tmpl
+
+outputFiles:
+  - ./files/config/network
+  - ./files/config/wireless
+
+datasources:
+  network:
+    url: file:///tmp/network.yaml
+  wireless:
+    url: file:///tmp/wireless.yaml

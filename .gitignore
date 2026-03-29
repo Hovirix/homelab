@@ -12,9 +12,6 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 
-# OpenWRT
-files/
-
 # Butane / Ignition
 *.ign
 build/
@@ -44,3 +41,5 @@ secrets.yml
 *.swp
 .DS_Store
 Thumbs.db
+/firmware/openwrt/files/config/network
+/firmware/openwrt/files/config/wireless
