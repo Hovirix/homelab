@@ -1,0 +1,113 @@
+config defaults
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	option synflood_protect '1'
+	option flow_offloading '1'
+	option flow_offloading_hw '1'
+
+config zone
+	option name 'wan'
+	option input 'DROP'
+	option output 'ACCEPT'
+	option forward 'DROP'
+	list network 'wan6'
+	list network 'wan'
+	option masq '1'
+	option mtu_fix '1'
+
+config rule
+	option name 'Allow-DHCPv6'
+	option src 'wan'
+	option proto 'udp'
+	option dest_port '546'
+	option family 'ipv6'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-ICMPv6-Input'
+	option src 'wan'
+	option proto 'icmp'
+	list icmp_type 'echo-request'
+	list icmp_type 'echo-reply'
+	list icmp_type 'destination-unreachable'
+	list icmp_type 'packet-too-big'
+	list icmp_type 'time-exceeded'
+	list icmp_type 'bad-header'
+	list icmp_type 'unknown-header-type'
+	list icmp_type 'router-solicitation'
+	list icmp_type 'neighbour-solicitation'
+	list icmp_type 'router-advertisement'
+	list icmp_type 'neighbour-advertisement'
+	option limit '1000/sec'
+	option family 'ipv6'
+	option target 'ACCEPT'
+
+config rule
+	option name 'Allow-ICMPv6-Forward'
+	option src 'wan'
+	option dest '*'
+	option proto 'icmp'
+	list icmp_type 'echo-request'
+	list icmp_type 'echo-reply'
+	list icmp_type 'destination-unreachable'
+	list icmp_type 'packet-too-big'
+	list icmp_type 'time-exceeded'
+	list icmp_type 'bad-header'
+	list icmp_type 'unknown-header-type'
+	option limit '1000/sec'
+	option family 'ipv6'
+	option target 'ACCEPT'
+
+config zone
+	option name 'vlan10'
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'ACCEPT'
+	list network 'vlan10'
+
+config forwarding
+	option src 'vlan10'
+	option dest 'wan'
+
+config zone
+	option name 'vlan20'
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	list network 'vlan20'
+
+config forwarding
+	option src 'vlan20'
+	option dest 'wan'
+
+config zone
+	option name 'vlan30'
+	option input 'REJECT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	list network 'vlan30'
+
+config forwarding
+	option src 'vlan30'
+	option dest 'wan'
+
+config rule
+	option src 'vlan20'
+	option name 'Allow-DNS-DHCP'
+	option dest_port '53 67 68'
+	option target 'ACCEPT'
+
+config rule
+	option src 'vlan30'
+	option name 'Allow-DNS-DHCP'
+	option dest_port '53 67 68'
+	option target 'ACCEPT'
+
+config rule
+	option src 'vlan10'
+	option dest 'vlan20'
+	option name 'Allow-SSH-mgmt-to-servers'
+	list proto 'tcp'
+	option dest_port '22'
+	option target 'ACCEPT'

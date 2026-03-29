@@ -1,14 +1,4 @@
-http:
-  address: 192.168.1.1:8080
-
 dns:
-  # General settings
-  bind_hosts:
-    - 127.0.0.1
-    - ::1
-    - 192.168.1.1
-  port: 53
-
   # Upstream DNS servers settings:
   upstream_dns:
     - https://dns.quad9.net/dns-query
@@ -38,8 +28,8 @@ filtering:
   blocking_mode: refused
 
   rewrites:
-    - domain: 'home.hovirix.dev'
-      answer: 192.168.1.20
+    - domain: '*.home.hovirix.dev'
+      answer: 10.20.0.10
       enabled: true
   rewrites_enabled: true
 
