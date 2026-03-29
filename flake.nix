@@ -31,9 +31,13 @@
 
         openwrt = pkgs.mkShell {
           packages = with pkgs; [
-            just
+            bash-language-server
+            go-task
+            sops
+            shfmt
             wget
             gnumake
+            gomplate
             gzip
             unzip
             python3
