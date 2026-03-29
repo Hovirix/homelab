@@ -1,0 +1,82 @@
+{{- $network := ds "network" -}}
+{{- $mape := index $network "map-e" -}}
+{{- $vlan := index $mape "vlan_id" -}}
+{{- $peer := index $mape "peeraddr" -}}
+{{- $ip := index $mape "ipaddr" -}}
+{{- $prefix := index $mape "ip6prefix" -}}
+{{- $prefixlen := index $mape "ip6prefixlen" -}}
+
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	list ipaddr '127.0.0.1/8'
+
+config globals 'globals'
+	option ula_prefix 'auto'
+	option packet_steering '2'
+
+config device
+	option name 'br-lan'
+	option type 'bridge'
+	list ports 'lan1'
+	list ports 'lan2'
+	list ports 'lan3'
+	list ports 'lan4'
+	list ports 'lan5'
+	option ipv6 '0'
+
+config bridge-vlan
+	option device 'br-lan'
+	option vlan '10'
+	list ports 'lan1:t'
+	list ports 'lan5:u*'
+
+config bridge-vlan
+	option device 'br-lan'
+	option vlan '20'
+	list ports 'lan1:t'
+
+config bridge-vlan
+	option device 'br-lan'
+	option vlan '30'
+	list ports 'lan1:t'
+
+config interface 'vlan10'
+	option proto 'static'
+	option device 'br-lan.10'
+	list ipaddr '10.10.0.1/24'
+
+config interface 'vlan20'
+	option proto 'static'
+	option device 'br-lan.20'
+	list ipaddr '10.20.0.1/24'
+
+config interface 'vlan30'
+	option proto 'static'
+	option device 'br-lan.30'
+	list ipaddr '10.30.0.1/24'
+
+config device
+	option type '8021q'
+	option ifname 'eth1'
+	option vid '{{ $vlan }}'
+	option name 'eth1.{{ $vlan }}'
+
+config interface 'wan6'
+	option proto 'dhcpv6'
+	option device 'eth1.{{ $vlan }}'
+	option reqaddress 'try'
+	option reqprefix 'auto'
+	option norelease '0'
+	option peerdns '0'
+	list dns '127.0.0.1'
+	list dns '::1'
+
+config interface 'wan'
+	option proto 'map'
+	option maptype 'map-e'
+	option peeraddr '{{ $peer }}'
+	option ipaddr '{{ $ip }}'
+	option ip6prefix '{{ $prefix }}'
+	option ip6prefixlen '{{ $prefixlen }}'
+	option tunlink 'wan6'
