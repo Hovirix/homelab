@@ -1,0 +1,21 @@
+version: '3'
+
+tasks:
+  setup:
+    cmds:
+      - ./scripts/setup.sh
+
+  render:
+    cmds:
+      - ./scripts/render.sh
+
+  build:
+    deps: [setup, render]
+    cmds:
+      - ./scripts/build.sh
+
+  clean:
+    cmds:
+      - rm -rf openwrt-imagebuilder-* 
+      - rm -f ./files/config/network
+      - rm -f ./files/config/wireless
