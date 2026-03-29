@@ -39,7 +39,7 @@ resource "proxmox_virtual_environment_vm" "prod_idp_01" {
 
     ip_config {
       ipv4 {
-        address = "10.20.0.15/24"
+        address = "10.20.0.11/24"
         gateway = "10.20.0.1"
       }
     }
