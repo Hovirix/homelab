@@ -1,14 +1,21 @@
+http:
+  address: 0.0.0.0:3000
+
 dns:
+  # General settings
+  bind_hosts:
+    - 0.0.0.0
+  port: 53
+
   # Upstream DNS servers settings:
   upstream_dns:
-    - https://dns.quad9.net/dns-query
-    - https://dns.adguard-dns.com/dns-query
+    - https://dns11.quad9.net/dns-query
     - https://family.dns.mullvad.net/dns-query
   bootstrap_dns:
-    - 9.9.9.10
-    - 149.112.112.10
-    - 2620:fe::10
-    - 2620:fe::fe:10
+    - 9.9.9.11
+    - 149.112.112.11
+    - 2620:fe::11
+    - 2620:fe::fe:11
   upstream_mode: parallel
   use_http3_upstreams: true
 
@@ -28,10 +35,65 @@ filtering:
   blocking_mode: refused
 
   rewrites:
-    - domain: '*.home.hovirix.dev'
+    - domain: "*.home.hovirix.dev"
       answer: 10.20.0.10
       enabled: true
-  rewrites_enabled: true
+
+    - domain: "compute-01.home.hovirix.dev"
+      answer: 10.10.0.11
+      enabled: true
+
+    - domain: "infra-01.home.hovirix.dev"
+      answer: 10.10.0.10
+      enabled: true
+
+    - domain: "prod-apps-01.home.hovirix.dev"
+      answer: 10.20.0.100
+      enabled: true
+
+    - domain: "prod-data-01.home.hovirix.dev"
+      answer: 10.20.0.50
+      enabled: true
+
+    - domain: "prod-edge-01.home.hovirix.dev"
+      answer: 10.20.0.10
+      enabled: true
+
+    - domain: "prod-idp-01.home.hovirix.dev"
+      answer: 10.20.0.11
+      enabled: true
+
+    - domain: "prod-monitoring-01.home.hovirix.dev"
+      answer: 10.10.0.50
+      enabled: true
+
+    - domain: "authentik.internal.home.hovirix.dev"
+      answer: 10.20.0.11
+      enabled: true
+
+    - domain: "grafana.internal.home.hovirix.dev"
+      answer: 10.10.0.50
+      enabled: true
+
+    - domain: "immich.internal.home.hovirix.dev"
+      answer: 10.20.0.100
+      enabled: true
+
+    - domain: "paperless.internal.home.hovirix.dev"
+      answer: 10.20.0.100
+      enabled: true
+
+    - domain: "postgres.internal.home.hovirix.dev"
+      answer: 10.20.0.50
+      enabled: true
+
+    - domain: "valkey.internal.home.hovirix.dev"
+      answer: 10.20.0.50
+      enabled: true
+
+    - domain: "vaultwarden.internal.home.hovirix.dev"
+      answer: 10.20.0.100
+      enabled: true
 
 querylog:
   enabled: true
