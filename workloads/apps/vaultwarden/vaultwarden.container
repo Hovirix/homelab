@@ -14,7 +14,7 @@ Secret=vaultwarden_installation_key,type=env,target=PUSH_INSTALLATION_KEY
 
 Network=host
 
-Volume=/var/lib/app-data/vaultwarden:/data:Z
+Volume=/srv/vaultwarden:/data:Z
 
 [Service]
 MemoryMax=512M

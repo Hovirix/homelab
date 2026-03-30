@@ -20,7 +20,7 @@ Secret=valkey_password,type=env,target=REDIS_PASSWORD
 
 Network=host
 
-Volume=/var/lib/app-data/immich:/usr/src/app/upload:Z
+Volume=/srv/immich:/data:Z
 
 [Service]
 MemoryMax=6G
