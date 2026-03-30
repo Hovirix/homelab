@@ -19,10 +19,10 @@ Secret=paperless_socialaccount_providers,type=env,target=PAPERLESS_SOCIALACCOUNT
 
 Network=host
 
-Volume=/var/lib/app-data/paperless/data:/usr/src/paperless/data:Z
-Volume=/var/lib/app-data/paperless/media:/usr/src/paperless/media:Z
-Volume=/var/lib/app-data/paperless/export:/usr/src/paperless/export:Z
-Volume=/var/lib/app-data/paperless/consume:/usr/src/paperless/consume:Z
+Volume=/srv/paperless/data:/usr/src/paperless/data:Z
+Volume=/srv/paperless/media:/usr/src/paperless/media:Z
+Volume=/srv/paperless/export:/usr/src/paperless/export:Z
+Volume=/srv/paperless/consume:/usr/src/paperless/consume:Z
 
 [Service]
 MemoryMax=2G

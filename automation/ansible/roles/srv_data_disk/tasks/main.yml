@@ -1,0 +1,97 @@
+---
+- name: Ensure /srv exists
+  ansible.builtin.file:
+    path: /srv
+    state: directory
+    mode: "0755"
+
+- name: Ensure srv_folders is defined
+  ansible.builtin.assert:
+    that:
+      - srv_folders is defined
+      - srv_folders is iterable
+      - srv_folders is not string
+    fail_msg: "srv_folders must be defined as a list of directory names"
+
+- name: Ensure data disk exists (scsi1)
+  ansible.builtin.stat:
+    path: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+  register: srv_disk_stat
+
+- name: Fail if data disk is missing
+  ansible.builtin.fail:
+    msg: "Expected data disk /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1 not found"
+  when: not srv_disk_stat.stat.exists
+
+- name: Read current partition table
+  community.general.parted:
+    device: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+    unit: MiB
+    state: info
+  register: srv_disk_info
+  changed_when: false
+
+- name: Fail if data disk has more than one partition
+  ansible.builtin.fail:
+    msg: >-
+      Expected exactly zero or one partition on
+      /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1,
+      found {{ srv_disk_info.partitions | default([]) | length }}
+  when: (srv_disk_info.partitions | default([]) | length) > 1
+
+- name: Create GPT partition table and primary partition
+  community.general.parted:
+    device: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1
+    label: gpt
+    number: 1
+    state: present
+    part_start: 1MiB
+    part_end: 100%
+    fs_type: xfs
+  when: (srv_disk_info.partitions | default([]) | length) == 0
+
+- name: Probe filesystem type on data partition
+  ansible.builtin.command:
+    cmd: blkid -s TYPE -o value /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1
+  register: srv_disk_fstype
+  changed_when: false
+  failed_when: false
+
+- name: Create XFS filesystem on data partition
+  community.general.filesystem:
+    dev: /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1
+    fstype: xfs
+    force: false
+  when: srv_disk_fstype.rc != 0 or (srv_disk_fstype.stdout | trim) == ""
+
+- name: Fail if existing filesystem is not XFS
+  ansible.builtin.fail:
+    msg: >-
+      Expected XFS on /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1,
+      found {{ srv_disk_fstype.stdout | trim }}
+  when:
+    - srv_disk_fstype.rc == 0
+    - (srv_disk_fstype.stdout | trim) != ""
+    - (srv_disk_fstype.stdout | trim) != "xfs"
+
+- name: Read UUID of data partition
+  ansible.builtin.command:
+    cmd: blkid -s UUID -o value /dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi1-part1
+  register: srv_disk_uuid
+  changed_when: false
+  failed_when: srv_disk_uuid.rc != 0 or (srv_disk_uuid.stdout | trim | length == 0)
+
+- name: Mount data partition on /srv
+  ansible.posix.mount:
+    path: /srv
+    src: "UUID={{ srv_disk_uuid.stdout | trim }}"
+    fstype: xfs
+    opts: defaults,nofail
+    state: mounted
+
+- name: Create application directories
+  ansible.builtin.file:
+    path: "/srv/{{ item }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ srv_folders }}"

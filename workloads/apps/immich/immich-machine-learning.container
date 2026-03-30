@@ -3,7 +3,7 @@ Image=ghcr.io/immich-app/immich-machine-learning@sha256:b213fa3c82d27a21a299c46f
 
 Network=host
 
-Volume=/var/lib/app-data/immich/ml-cache:/cache:Z
+Volume=immich-model-cache.volume:/cache
 
 [Service]
 MemoryMax=6G

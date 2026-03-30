@@ -6,8 +6,8 @@ Secret=caddy_cloudflare_dns_token,type=env,target=CLOUDFLARE_API_TOKEN
 Network=host
 
 Volume=./Caddyfile:/etc/caddy/Caddyfile:ro,Z
-Volume=/var/lib/proxy-data/caddy/data:/data:Z
-Volume=/var/lib/proxy-data/caddy/config:/config:Z
+Volume=caddy-data.volume:/data:Z
+Volume=caddy-config.volume:/config:Z
 
 [Service]
 MemoryMax=512M

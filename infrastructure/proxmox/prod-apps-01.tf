@@ -25,6 +25,15 @@ resource "proxmox_virtual_environment_vm" "prod_apps_01" {
     size         = 20
   }
 
+  disk {
+    datastore_id = "data"
+    interface    = "scsi1"
+    iothread     = true
+    discard      = "on"
+    ssd          = true
+    size         = 300
+  }
+
   network_device {
     bridge  = "vmbr0"
     vlan_id = 20
