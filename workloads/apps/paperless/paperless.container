@@ -1,6 +1,7 @@
 [Container]
 Image=ghcr.io/paperless-ngx/paperless-ngx:2.20.3@sha256:7b937cb2fa2885ab0ecfceb8c7e8827e2312472d9d897a270097ba7f5522dcdc
 
+Environment=PAPERLESS_URL=https://paperless.home.hovirix.dev
 Environment=PAPERLESS_REDIS=redis://valkey.internal.home.hovirix.dev:6379/1
 Environment=PAPERLESS_DBENGINE=postgresql
 Environment=PAPERLESS_DBHOST=postgres.internal.home.hovirix.dev

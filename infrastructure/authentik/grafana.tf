@@ -10,6 +10,12 @@ resource "authentik_provider_oauth2" "grafana" {
     matching_mode = "strict",
     url           = "https://grafana.home.hovirix.dev/login/generic_oauth",
   }]
+
+  property_mappings = [
+    data.authentik_property_mapping_provider_scope.openid.id,
+    data.authentik_property_mapping_provider_scope.profile.id,
+    data.authentik_property_mapping_provider_scope.email.id,
+  ]
 }
 
 resource "authentik_application" "grafana" {
