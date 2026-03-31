@@ -28,8 +28,8 @@
   roles:
     - role: srv_data_disk
       vars:
-        srv_folders: "{{ apps_quadlet | map(attribute='name') | list }}"
-      
+        srv_layout: "{{ apps_srv_layout }}"      
+
     - role: podman_secrets
       vars:
         podman_secrets_items: "{{ apps_podman_secrets }}"

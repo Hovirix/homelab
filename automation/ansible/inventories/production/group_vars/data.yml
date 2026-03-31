@@ -41,3 +41,6 @@ data_quadlet:
     src: "{{ workloads_root }}/data/postgres"
   - name: valkey
     src: "{{ workloads_root }}/data/valkey"
+
+data_srv_layout:
+  - name: postgres
