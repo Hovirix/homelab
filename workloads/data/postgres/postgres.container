@@ -1,5 +1,5 @@
 [Container]
-Image=docker.io/pgvector/pgvector@sha256:137f044b0efe3d57f39b972b9b53641b1f2045b99d879e298bbf514a25787dcf
+Image=docker.io/pgvector/pgvector:0.8.0@sha256:137f044b0efe3d57f39b972b9b53641b1f2045b99d879e298bbf514a25787dcf
 
 Secret=postgres_admin_password,type=env,target=POSTGRES_PASSWORD
 Secret=postgres_authentik_username,type=env,target=POSTGRES_AUTHENTIK_USERNAME
