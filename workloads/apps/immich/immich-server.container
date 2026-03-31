@@ -3,7 +3,7 @@ After=immich-machine-learning.container
 Wants=immich-machine-learning.container
 
 [Container]
-Image=ghcr.io/immich-app/immich-server@sha256:8b14246ee4c53e39191a54279f8c72f3eed3c026c5b23d0f7e4ab5e69e3aac4a
+Image=ghcr.io/immich-app/immich-server:v1.102.3@sha256:8b14246ee4c53e39191a54279f8c72f3eed3c026c5b23d0f7e4ab5e69e3aac4a
 
 Environment=DB_HOSTNAME=postgres.internal.home.hovirix.dev
 Environment=DB_PORT=5432
@@ -15,8 +15,8 @@ Environment=REDIS_DBINDEX=0
 
 Secret=postgres_immich_username,type=env,target=DB_USERNAME
 Secret=postgres_immich_password,type=env,target=DB_PASSWORD
-Secret=valkey_username,type=env,target=REDIS_USERNAME
-Secret=valkey_password,type=env,target=REDIS_PASSWORD
+# Secret=valkey_username,type=env,target=REDIS_USERNAME
+# Secret=valkey_password,type=env,target=REDIS_PASSWORD
 
 Network=host
 

@@ -2,6 +2,7 @@
 - name: Create Podman secrets
   containers.podman.podman_secret:
     state: present
+    force: true
     name: "{{ item.name }}"
     data: "{{ item.value }}"
   loop: "{{ podman_secrets_items }}"

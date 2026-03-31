@@ -13,7 +13,7 @@ resource "proxmox_virtual_environment_vm" "prod_data_01" {
   }
 
   memory {
-    dedicated = 2048
+    dedicated = 4096
   }
 
   disk {

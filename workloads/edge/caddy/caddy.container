@@ -1,5 +1,5 @@
 [Container]
-Image=docker.io/caddybuilds/caddy-cloudflare@sha256:d81ee34d06745f8e34e647519820a7c2f8e0d6901641b6df40e85e1f376e5dec
+Image=docker.io/caddybuilds/caddy-cloudflare:2.11.2@sha256:d81ee34d06745f8e34e647519820a7c2f8e0d6901641b6df40e85e1f376e5dec
 
 Secret=caddy_cloudflare_dns_token,type=env,target=CLOUDFLARE_API_TOKEN
 

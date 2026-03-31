@@ -8,12 +8,12 @@ resource "proxmox_virtual_environment_vm" "prod_apps_01" {
   stop_on_destroy = true
 
   cpu {
-    cores = 2
+    cores = 4
     type  = "host"
   }
 
   memory {
-    dedicated = 2048
+    dedicated = 8182
   }
 
   disk {
