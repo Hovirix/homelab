@@ -10,6 +10,12 @@ resource "authentik_provider_oauth2" "paperless" {
     matching_mode = "strict"
     url           = "https://paperless.home.hovirix.dev/accounts/oidc/authentik/login/callback/"
   }]
+
+  property_mappings = [
+    data.authentik_property_mapping_provider_scope.openid.id,
+    data.authentik_property_mapping_provider_scope.profile.id,
+    data.authentik_property_mapping_provider_scope.email.id,
+  ]
 }
 
 resource "authentik_application" "paperless" {
