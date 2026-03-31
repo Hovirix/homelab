@@ -1,0 +1,18 @@
+[Container]
+Image=docker.io/cloudflare/cloudflared:latest
+
+Exec=tunnel --no-autoupdate run
+
+Secret=cloudflared_tunnel_token,type=env,target=TUNNEL_TOKEN
+
+Network=host
+
+[Service]
+MemoryMax=512M
+TasksMax=2048
+LimitNOFILE=262144
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
