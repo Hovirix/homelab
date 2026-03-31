@@ -22,7 +22,7 @@ authentik.home.hovirix.dev {
 vaultwarden.home.hovirix.dev {
     encode zstd gzip
     import security_headers
-    reverse_proxy http://prod-apps-01.home.hovirix.dev:8000
+    reverse_proxy http://prod-apps-01.home.hovirix.dev:80
 }
 
 immich.home.hovirix.dev {
