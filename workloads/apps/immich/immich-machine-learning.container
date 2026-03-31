@@ -1,5 +1,5 @@
 [Container]
-Image=ghcr.io/immich-app/immich-machine-learning:v1.102.3@sha256:b213fa3c82d27a21a299c46ffbb38a091f18384db1ad67d409a3b34fe0fce556
+Image=ghcr.io/immich-app/immich-machine-learning:v1.144.1@sha256:21b6a0bf02426336f456e8dca43c55b6a79b8e01ee2c25f91bc817fc3a745e52
 
 Network=host
 

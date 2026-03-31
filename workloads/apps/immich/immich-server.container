@@ -3,7 +3,7 @@ After=immich-machine-learning.container
 Wants=immich-machine-learning.container
 
 [Container]
-Image=ghcr.io/immich-app/immich-server:v1.102.3@sha256:8b14246ee4c53e39191a54279f8c72f3eed3c026c5b23d0f7e4ab5e69e3aac4a
+Image=ghcr.io/immich-app/immich-server:v1.144.1@sha256:3a348a23f9fd7647fd1b1ed537bb72d2f5aeab3525b2eb7428191643646e5b53
 
 Environment=DB_HOSTNAME=postgres.internal.home.hovirix.dev
 Environment=DB_PORT=5432
