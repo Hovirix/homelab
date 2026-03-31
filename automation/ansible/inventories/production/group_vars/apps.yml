@@ -45,3 +45,19 @@ apps_quadlet:
     src: "{{ workloads_root }}/apps/paperless"
   - name: vaultwarden
     src: "{{ workloads_root }}/apps/vaultwarden"
+
+apps_srv_layout:
+  - name: immich
+    directories:
+      - library
+      - profile
+      - thumbnails
+
+  - name: paperless
+    directories:
+      - data
+      - media
+      - consume
+      - export
+
+  - name: vaultwarden

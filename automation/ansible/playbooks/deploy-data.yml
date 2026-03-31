@@ -18,7 +18,7 @@
   roles:
     - role: srv_data_disk
       vars:
-        srv_folders: "{{ data_quadlet | map(attribute='name') | list }}"
+        srv_layout: "{{ data_srv_layout }}"
         
     - role: podman_secrets
       vars:

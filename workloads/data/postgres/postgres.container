@@ -17,6 +17,8 @@ Network=host
 
 Volume=./init:/docker-entrypoint-initdb.d:Z
 Volume=/srv/postgres:/var/lib/postgresql/data:Z
+Volume=./config/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf:Z
+Volume=./config/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:Z
 
 HealthCmd=pg_isready -U postgres
 HealthInterval=30s
