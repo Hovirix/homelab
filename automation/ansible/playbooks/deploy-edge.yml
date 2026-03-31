@@ -10,6 +10,11 @@
         file: "{{ edge_secret_files.caddy }}"
         name: sops_caddy
 
+    - name: Load cloudflared workload secrets
+      community.sops.load_vars:
+        file: "{{ edge_secret_files.cloudflared }}"
+        name: sops_cloudflared
+
   roles:
     - role: podman_secrets
       vars:

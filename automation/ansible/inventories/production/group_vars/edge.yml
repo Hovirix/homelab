@@ -4,13 +4,18 @@ secrets_root: "{{ playbook_dir }}/../../../secrets/workloads"
 
 edge_secret_files:
   caddy: "{{ secrets_root }}/caddy.sops.yaml"
+  cloudflared: "{{ secrets_root }}/cloudflared.sops.yaml"
 
 edge_podman_secrets:
   - name: caddy_cloudflare_dns_token
     value: "{{ sops_caddy.caddy.cloudflare_dns_token }}"
+  - name: cloudflared_tunnel_token
+    value: "{{ sops_cloudflared.token }}"
     
 edge_quadlet_dir: /etc/containers/systemd
 
 edge_quadlet:
   - name: caddy
     src: "{{ workloads_root }}/edge/caddy"
+  - name: cloudflared
+    src: "{{ workloads_root }}/edge/cloudflared"
