@@ -1,6 +1,6 @@
 ---
-workloads_root: "{{ playbook_dir }}/../../../workloads"
-secrets_root: "{{ playbook_dir }}/../../../secrets/workloads"
+services_root: "{{ playbook_dir }}/../../../services"
+secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 
 apps_secret_files:
   postgres: "{{ secrets_root }}/postgres.sops.yaml"
@@ -40,11 +40,11 @@ apps_quadlet_dir: /etc/containers/systemd
 
 apps_quadlet:
   - name: immich
-    src: "{{ workloads_root }}/apps/immich"
+    src: "{{ services_root }}/immich"
   - name: paperless
-    src: "{{ workloads_root }}/apps/paperless"
+    src: "{{ services_root }}/paperless"
   - name: vaultwarden
-    src: "{{ workloads_root }}/apps/vaultwarden"
+    src: "{{ services_root }}/vaultwarden"
 
 apps_srv_layout:
   - name: immich

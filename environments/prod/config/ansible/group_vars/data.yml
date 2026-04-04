@@ -1,6 +1,6 @@
 ---
-workloads_root: "{{ playbook_dir }}/../../../workloads"
-secrets_root: "{{ playbook_dir }}/../../../secrets/workloads"
+services_root: "{{ playbook_dir }}/../../../services"
+secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 
 data_secret_files:
   postgres: "{{ secrets_root }}/postgres.sops.yaml"
@@ -38,9 +38,9 @@ data_quadlet_dir: /etc/containers/systemd
 
 data_quadlet:
   - name: postgres
-    src: "{{ workloads_root }}/data/postgres"
+    src: "{{ services_root }}/postgres"
   - name: valkey
-    src: "{{ workloads_root }}/data/valkey"
+    src: "{{ services_root }}/valkey"
 
 data_srv_layout:
   - name: postgres

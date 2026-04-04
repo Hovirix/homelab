@@ -1,16 +1,16 @@
 ---
-- name: Deploy data workloads
+- name: Deploy data services
   hosts: data
   become: true
   gather_facts: false
 
   pre_tasks:
-    - name: Load postgres workload secrets
+    - name: Load postgres service secrets
       community.sops.load_vars:
         file: "{{ data_secret_files.postgres }}"
         name: sops_postgres
 
-    - name: Load valkey workload secrets
+    - name: Load valkey service secrets
       community.sops.load_vars:
         file: "{{ data_secret_files.valkey }}"
         name: sops_valkey
@@ -27,4 +27,4 @@
     - role: quadlet
       vars:
         quadlet_dir: "{{ data_quadlet_dir }}"
-        quadlet_workloads: "{{ data_quadlet }}"
+        quadlet_services: "{{ data_quadlet }}"

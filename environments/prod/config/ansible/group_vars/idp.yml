@@ -1,6 +1,6 @@
 ---
-workloads_root: "{{ playbook_dir }}/../../../workloads"
-secrets_root: "{{ playbook_dir }}/../../../secrets/workloads"
+services_root: "{{ playbook_dir }}/../../../services"
+secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 
 idp_secret_files:
   authentik: "{{ secrets_root }}/authentik.sops.yaml"
@@ -24,4 +24,4 @@ idp_quadlet_dir: /etc/containers/systemd
 
 idp_quadlet:
   - name: authentik
-    src: "{{ workloads_root }}/identity/authentik/"
+    src: "{{ services_root }}/authentik/"

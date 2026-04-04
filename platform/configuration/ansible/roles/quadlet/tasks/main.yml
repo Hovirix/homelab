@@ -3,7 +3,7 @@
   ansible.builtin.copy:
     src: "{{ item.src }}"
     dest: "{{ quadlet_dir }}"
-  loop: "{{ quadlet_workloads }}"
+  loop: "{{ quadlet_services }}"
   loop_control:
     label: "{{ item.name }}"
 

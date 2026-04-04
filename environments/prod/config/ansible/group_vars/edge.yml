@@ -1,6 +1,6 @@
 ---
-workloads_root: "{{ playbook_dir }}/../../../workloads"
-secrets_root: "{{ playbook_dir }}/../../../secrets/workloads"
+services_root: "{{ playbook_dir }}/../../../services"
+secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 
 edge_secret_files:
   caddy: "{{ secrets_root }}/caddy.sops.yaml"
@@ -16,6 +16,6 @@ edge_quadlet_dir: /etc/containers/systemd
 
 edge_quadlet:
   - name: caddy
-    src: "{{ workloads_root }}/edge/caddy"
+    src: "{{ services_root }}/caddy"
   - name: cloudflared
-    src: "{{ workloads_root }}/edge/cloudflared"
+    src: "{{ services_root }}/cloudflared"
