@@ -36,6 +36,7 @@ secrets.yaml
 secrets.yml
 
 # Editor / OS
+.helix/
 .vscode/
 .idea/
 *.swp
