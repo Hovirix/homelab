@@ -1,0 +1,26 @@
+---
+- name: Deploy idp services
+  hosts: idp
+  become: true
+  gather_facts: false
+
+  pre_tasks:
+    - name: Load authentik service secrets
+      community.sops.load_vars:
+        file: "{{ idp_secret_files.authentik }}"
+        name: sops_authentik
+
+    - name: Load postgres service secrets
+      community.sops.load_vars:
+        file: "{{ idp_secret_files.postgres }}"
+        name: sops_postgres
+
+  roles:  
+    - role: podman_secrets
+      vars:
+        podman_secrets_items: "{{ idp_podman_secrets }}"
+
+    - role: quadlet
+      vars:
+        quadlet_dir: "{{ idp_quadlet_dir }}"
+        quadlet_services: "{{ idp_quadlet }}"

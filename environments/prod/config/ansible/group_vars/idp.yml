@@ -1,0 +1,27 @@
+---
+services_root: "{{ playbook_dir }}/../../../services"
+secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
+
+idp_secret_files:
+  authentik: "{{ secrets_root }}/authentik.sops.yaml"
+  postgres: "{{ secrets_root }}/postgres.sops.yaml"
+
+idp_podman_secrets:
+  - name: authentik_bootstrap_password
+    value: "{{ sops_authentik.authentik.bootstrap_password }}"
+  - name: authentik_secret_key
+    value: "{{ sops_authentik.authentik.secret_key }}"
+  - name: authentik_bootstrap_token
+    value: "{{ sops_authentik.authentik.bootstrap_token }}"
+  - name: authentik_bootstrap_email
+    value: "{{ sops_authentik.authentik.bootstrap_email }}"
+  - name: postgres_authentik_username
+    value: "{{ sops_postgres.postgres.authentik.username }}"
+  - name: postgres_authentik_password
+    value: "{{ sops_postgres.postgres.authentik.password }}"
+
+idp_quadlet_dir: /etc/containers/systemd
+
+idp_quadlet:
+  - name: authentik
+    src: "{{ services_root }}/authentik/"
