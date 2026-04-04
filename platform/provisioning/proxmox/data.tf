@@ -19,9 +19,9 @@ data "authentik_property_mapping_provider_scope" "email" {
 }
 
 data "sops_file" "authentik_token" {
-  source_file = "../../secrets/infrastructure/authentik.sops.yaml"
+  source_file = "../../security/secrets/infrastructure/authentik.sops.yaml"
 }
 
 data "sops_file" "authentik_clients" {
-  source_file = "../../secrets/identity/oauth-clients.sops.yaml"
+  source_file = "../../security/secrets/identity/oauth-clients.sops.yaml"
 }
