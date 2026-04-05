@@ -18,7 +18,7 @@ provider "registry.opentofu.org/carlpett/sops" {
 
 provider "registry.opentofu.org/cloudflare/cloudflare" {
   version     = "5.18.0"
-  constraints = "~> 5.0"
+  constraints = "~> 5.18"
   hashes = [
     "h1:B9eoAx4QKNVuKHDahNl8JzuSLCCeIGAJiS0MckJu5wQ=",
     "zh:47e7bdfd8eddd2685f383269c0b6936ef62edd6d8383c8d7757b0cce0a689737",
