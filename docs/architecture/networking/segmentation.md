@@ -1,8 +1,6 @@
----
-title: "Network Layer (Layer 3)"
-description: "IP addressing, routing, inter-VLAN boundaries, and firewall policy."
-sidebarTitle: "Network Layer"
----
+# Network Layer (Layer 3)
+
+IP addressing, routing, inter-VLAN boundaries, and firewall policy.
 
 ## IP addressing scheme
 
@@ -21,40 +19,25 @@ The network uses a deterministic IP addressing scheme. Each VLAN follows the sam
 
 ### VLAN addressing
 
-<Tabs>
-  <Tab title="VLAN 10 — Management">
+:::tabs key:vlan
+== VLAN 10 — Management
+Used for infrastructure and administrative access.
+- `.10–49` → Proxmox nodes, OpenWRT management, core infrastructure
+- `.50–99` → Monitoring and admin tooling
+- No client devices
 
-  Used for infrastructure and administrative access.
+== VLAN 20 — Servers
+Used for applications and platform services.
+- `.10–49` → Reverse proxy, identity provider, core services
+- `.50–99` → Databases and observability
+- `.100–199` → Application VMs
 
-  **Typical usage**
-  - `.10–49` → Proxmox nodes, OpenWRT management, core infrastructure
-  - `.50–99` → Monitoring and admin tooling
-  - No client devices
-
-  </Tab>
-
-  <Tab title="VLAN 20 — Servers">
-
-  Used for applications and platform services.
-
-  **Typical usage**
-  - `.10–49` → Reverse proxy, identity provider, core services
-  - `.50–99` → Databases and observability
-  - `.100–199` → Application VMs
-
-  </Tab>
-
-  <Tab title="VLAN 30 — Clients">
-
-  Used for user devices and WiFi clients.
-
-  **Typical usage**
-  - `.10–49` → Reserved or static clients
-  - `.50–199` → DHCP pool
-  - `.200–254` → Temporary or overflow
-
-  </Tab>
-</Tabs>
+== VLAN 30 — Clients
+Used for user devices and WiFi clients.
+- `.10–49` → Reserved or static clients
+- `.50–199` → DHCP pool
+- `.200–254` → Temporary or overflow
+:::
 
 ---
 
@@ -88,7 +71,7 @@ OpenWRT is the default gateway for all VLANs.
 
 ### Zone model
 
-![OpenWRT firewall zones](../../images/hx_lab_firewall.png)
+![OpenWRT firewall zones](/images/hx_lab_firewall.png)
 
 ### Allowed flows
 
@@ -99,5 +82,3 @@ OpenWRT is the default gateway for all VLANs.
 | VLAN 30  | VLAN 10     | Any        | Deny   |
 | VLAN 20  | VLAN 10     | Any        | Deny   |
 | All VLANs| WAN         | Required   | Allow  |
-
----

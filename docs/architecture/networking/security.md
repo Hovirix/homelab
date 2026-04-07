@@ -1,10 +1,6 @@
----
-title: "Application & Services (Layer 7)"
-description: "Service inventory and application access paths."
-sidebarTitle: "Applications"
----
+# Application & Services (Layer 7)
 
----
+Service inventory and application access paths.
 
 ## Service inventory
 
@@ -14,8 +10,6 @@ Core services:
 - Identity provider (Authentik)
 - Applications (Immich, Paperless, Vaultwarden)
 - Observability (Prometheus, Grafana)
-
----
 
 ## Access paths
 
@@ -44,8 +38,6 @@ Admin → Service (direct)
 - SSH and admin interfaces
 - Restricted to management network
 
----
-
 ## Service boundaries
 
 - Applications run in VLAN 20
@@ -53,11 +45,7 @@ Admin → Service (direct)
 - All application access passes through Authentik
 - Internal services (e.g. databases) are not exposed
 
----
-
 ## Rule
 
 All application access must go through an authenticated ingress path.  
 Direct access to applications or internal services is not allowed.
-
----
