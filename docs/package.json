@@ -1,5 +1,20 @@
 {
-  "dependencies": {
-    "mintlify": "^4.2.216"
-  }
+  "name": "docs_v2",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "lint": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vitepress": "2.0.0-alpha.17",
+    "vitepress-plugin-tabs": "^0.8.0"
+  },
+  "packageManager": "pnpm@10.28.0"
 }
