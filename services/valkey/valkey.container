@@ -1,5 +1,5 @@
 [Container]
-Image=docker.io/valkey/valkey:9.0.1@sha256:138afc759e46b92d99b9eae76e1bc1203bb5dcac8579473a30102f38fd2c12fb
+Image=docker.io/valkey/valkey:9.0.3@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
 
 Exec=valkey-server --supervised systemd --appendonly yes --maxmemory 400mb --maxmemory-policy allkeys-lru
 
