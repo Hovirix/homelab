@@ -1,0 +1,27 @@
+# Transport Layer (Layer 4)
+
+Port usage and protocol boundaries.
+
+## Protocol usage
+
+- TCP → HTTP, HTTPS, SSH  
+- UDP → DNS, VPN  
+
+## Port mapping
+
+| Service | Protocol | Port | Scope     |
+| ------- | -------- | ---- | --------- |
+| HTTP    | TCP      | 80   | VLAN 20   |
+| HTTPS   | TCP      | 443  | VLAN 20   |
+| SSH     | TCP      | 22   | VLAN 10   |
+| DNS     | UDP      | 53   | All VLANs |
+
+## Access model
+
+- VLAN 30 → VLAN 20 → `80`, `443` only  
+- VLAN 10 → infrastructure and services (admin access)  
+- No other ports exposed between VLANs  
+
+## Rule
+
+Only required ports are allowed. All other traffic is implicitly blocked.

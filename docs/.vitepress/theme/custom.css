@@ -1,0 +1,44 @@
+:root {
+  --vp-c-brand-1: #0052ff;
+  --vp-c-brand-2: #0052ff;
+  --vp-c-brand-3: #0052ff;
+  --vp-c-brand-soft: rgba(0, 82, 255, 0.14);
+
+  --vp-button-brand-bg: #0052ff;
+  --vp-button-brand-border: #0052ff;
+  --vp-button-brand-hover-bg: #0046db;
+  --vp-button-brand-hover-border: #0046db;
+  --vp-button-brand-active-bg: #003dbf;
+  --vp-button-brand-active-border: #003dbf;
+}
+
+.dark {
+  --vp-c-brand-1: #0052ff;
+  --vp-c-brand-2: #0052ff;
+  --vp-c-brand-3: #0052ff;
+  --vp-c-brand-soft: rgba(0, 82, 255, 0.2);
+
+  --vp-button-brand-bg: #0052ff;
+  --vp-button-brand-border: #0052ff;
+  --vp-button-brand-hover-bg: #1b63ff;
+  --vp-button-brand-hover-border: #1b63ff;
+  --vp-button-brand-active-bg: #0046db;
+  --vp-button-brand-active-border: #0046db;
+}
+
+/* Tables - full width */
+.vp-doc table {
+  width: 100%;
+  max-width: 100%;
+  display: table;
+}
+
+/* Badge alignment */
+img[src*='shields.io'] {
+  display: inline;
+  vertical-align: middle;
+}
+
+.vp-doc h4 {
+  margin: 0px 0;
+}
