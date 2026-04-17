@@ -29,22 +29,6 @@
             pnpm
           ];
         };
-
-        openwrt = pkgs.mkShell {
-          packages = with pkgs; [
-            bash-language-server
-            go-task
-            sops
-            shfmt
-            wget
-            gnumake
-            gomplate
-            gzip
-            unzip
-            python3
-            python3Packages.distutils
-          ];
-        };
       };
     };
 }

@@ -1,6 +1,0 @@
-config dropbear 'main'
-	option PasswordAuth 'off'
-	option Port '22'
-	option _direct '1'
-	option DirectInterface 'vlan10'
-	option RootPasswordAuth 'off'
