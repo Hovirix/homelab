@@ -1,4 +1,3 @@
----
 - name: Deploy apps services
   hosts: apps
   become: true
@@ -28,7 +27,7 @@
   roles:
     - role: srv_data_disk
       vars:
-        srv_layout: "{{ apps_srv_layout }}"      
+        srv_layout: "{{ apps_srv_layout }}"
 
     - role: podman_secrets
       vars:

@@ -1,4 +1,3 @@
----
 - name: Deploy data services
   hosts: data
   become: true
@@ -19,7 +18,7 @@
     - role: srv_data_disk
       vars:
         srv_layout: "{{ data_srv_layout }}"
-        
+
     - role: podman_secrets
       vars:
         podman_secrets_items: "{{ data_podman_secrets }}"

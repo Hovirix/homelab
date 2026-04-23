@@ -1,4 +1,3 @@
----
 services_root: "{{ playbook_dir }}/../../../services"
 secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 
@@ -11,7 +10,7 @@ edge_podman_secrets:
     value: "{{ sops_caddy.caddy.cloudflare_dns_token }}"
   - name: cloudflared_tunnel_token
     value: "{{ sops_cloudflared.token }}"
-    
+
 edge_quadlet_dir: /etc/containers/systemd
 
 edge_quadlet:

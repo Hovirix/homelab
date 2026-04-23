@@ -8,36 +8,39 @@ The network uses a deterministic IP addressing scheme. Each VLAN follows the sam
 
 ### Allocation model
 
-| Range        | Purpose                      |
-| ------------ | ---------------------------- |
-| `.1`         | Gateway                      |
-| `.2 - .9`    | Reserved                     |
-| `.10 - .49`  | Infrastructure               |
-| `.50 - .99`  | Platform services            |
-| `.100 - .199`| Applications / VMs           |
-| `.200 - .254`| Clients / DHCP / temporary   |
+| Range         | Purpose                    |
+| ------------- | -------------------------- |
+| `.1`          | Gateway                    |
+| `.2 - .9`     | Reserved                   |
+| `.10 - .49`   | Infrastructure             |
+| `.50 - .99`   | Platform services          |
+| `.100 - .199` | Applications / VMs         |
+| `.200 - .254` | Clients / DHCP / temporary |
 
 ### VLAN addressing
 
 :::tabs key:vlan
 == VLAN 10 — Management
 Used for infrastructure and administrative access.
+
 - `.10–49` → Proxmox nodes, OpenWRT management, core infrastructure
 - `.50–99` → Monitoring and admin tooling
 - No client devices
 
 == VLAN 20 — Servers
 Used for applications and platform services.
+
 - `.10–49` → Reverse proxy, identity provider, core services
 - `.50–99` → Databases and observability
 - `.100–199` → Application VMs
 
 == VLAN 30 — Clients
 Used for user devices and WiFi clients.
+
 - `.10–49` → Reserved or static clients
 - `.50–199` → DHCP pool
 - `.200–254` → Temporary or overflow
-:::
+  :::
 
 ---
 
@@ -75,10 +78,10 @@ OpenWRT is the default gateway for all VLANs.
 
 ### Allowed flows
 
-| Source   | Destination | Ports      | Action |
-| -------- | ----------- | ---------- | ------ |
-| VLAN 10  | VLAN 20     | `22`       | Allow  |
-| VLAN 30  | VLAN 20     | `80`, `443`| Allow  |
-| VLAN 30  | VLAN 10     | Any        | Deny   |
-| VLAN 20  | VLAN 10     | Any        | Deny   |
-| All VLANs| WAN         | Required   | Allow  |
+| Source    | Destination | Ports       | Action |
+| --------- | ----------- | ----------- | ------ |
+| VLAN 10   | VLAN 20     | `22`        | Allow  |
+| VLAN 30   | VLAN 20     | `80`, `443` | Allow  |
+| VLAN 30   | VLAN 10     | Any         | Deny   |
+| VLAN 20   | VLAN 10     | Any         | Deny   |
+| All VLANs | WAN         | Required    | Allow  |

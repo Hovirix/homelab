@@ -1,4 +1,3 @@
----
 services_root: "{{ playbook_dir }}/../../../services"
 secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 
@@ -35,7 +34,7 @@ apps_podman_secrets:
     value: "{{ sops_vaultwarden.vaultwarden.installation.id }}"
   - name: vaultwarden_installation_key
     value: "{{ sops_vaultwarden.vaultwarden.installation.key }}"
-    
+
 apps_quadlet_dir: /etc/containers/systemd
 
 apps_quadlet:

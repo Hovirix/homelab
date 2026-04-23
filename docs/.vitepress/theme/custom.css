@@ -34,7 +34,7 @@
 }
 
 /* Badge alignment */
-img[src*='shields.io'] {
+img[src*="shields.io"] {
   display: inline;
   vertical-align: middle;
 }

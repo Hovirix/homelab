@@ -1,4 +1,3 @@
----
 services_root: "{{ playbook_dir }}/../../../services"
 secrets_root: "{{ playbook_dir }}/../../../security/secrets/services"
 

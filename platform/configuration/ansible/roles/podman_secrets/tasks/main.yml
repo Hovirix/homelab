@@ -1,4 +1,3 @@
----
 - name: Create Podman secrets
   containers.podman.podman_secret:
     state: present

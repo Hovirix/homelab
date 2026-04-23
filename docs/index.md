@@ -5,11 +5,11 @@ hero:
   name: "HX Lab"
   text: "The Self-Hosted DevSecOps Platform"
   tagline: "Security-focused infrastructure, designed and operated like production."
-  
+
   image:
     src: /logo.png
     alt: HX Lab logo
-    
+
   actions:
     - theme: brand
       text: View Architecture

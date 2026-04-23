@@ -4,8 +4,8 @@ Port usage and protocol boundaries.
 
 ## Protocol usage
 
-- TCP → HTTP, HTTPS, SSH  
-- UDP → DNS, VPN  
+- TCP → HTTP, HTTPS, SSH
+- UDP → DNS, VPN
 
 ## Port mapping
 
@@ -18,9 +18,9 @@ Port usage and protocol boundaries.
 
 ## Access model
 
-- VLAN 30 → VLAN 20 → `80`, `443` only  
-- VLAN 10 → infrastructure and services (admin access)  
-- No other ports exposed between VLANs  
+- VLAN 30 → VLAN 20 → `80`, `443` only
+- VLAN 10 → infrastructure and services (admin access)
+- No other ports exposed between VLANs
 
 ## Rule
 

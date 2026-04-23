@@ -1,4 +1,3 @@
----
 - name: Deploy idp services
   hosts: idp
   become: true
@@ -15,7 +14,7 @@
         file: "{{ idp_secret_files.postgres }}"
         name: sops_postgres
 
-  roles:  
+  roles:
     - role: podman_secrets
       vars:
         podman_secrets_items: "{{ idp_podman_secrets }}"
