@@ -1,5 +1,5 @@
 [Container]
-Image=ghcr.io/paperless-ngx/paperless-ngx:2.20.3@sha256:7b937cb2fa2885ab0ecfceb8c7e8827e2312472d9d897a270097ba7f5522dcdc
+Image=ghcr.io/paperless-ngx/paperless-ngx:2.20.15@sha256:6c86cad803970ea782683a8e80e7403444c5bf3cf70de63b4d3c8e87500db92f
 
 Environment=PAPERLESS_URL=https://paperless.home.hovirix.dev
 Environment=PAPERLESS_REDIS=redis://valkey.internal.home.hovirix.dev:6379/1
