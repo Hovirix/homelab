@@ -1,5 +1,5 @@
 module "homelab_tunnel" {
-  source = "../../../../platform/provisioning/cloudflare/modules/zt_tunnel"
+  source = "../../../modules/cloudflare/zt_tunnel"
 
   account_id = local.account_id
   name       = "homelab"

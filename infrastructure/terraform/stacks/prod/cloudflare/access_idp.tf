@@ -1,5 +1,5 @@
 module "authentik_idp" {
-  source = "../../../../platform/provisioning/cloudflare/modules/zt_access_identidy_provider"
+  source = "../../../modules/cloudflare/zt_access_identidy_provider"
 
   account_id = local.account_id
   name       = "authentik"

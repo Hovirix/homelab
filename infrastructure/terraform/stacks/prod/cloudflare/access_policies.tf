@@ -1,5 +1,5 @@
 module "policy_authentik_admins" {
-  source = "../../../../platform/provisioning/cloudflare/modules/zt_access_policy"
+  source = "../../../modules/cloudflare/zt_access_policy"
 
   account_id = local.account_id
   name       = "authentik-admins"
@@ -27,7 +27,7 @@ module "policy_authentik_admins" {
 }
 
 module "policy_authentik_users" {
-  source = "../../../../platform/provisioning/cloudflare/modules/zt_access_policy"
+  source = "../../../modules/cloudflare/zt_access_policy"
 
   account_id = local.account_id
   name       = "authentik-users"
@@ -55,7 +55,7 @@ module "policy_authentik_users" {
 }
 
 module "policy_block_non_fr" {
-  source = "../../../../platform/provisioning/cloudflare/modules/zt_access_policy"
+  source = "../../../modules/cloudflare/zt_access_policy"
 
   account_id = local.account_id
   name       = "block-non-fr"

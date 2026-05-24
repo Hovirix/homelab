@@ -59,11 +59,4 @@ locals {
       module.policy_block_non_fr.id,
     ]
   }
-
-  dns_records = {
-    for name, app in local.exposed_apps : name => {
-      name     = name
-      hostname = app.hostname
-    }
-  }
 }
