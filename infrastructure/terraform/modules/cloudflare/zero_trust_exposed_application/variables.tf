@@ -32,8 +32,8 @@ variable "type" {
   default = "self_hosted"
 
   validation {
-    condition     = contains(["self_hosted", "saas", "ssh", "vnc", "app_launcher", "warp", "biso", "bookmark", "dash_sso", "infrastructure", "rdp", "mcp", "mcp_portal", "proxy_endpoint"], var.type)
-    error_message = "type must be a valid Cloudflare Access application type."
+    condition     = var.type == "self_hosted"
+    error_message = "This module currently supports only self_hosted applications."
   }
 }
 

@@ -1,5 +1,5 @@
 module "access_application" {
-  source = "../zt_access_application"
+  source = "../zero_trust_access_application"
 
   account_id = var.account_id
 
