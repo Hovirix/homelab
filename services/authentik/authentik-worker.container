@@ -1,5 +1,5 @@
 [Container]
-Image=ghcr.io/goauthentik/server:2026.2.1@sha256:c2f132826e5b33629800cdd045a33ed9d80599538aaa49ad290397399539be9d
+Image=ghcr.io/goauthentik/server:2026.5.2@sha256:bf0a9740dc92a768595972e9e939e797a8b6f22d92be90f53a005c2af74eb722
 Exec=worker
 
 Environment=AUTHENTIK_POSTGRESQL__HOST=postgres.internal.home.hovirix.dev
