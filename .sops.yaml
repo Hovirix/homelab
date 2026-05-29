@@ -1,4 +1,4 @@
 creation_rules:
-  - path_regex: ^security/secrets/.*
+  - path_regex: ^secrets/.*
     age: >-
       ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB

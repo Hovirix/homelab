@@ -1,4 +1,0 @@
-- import_playbook: deploy-apps.yml
-- import_playbook: deploy-data.yml
-- import_playbook: deploy-edge.yml
-- import_playbook: deploy-idp.yml
