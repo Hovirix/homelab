@@ -16,5 +16,5 @@
     "vitepress": "2.0.0-alpha.17",
     "vitepress-plugin-tabs": "^0.8.0"
   },
-  "packageManager": "pnpm@10.28.0"
+  "packageManager": "pnpm@10.34.1"
 }
