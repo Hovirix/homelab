@@ -4,18 +4,12 @@
 
 proxmox_domain: home.hovirix.dev
 proxmox_timezone: Etc/UTC
-proxmox_common_manage_hostname: true
-proxmox_common_manage_timezone: true
-proxmox_common_install_packages: true
 
 # =============================================================================
 # REPOSITORIES
 # =============================================================================
 
 # Managed by roles/repositories.
-proxmox_repositories_manage: false
-proxmox_repositories_debian_suite: bookworm
-proxmox_repositories_no_subscription_uri: http://download.proxmox.com/debian/pve
 
 # =============================================================================
 # UPDATES
@@ -36,8 +30,6 @@ proxmox_admin_users:
     ssh_authorized_keys:
       - "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_ed25519.pub') }}"
 
-proxmox_users_manage: false
-
 # =============================================================================
 # SSH
 # =============================================================================
@@ -45,7 +37,6 @@ proxmox_users_manage: false
 proxmox_ssh_allowed_groups:
   - sudo
 
-proxmox_ssh_manage: false
 proxmox_ssh_allow_users: []
 proxmox_ssh_permit_root_login: prohibit-password
 
@@ -55,7 +46,6 @@ proxmox_ssh_permit_root_login: prohibit-password
 
 proxmox_management_vlan: 20
 proxmox_management_gateway: 10.20.0.1
-proxmox_networking_manage: false
 
 proxmox_allowed_vlans:
   - 20 # Management
@@ -74,24 +64,21 @@ proxmox_allowed_vlans:
 # - Additional storage pools
 # - ZFS tuning
 #
-# Currently no storage configuration is managed by Ansible.llj
-proxmox_storage_manage: false
+# Currently no storage configuration is managed by Ansible.
 
 # =============================================================================
 # KERNEL
 # =============================================================================
 
-proxmox_enable_iommu: false
-proxmox_enable_vfio: false
-proxmox_enable_hugepages: false
-proxmox_kernel_manage: false
+proxmox_kernel_manage: true     # manage /etc/kernel/cmdline
+proxmox_enable_iommu: true      # add intel_iommu=on or amd_iommu=on
+proxmox_enable_vfio: true       # load vfio modules
 
 # =============================================================================
 # FIREWALL
 # =============================================================================
 
 # Firewall configuration is intentionally unmanaged.
-proxmox_firewall_manage: false
 #
 # Future responsibilities:
 # - Datacenter firewall
@@ -105,7 +92,6 @@ proxmox_firewall_manage: false
 # =============================================================================
 
 # Certificate configuration is intentionally unmanaged.
-proxmox_certificates_manage: false
 #
 # Future responsibilities:
 # - ACME / Let's Encrypt
@@ -118,7 +104,6 @@ proxmox_certificates_manage: false
 # =============================================================================
 
 # Monitoring configuration is intentionally unmanaged.
-proxmox_monitoring_manage: false
 #
 # Future responsibilities:
 # - Node Exporter
@@ -132,7 +117,6 @@ proxmox_monitoring_manage: false
 # =============================================================================
 
 # Notification configuration is intentionally unmanaged.
-proxmox_notifications_manage: false
 #
 # Future responsibilities:
 # - SMTP notifications
@@ -147,8 +131,6 @@ proxmox_notifications_manage: false
 # BACKUP
 # =============================================================================
 
-proxmox_backup_manage: false
-
 proxmox_backup_target_type: nfs
 
 proxmox_backup_retention:
@@ -162,7 +144,6 @@ proxmox_backup_retention:
 
 # Cluster configuration is intentionally unmanaged until all
 # Proxmox nodes are installed and available.
-proxmox_cluster_manage: false
 #
 # Planned nodes:
 # - pve1
