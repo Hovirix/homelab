@@ -1,4 +1,3 @@
----
 - name: Configure kernel command line
   ansible.builtin.template:
     src: cmdline.j2

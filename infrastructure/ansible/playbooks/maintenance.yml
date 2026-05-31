@@ -1,4 +1,3 @@
----
 - name: Maintain Proxmox hosts
   hosts: proxmox
   become: true

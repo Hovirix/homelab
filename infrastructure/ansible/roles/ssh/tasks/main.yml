@@ -1,4 +1,3 @@
----
 - name: Ensure SSH drop-in directory exists
   ansible.builtin.file:
     path: /etc/ssh/sshd_config.d

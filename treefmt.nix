@@ -1,5 +1,4 @@
 { pkgs, ... }:
-
 {
   programs = {
     nixfmt.enable = true;
@@ -13,12 +12,15 @@
     };
   };
 
-  settings.formatter.opentofu = {
-    command = "${pkgs.opentofu}/bin/tofu";
-    options = [ "fmt" ];
-    includes = [
-      "*.tf"
-      "*.tfvars"
-    ];
+  settings = {
+    global.excludes = [ "secrets/**" ];
+    formatter.opentofu = {
+      command = "${pkgs.opentofu}/bin/tofu";
+      options = [ "fmt" ];
+      includes = [
+        "*.tf"
+        "*.tfvars"
+      ];
+    };
   };
 }

@@ -1,4 +1,3 @@
----
 - name: Configure Proxmox hosts
   hosts: proxmox
   become: true
