@@ -46,3 +46,5 @@ Thumbs.db
 /firmware/openwrt/files/config/wireless
 /docs/.vitepress/cache/deps
 /docs/node_modules/
+/.ansible-lint
+/.yamllint

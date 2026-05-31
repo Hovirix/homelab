@@ -31,6 +31,7 @@
           default = pkgs.mkShell {
             packages = with pkgs; [
               ansible
+              ansible-lint
               helm-ls
               helmfile
               kubectl
