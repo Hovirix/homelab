@@ -5,7 +5,6 @@
     owner: root
     group: root
     mode: "0755"
-  when: proxmox_ssh_manage
 
 - name: Configure SSH key-only access
   ansible.builtin.template:
@@ -16,4 +15,3 @@
     mode: "0644"
     validate: "sshd -t -f %s"
   notify: Reload sshd
-  when: proxmox_ssh_manage

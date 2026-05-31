@@ -6,7 +6,8 @@
     group: root
     mode: "0644"
   notify: Refresh bootloader
-  when: proxmox_kernel_manage
+  when:
+    - proxmox_kernel_manage | bool
 
 - name: Configure VFIO modules
   ansible.builtin.copy:
@@ -19,7 +20,7 @@
       vfio_iommu_type1
       vfio_pci
       vfio_virqfd
-  when:
-    - proxmox_kernel_manage
-    - proxmox_enable_vfio
   notify: Update initramfs
+  when:
+    - proxmox_kernel_manage | bool
+    - proxmox_enable_vfio | bool

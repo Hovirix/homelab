@@ -6,7 +6,6 @@
 - name: Upgrade packages
   ansible.builtin.apt:
     upgrade: dist
-  when: proxmox_updates_upgrade
 
 - name: Check if reboot is required
   ansible.builtin.stat:
@@ -16,6 +15,4 @@
 - name: Reboot if required
   ansible.builtin.reboot:
     reboot_timeout: 900
-  when:
-    - proxmox_updates_reboot
-    - proxmox_reboot_required.stat.exists
+  when: proxmox_reboot_required.stat.exists

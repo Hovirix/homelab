@@ -7,7 +7,6 @@
     create_home: true
     state: present
   loop: "{{ proxmox_admin_users }}"
-  when: proxmox_users_manage
 
 - name: Install admin SSH authorized keys
   ansible.posix.authorized_key:
@@ -17,5 +16,4 @@
     state: present
   loop: "{{ proxmox_admin_users }}"
   when:
-    - proxmox_users_manage
     - item.ssh_authorized_keys is defined
