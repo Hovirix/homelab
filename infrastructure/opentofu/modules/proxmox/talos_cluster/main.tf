@@ -3,7 +3,7 @@ locals {
   proxmox_nodes   = toset([for node in values(var.nodes) : node.node_name])
 }
 
-resource "proxmox_virtual_environment_download_file" "talos_nocloud" {
+resource "proxmox_download_file" "talos_nocloud" {
   for_each = local.proxmox_nodes
 
   content_type = "import"
@@ -30,7 +30,7 @@ module "node" {
 
   boot_disk = {
     datastore_id = var.boot_disk_datastore_id
-    import_from  = proxmox_virtual_environment_download_file.talos_nocloud[each.value.node_name].id
+    import_from  = proxmox_download_file.talos_nocloud[each.value.node_name].id
     size         = var.boot_disk_size
   }
 }

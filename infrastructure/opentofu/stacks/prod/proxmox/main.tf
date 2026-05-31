@@ -2,7 +2,7 @@ module "kubernetes_cluster" {
   source = "../../../modules/proxmox/talos_cluster"
 
   talos_image_schematic_id = "ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515"
-  talos_version            = "v1.11.2"
+  talos_version            = "v1.13.3"
 
   nodes = {
     prod-k8s-01 = {
