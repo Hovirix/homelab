@@ -1,5 +1,5 @@
-# Terraform
-**/.terraform/*
+# OpenTofu
+**/.[t]erraform/*
 *.tfstate
 *.tfstate.*
 crash.log
@@ -26,7 +26,6 @@ dist/
 # Secrets
 *.tfvars
 *.tfvars.json
-terraform.tfvars
 *.pem
 *.key
 id_rsa

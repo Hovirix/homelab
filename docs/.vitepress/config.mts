@@ -91,7 +91,7 @@ export default defineConfig({
           text: "Provisioning",
           collapsed: false,
           items: [
-            { text: "Terraform", link: "/platform/provisioning/terraform" },
+            { text: "OpenTofu", link: "/platform/provisioning/opentofu" },
             { text: "Proxmox", link: "/platform/provisioning/proxmox" }
           ]
         },
