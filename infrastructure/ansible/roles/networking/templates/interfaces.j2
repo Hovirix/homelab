@@ -1,0 +1,17 @@
+auto lo
+iface lo inet loopback
+
+iface {{ proxmox_network_interface }} inet manual
+
+auto vmbr0
+iface vmbr0 inet manual
+    bridge-ports {{ proxmox_network_interface }}
+    bridge-stp off
+    bridge-fd 0
+    bridge-vlan-aware yes
+    bridge-vids {{ proxmox_allowed_vlans | join(' ') }}
+
+auto vmbr0.{{ proxmox_management_vlan }}
+iface vmbr0.{{ proxmox_management_vlan }} inet static
+    address {{ proxmox_management_address }}
+    gateway {{ proxmox_management_gateway }}

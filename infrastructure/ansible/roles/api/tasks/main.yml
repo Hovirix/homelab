@@ -1,0 +1,71 @@
+---
+# Behavior:
+#
+# ✓ Creates roles if missing
+# ✓ Creates users if missing
+# ✓ Applies ACL assignments
+# ✓ Safe to run multiple times
+# ✗ Does not update existing role privileges
+# ✗ Does not update existing user properties
+# ✗ Not strictly idempotent
+
+# Homelab note:
+#
+# This implementation favors simplicity over full reconciliation.
+#
+# If you change role privileges later:
+#
+#   pveum role delete <role>
+#
+# Then rerun Ansible.
+#
+# Example:
+#
+#   pveum role delete OpenTofuProv
+#   ansible-playbook playbooks/configure.yml --tags api
+
+- name: Ensure Proxmox API roles exist
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - add
+      - "{{ item.name }}"
+      - -privs
+      - "{{ item.privileges | join(' ') }}"
+  loop: "{{ proxmox_api_roles }}"
+  register: proxmox_api_role_add
+  changed_when: proxmox_api_role_add.rc == 0
+  failed_when:
+    - proxmox_api_role_add.rc != 0
+    - "'already exists' not in proxmox_api_role_add.stderr"
+
+- name: Ensure Proxmox API users exist
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - add
+      - "{{ item.userid }}"
+      - -comment
+      - "{{ item.comment | default('Managed by Ansible') }}"
+  loop: "{{ proxmox_api_users }}"
+  register: proxmox_api_user_add
+  changed_when: proxmox_api_user_add.rc == 0
+  failed_when:
+    - proxmox_api_user_add.rc != 0
+    - "'already exists' not in proxmox_api_user_add.stderr"
+
+- name: Ensure Proxmox API ACLs are applied
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - "{{ item.acl_path | default('/') }}"
+      - -user
+      - "{{ item.userid }}"
+      - -role
+      - "{{ item.role }}"
+  loop: "{{ proxmox_api_users }}"
+  changed_when: false

@@ -1,0 +1,20 @@
+---
+- name: Ensure SSH drop-in directory exists
+  ansible.builtin.file:
+    path: /etc/ssh/sshd_config.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  when: proxmox_ssh_manage
+
+- name: Configure SSH key-only access
+  ansible.builtin.template:
+    src: hxlab.conf.j2
+    dest: /etc/ssh/sshd_config.d/99-hxlab.conf
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "sshd -t -f %s"
+  notify: Reload sshd
+  when: proxmox_ssh_manage

@@ -1,0 +1,28 @@
+---
+# =============================================================================
+# FIREWALL
+# =============================================================================
+#
+# Intentionally not managed yet.
+#
+# Network segmentation is currently enforced by OpenWrt VLANs:
+#
+# VLAN 20 - Management
+# VLAN 40 - Kubernetes
+# VLAN 60 - Security Lab / Air-gapped
+#
+# Future responsibilities:
+# - Enable Proxmox Datacenter Firewall
+# - Enable Proxmox Node Firewall
+# - Restrict SSH access
+# - Restrict Proxmox API/UI access (8006/tcp)
+# - Configure Corosync cluster rules
+# - Configure default deny policies
+# - Configure logging and rate limiting
+#
+# Current state:
+# - Firewall configuration is managed manually.
+# - No host firewall changes are performed by Ansible.
+#
+# References:
+# https://pve.proxmox.com/pve-docs/chapter-pve-firewall.html

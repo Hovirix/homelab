@@ -1,0 +1,3 @@
+proxmox_hostname: pve2
+proxmox_management_address: 10.20.0.12/24
+proxmox_network_interface: nic0

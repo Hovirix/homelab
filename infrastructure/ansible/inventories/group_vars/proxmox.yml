@@ -1,0 +1,213 @@
+# =============================================================================
+# COMMON
+# =============================================================================
+
+proxmox_domain: home.hovirix.dev
+proxmox_timezone: Etc/UTC
+proxmox_common_manage_hostname: true
+proxmox_common_manage_timezone: true
+proxmox_common_install_packages: true
+
+# =============================================================================
+# REPOSITORIES
+# =============================================================================
+
+# Managed by roles/repositories.
+proxmox_repositories_manage: false
+proxmox_repositories_debian_suite: bookworm
+proxmox_repositories_no_subscription_uri: http://download.proxmox.com/debian/pve
+
+# =============================================================================
+# UPDATES
+# =============================================================================
+
+proxmox_updates_upgrade: false
+proxmox_updates_reboot: false
+
+# =============================================================================
+# USERS
+# =============================================================================
+
+proxmox_admin_users:
+  - name: admin
+    groups:
+      - sudo
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_ed25519.pub') }}"
+
+proxmox_users_manage: false
+
+# =============================================================================
+# SSH
+# =============================================================================
+
+proxmox_ssh_allowed_groups:
+  - sudo
+
+proxmox_ssh_manage: false
+proxmox_ssh_allow_users: []
+proxmox_ssh_permit_root_login: prohibit-password
+
+# =============================================================================
+# NETWORKING
+# =============================================================================
+
+proxmox_management_vlan: 20
+proxmox_management_gateway: 10.20.0.1
+proxmox_networking_manage: false
+
+proxmox_allowed_vlans:
+  - 20 # Management
+  - 40 # Kubernetes
+  - 60 # Air-gapped VMs
+
+# =============================================================================
+# STORAGE
+# =============================================================================
+
+# Proxmox is installed with ZFS and manages the local-zfs storage.
+#
+# Future responsibilities:
+# - ZFS dataset management
+# - Local replication configuration
+# - Additional storage pools
+# - ZFS tuning
+#
+# Currently no storage configuration is managed by Ansible.llj
+proxmox_storage_manage: false
+
+# =============================================================================
+# KERNEL
+# =============================================================================
+
+proxmox_enable_iommu: false
+proxmox_enable_vfio: false
+proxmox_enable_hugepages: false
+proxmox_kernel_manage: false
+
+# =============================================================================
+# FIREWALL
+# =============================================================================
+
+# Firewall configuration is intentionally unmanaged.
+proxmox_firewall_manage: false
+#
+# Future responsibilities:
+# - Datacenter firewall
+# - Node firewall
+# - SSH restrictions
+# - Proxmox UI/API restrictions
+# - Corosync rules
+
+# =============================================================================
+# CERTIFICATES
+# =============================================================================
+
+# Certificate configuration is intentionally unmanaged.
+proxmox_certificates_manage: false
+#
+# Future responsibilities:
+# - ACME / Let's Encrypt
+# - DNS-01 challenge
+# - Internal CA
+# - Proxmox API/UI certificate replacement
+
+# =============================================================================
+# MONITORING
+# =============================================================================
+
+# Monitoring configuration is intentionally unmanaged.
+proxmox_monitoring_manage: false
+#
+# Future responsibilities:
+# - Node Exporter
+# - Proxmox VE Exporter
+# - SMART monitoring
+# - Log collection
+# - OpenTelemetry / Alloy integration
+
+# =============================================================================
+# NOTIFICATIONS
+# =============================================================================
+
+# Notification configuration is intentionally unmanaged.
+proxmox_notifications_manage: false
+#
+# Future responsibilities:
+# - SMTP notifications
+# - Gotify integration
+# - ntfy integration
+# - Webhook notifications
+# - Backup failure alerts
+# - Cluster health alerts
+# - Hardware monitoring alerts
+
+# =============================================================================
+# BACKUP
+# =============================================================================
+
+proxmox_backup_manage: false
+
+proxmox_backup_target_type: nfs
+
+proxmox_backup_retention:
+  keep_daily: 7
+  keep_weekly: 4
+  keep_monthly: 12
+
+# =============================================================================
+# CLUSTER
+# =============================================================================
+
+# Cluster configuration is intentionally unmanaged until all
+# Proxmox nodes are installed and available.
+proxmox_cluster_manage: false
+#
+# Planned nodes:
+# - pve1
+# - pve2
+# - pve3
+#
+# Future responsibilities:
+# - Cluster creation
+# - Node joins
+# - Corosync configuration
+# - Cluster health validation
+
+# =============================================================================
+# API
+# =============================================================================
+
+proxmox_api_users:
+  - userid: opentofu@pve
+    comment: OpenTofu lifecycle user
+    role: OpenTofuProv
+    acl_path: /
+
+proxmox_api_roles:
+  - name: OpenTofuProv
+    privileges:
+      - Datastore.Allocate
+      - Datastore.AllocateSpace
+      - Datastore.AllocateTemplate
+      - Datastore.Audit
+      - Pool.Allocate
+      - SDN.Use
+      - Sys.Audit
+      - Sys.Console
+      - Sys.Modify
+      - VM.Allocate
+      - VM.Audit
+      - VM.Clone
+      - VM.Config.CDROM
+      - VM.Config.CPU
+      - VM.Config.Cloudinit
+      - VM.Config.Disk
+      - VM.Config.HWType
+      - VM.Config.Memory
+      - VM.Config.Network
+      - VM.Config.Options
+      - VM.Migrate
+      - VM.Monitor
+      - VM.PowerMgmt

@@ -1,0 +1,26 @@
+---
+- name: Configure kernel command line
+  ansible.builtin.template:
+    src: cmdline.j2
+    dest: /etc/kernel/cmdline
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Refresh bootloader
+  when: proxmox_kernel_manage
+
+- name: Configure VFIO modules
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/vfio.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      vfio
+      vfio_iommu_type1
+      vfio_pci
+      vfio_virqfd
+  when:
+    - proxmox_kernel_manage
+    - proxmox_enable_vfio
+  notify: Update initramfs

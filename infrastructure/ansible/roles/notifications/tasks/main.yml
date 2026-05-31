@@ -1,0 +1,22 @@
+---
+# =============================================================================
+# NOTIFICATIONS
+# =============================================================================
+#
+# Intentionally not managed yet.
+#
+# Future responsibilities:
+# - SMTP notifications
+# - Gotify integration
+# - ntfy integration
+# - Webhook notifications
+# - Backup failure alerts
+# - Cluster health alerts
+# - Hardware monitoring alerts
+#
+# Current state:
+# - Notification configuration is managed manually.
+# - No notification endpoints are configured by Ansible.
+#
+# References:
+# https://pve.proxmox.com/pve-docs/chapter-notifications.html

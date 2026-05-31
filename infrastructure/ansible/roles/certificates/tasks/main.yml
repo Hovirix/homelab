@@ -1,0 +1,21 @@
+---
+# =============================================================================
+# CERTIFICATES
+# =============================================================================
+#
+# Intentionally not managed yet.
+#
+# Proxmox default self-signed certificates are currently acceptable for
+# initial cluster setup.
+#
+# Future responsibilities:
+# - Configure ACME account
+# - Configure DNS-01 challenge
+# - Issue Let's Encrypt certificates
+# - Deploy internal CA certificates
+# - Replace Proxmox API/UI certificates
+# - Reload pveproxy after certificate changes
+#
+# Current state:
+# - Certificate configuration is managed manually.
+# - No certificate changes are performed by Ansible.

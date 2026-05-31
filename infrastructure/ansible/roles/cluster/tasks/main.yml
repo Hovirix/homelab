@@ -1,0 +1,28 @@
+---
+# =============================================================================
+# CLUSTER
+# =============================================================================
+#
+# Intentionally not managed yet.
+#
+# The full Proxmox cluster cannot be created until all nodes are
+# installed and available:
+#
+# - pve1
+# - pve2
+# - pve3
+#
+# Future responsibilities:
+# - Create cluster on pve1
+# - Join pve2 to cluster
+# - Join pve3 to cluster
+# - Configure Corosync
+# - Validate cluster health
+# - Validate quorum
+#
+# Current state:
+# - Nodes are configured independently.
+# - Cluster formation is performed manually.
+#
+# References:
+# https://pve.proxmox.com/pve-docs/chapter-pvecm.html

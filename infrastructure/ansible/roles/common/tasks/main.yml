@@ -1,0 +1,10 @@
+---
+- name: Configure hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+  when: proxmox_common_manage_hostname
+
+- name: Configure timezone
+  community.general.timezone:
+    name: "{{ proxmox_timezone }}"
+  when: proxmox_common_manage_timezone

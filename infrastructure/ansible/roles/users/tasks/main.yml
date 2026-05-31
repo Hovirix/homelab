@@ -1,0 +1,22 @@
+---
+- name: Create Linux admin users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups | default([]) }}"
+    append: true
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    create_home: true
+    state: present
+  loop: "{{ proxmox_admin_users }}"
+  when: proxmox_users_manage
+
+- name: Install admin SSH authorized keys
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ item.ssh_authorized_keys | join('\n') }}"
+    exclusive: true
+    state: present
+  loop: "{{ proxmox_admin_users }}"
+  when:
+    - proxmox_users_manage
+    - item.ssh_authorized_keys is defined

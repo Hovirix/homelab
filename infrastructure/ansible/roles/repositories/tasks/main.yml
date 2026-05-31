@@ -1,0 +1,41 @@
+---
+- name: Remove legacy Debian sources list
+  ansible.builtin.file:
+    path: /etc/apt/sources.list
+    state: absent
+  when: proxmox_repositories_manage
+
+- name: Remove legacy Proxmox enterprise repository
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/pve-enterprise.list
+    state: absent
+  when: proxmox_repositories_manage
+
+- name: Remove Proxmox enterprise repository
+  ansible.builtin.file:
+    path: /etc/apt/sources.list.d/pve-enterprise.sources
+    state: absent
+  when: proxmox_repositories_manage
+
+- name: Configure Debian repositories
+  ansible.builtin.template:
+    src: debian.j2
+    dest: /etc/apt/sources.list.d/debian.sources
+    owner: root
+    group: root
+    mode: "0644"
+  when: proxmox_repositories_manage
+
+- name: Configure Proxmox no-subscription repository
+  ansible.builtin.template:
+    src: proxmox.sources.j2
+    dest: /etc/apt/sources.list.d/proxmox.sources
+    owner: root
+    group: root
+    mode: "0644"
+  when: proxmox_repositories_manage
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+  when: proxmox_repositories_manage

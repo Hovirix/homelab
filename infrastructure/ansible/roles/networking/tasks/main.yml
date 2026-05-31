@@ -1,0 +1,10 @@
+---
+- name: Configure Proxmox network interfaces
+  ansible.builtin.template:
+    src: interfaces.j2
+    dest: /etc/network/interfaces
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload networking
+  when: proxmox_networking_manage
