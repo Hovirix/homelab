@@ -4,8 +4,8 @@ module "cloudflare" {
   name = "Cloudflare"
   slug = "cloudflare"
 
-  client_id     = data.sops_file.authentik_clients.data["oauth.cloudflare.client_id"]
-  client_secret = data.sops_file.authentik_clients.data["oauth.cloudflare.client_secret"]
+  client_id     = data.sops_file.identity.data["oauth.cloudflare.client_id"]
+  client_secret = data.sops_file.identity.data["oauth.cloudflare.client_secret"]
 
   redirect_uris = [
     "https://hovirix.cloudflareaccess.com/cdn-cgi/access/callback",
@@ -18,8 +18,8 @@ module "grafana" {
   name = "Grafana"
   slug = "grafana"
 
-  client_id     = data.sops_file.authentik_clients.data["oauth.grafana.client_id"]
-  client_secret = data.sops_file.authentik_clients.data["oauth.grafana.client_secret"]
+  client_id     = data.sops_file.identity.data["oauth.grafana.client_id"]
+  client_secret = data.sops_file.identity.data["oauth.grafana.client_secret"]
 
   redirect_uris = [
     "https://grafana.home.hovirix.dev/login/generic_oauth",
@@ -32,8 +32,8 @@ module "immich" {
   name = "Immich"
   slug = "immich"
 
-  client_id     = data.sops_file.authentik_clients.data["oauth.immich.client_id"]
-  client_secret = data.sops_file.authentik_clients.data["oauth.immich.client_secret"]
+  client_id     = data.sops_file.identity.data["oauth.immich.client_id"]
+  client_secret = data.sops_file.identity.data["oauth.immich.client_secret"]
 
   redirect_uris = [
     "app.immich:///oauth-callback",
@@ -48,8 +48,8 @@ module "paperless" {
   name = "Paperless"
   slug = "paperless"
 
-  client_id     = data.sops_file.authentik_clients.data["oauth.paperless.client_id"]
-  client_secret = data.sops_file.authentik_clients.data["oauth.paperless.client_secret"]
+  client_id     = data.sops_file.identity.data["oauth.paperless.client_id"]
+  client_secret = data.sops_file.identity.data["oauth.paperless.client_secret"]
 
   redirect_uris = [
     "https://paperless.home.hovirix.dev/accounts/oidc/authentik/login/callback/",

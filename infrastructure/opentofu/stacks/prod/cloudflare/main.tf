@@ -12,8 +12,8 @@ module "zero_trust_access" {
 
   identity_provider = {
     name          = "authentik"
-    client_id     = data.sops_file.authentik_clients.data["oauth.cloudflare.client_id"]
-    client_secret = data.sops_file.authentik_clients.data["oauth.cloudflare.client_secret"]
+    client_id     = data.sops_file.identity.data["oauth.cloudflare.client_id"]
+    client_secret = data.sops_file.identity.data["oauth.cloudflare.client_secret"]
     auth_url      = "https://authentik.home.hovirix.dev/application/o/authorize/"
     token_url     = "https://authentik.home.hovirix.dev/application/o/token/"
     certs_url     = "https://authentik.home.hovirix.dev/application/o/cloudflare/jwks/"
