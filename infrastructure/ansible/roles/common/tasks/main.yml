@@ -1,6 +1,14 @@
 - name: Configure hostname
   ansible.builtin.hostname:
-    name: "{{ inventory_hostname }}"
+    name: "{{ proxmox_hostname }}"
+
+- name: Configure /etc/hosts
+  ansible.builtin.template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: "0644"
 
 - name: Configure timezone
   community.general.timezone:
