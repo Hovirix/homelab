@@ -19,26 +19,12 @@ proxmox_updates_upgrade: false
 proxmox_updates_reboot: false
 
 # =============================================================================
-# USERS
-# =============================================================================
-
-proxmox_admin_users:
-  - name: admin
-    groups:
-      - sudo
-    shell: /bin/bash
-    ssh_authorized_keys:
-      - "{{ lookup('file', lookup('env', 'HOME') + '/.ssh/id_ed25519.pub') }}"
-
-# =============================================================================
 # SSH
 # =============================================================================
 
-proxmox_ssh_allowed_groups:
-  - sudo
-
-proxmox_ssh_allow_users: []
 proxmox_ssh_permit_root_login: prohibit-password
+proxmox_ssh_root_authorized_keys:
+  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB
 
 # =============================================================================
 # NETWORKING

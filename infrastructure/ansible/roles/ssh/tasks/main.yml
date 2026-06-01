@@ -6,7 +6,7 @@
     group: root
     mode: "0755"
 
-- name: Configure SSH key-only access
+- name: Configure SSH key-only access for root
   ansible.builtin.template:
     src: hxlab.conf.j2
     dest: /etc/ssh/sshd_config.d/99-hxlab.conf
@@ -15,3 +15,10 @@
     mode: "0644"
     validate: "sshd -t -f %s"
   notify: Reload sshd
+
+- name: Configure root authorized keys
+  ansible.posix.authorized_key:
+    user: root
+    key: "{{ proxmox_ssh_root_authorized_keys | join('\n') }}"
+    exclusive: true
+    state: present

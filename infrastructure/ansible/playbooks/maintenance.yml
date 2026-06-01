@@ -1,6 +1,5 @@
 - name: Maintain Proxmox hosts
   hosts: proxmox
-  become: true
   serial: 1
 
   roles:

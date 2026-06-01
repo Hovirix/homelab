@@ -1,6 +1,5 @@
 - name: Configure Proxmox hosts
   hosts: proxmox
-  become: true
 
   roles:
     - role: common
@@ -9,17 +8,11 @@
     - role: repositories
       tags: [repositories]
 
-    - role: users
-      tags: [users]
-
     - role: api
       tags: [api]
 
     - role: ssh
       tags: [ssh]
-
-    - role: networking
-      tags: [networking]
 
     - role: storage
       tags: [storage]

@@ -1,13 +1,9 @@
 - name: Bootstrap Proxmox hosts
   hosts: proxmox
-  become: true
 
   roles:
     - role: repositories
       tags: [repositories]
-
-    - role: users
-      tags: [users]
 
     - role: ssh
       tags: [ssh]

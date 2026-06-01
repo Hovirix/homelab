@@ -2,11 +2,4 @@ PubkeyAuthentication yes
 PasswordAuthentication no
 KbdInteractiveAuthentication no
 PermitRootLogin {{ proxmox_ssh_permit_root_login }}
-
-{% if proxmox_ssh_allowed_groups | length > 0 %}
-AllowGroups {{ proxmox_ssh_allowed_groups | join(' ') }}
-{% endif %}
-
-{% if proxmox_ssh_allow_users | length > 0 %}
-AllowUsers {{ proxmox_ssh_allow_users | join(' ') }}
-{% endif %}
+AllowUsers root

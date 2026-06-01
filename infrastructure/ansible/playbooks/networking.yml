@@ -1,6 +1,5 @@
 - name: Migrate Proxmox hosts to VLAN networking
   hosts: proxmox
-  become: true
   serial: 1
 
   roles:
