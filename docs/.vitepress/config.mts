@@ -129,7 +129,8 @@ export default defineConfig({
           items: [
             { text: "Restore from Backup", link: "/operations/runbooks/restore" },
             { text: "Certificate Rotation", link: "/operations/runbooks/cert-rotation" },
-            { text: "Node Replacement", link: "/operations/runbooks/node-replacement" }
+            { text: "Node Replacement", link: "/operations/runbooks/node-replacement" },
+            { text: "Proxmox API Token", link: "/operations/runbooks/proxmox-api-token" }
           ]
         },
         {
