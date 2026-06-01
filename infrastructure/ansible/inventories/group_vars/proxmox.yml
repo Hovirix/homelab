@@ -56,9 +56,9 @@ proxmox_allowed_vlans:
 # KERNEL
 # =============================================================================
 
-proxmox_kernel_manage: true     # manage /etc/kernel/cmdline
-proxmox_enable_iommu: true      # add intel_iommu=on or amd_iommu=on
-proxmox_enable_vfio: true       # load vfio modules
+proxmox_kernel_manage: true # manage /etc/kernel/cmdline
+proxmox_enable_iommu: true # add intel_iommu=on or amd_iommu=on
+proxmox_enable_vfio: true # load vfio modules
 
 # =============================================================================
 # FIREWALL
@@ -149,5 +149,9 @@ proxmox_backup_retention:
 proxmox_api_users:
   - userid: opentofu@pve
     comment: OpenTofu lifecycle user
+    token_id: opentofu
+    token_comment: OpenTofu lifecycle token
+    token_privsep: false
+    token_regenerate: false
     role: PVEVMAdmin
     acl_path: /
