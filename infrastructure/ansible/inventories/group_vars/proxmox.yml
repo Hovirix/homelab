@@ -146,6 +146,31 @@ proxmox_backup_retention:
 # API
 # =============================================================================
 
+proxmox_api_roles:
+  - name: OpenTofuProv
+    privileges:
+      - Datastore.Allocate
+      - Datastore.AllocateSpace
+      - Datastore.AllocateTemplate
+      - Datastore.Audit
+      - Pool.Allocate
+      - SDN.Use
+      - Sys.Audit
+      - Sys.Modify
+      - VM.Allocate
+      - VM.Audit
+      - VM.Clone
+      - VM.Config.CDROM
+      - VM.Config.CPU
+      - VM.Config.Cloudinit
+      - VM.Config.Disk
+      - VM.Config.HWType
+      - VM.Config.Memory
+      - VM.Config.Network
+      - VM.Config.Options
+      - VM.Migrate
+      - VM.PowerMgmt
+
 proxmox_api_users:
   - userid: opentofu@pve
     comment: OpenTofu lifecycle user
@@ -153,5 +178,5 @@ proxmox_api_users:
     token_comment: OpenTofu lifecycle token
     token_privsep: false
     token_regenerate: false
-    role: PVEVMAdmin
+    role: OpenTofuProv
     acl_path: /

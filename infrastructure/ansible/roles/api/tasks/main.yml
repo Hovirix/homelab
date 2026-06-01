@@ -1,5 +1,7 @@
 # Behavior:
 #
+# ✓ Creates API roles if missing
+# ✓ Updates API role privileges
 # ✓ Creates API users if missing
 # ✓ Assigns user ACLs
 # ✓ Creates API tokens if missing
@@ -7,6 +9,34 @@
 # ✓ Safe to run multiple times
 # ✗ Does not update existing user properties
 # ✗ ACL task always executes
+
+- name: Ensure Proxmox API roles exist
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - add
+      - "{{ item.name }}"
+      - --privs
+      - "{{ item.privileges | join(' ') }}"
+  loop: "{{ proxmox_api_roles | default([]) }}"
+  register: proxmox_api_role_add
+  changed_when: proxmox_api_role_add.rc == 0
+  failed_when:
+    - proxmox_api_role_add.rc != 0
+    - "'already exists' not in proxmox_api_role_add.stderr"
+
+- name: Update Proxmox API role privileges
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - modify
+      - "{{ item.name }}"
+      - --privs
+      - "{{ item.privileges | join(' ') }}"
+  loop: "{{ proxmox_api_roles | default([]) }}"
+  changed_when: false
 
 - name: Ensure Proxmox API users exist
   ansible.builtin.command:
