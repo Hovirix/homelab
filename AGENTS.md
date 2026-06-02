@@ -6,7 +6,6 @@ The repository is the source of truth for infrastructure, platform configuration
 
 The codebase should stay simple, boring, readable, and recoverable.
 
-
 ## Principles
 
 - Git is the source of truth.
@@ -20,7 +19,6 @@ The codebase should stay simple, boring, readable, and recoverable.
 - Prefer safe defaults.
 - Prefer documentation close to the thing it explains.
 
-
 ## Domains
 
 ### Infrastructure
@@ -28,6 +26,7 @@ The codebase should stay simple, boring, readable, and recoverable.
 Infrastructure is the state required before the platform can run.
 
 **Typical scope:**
+
 - Proxmox
 - Cloudflare
 - DNS and edge infrastructure
@@ -40,18 +39,19 @@ Infrastructure is the state required before the platform can run.
 - Ansible
 
 **Typical paths:**
+
 ```plaintext
 infrastructure/
 docs/infrastructure/
 docs/architecture/
 ```
 
-
 ### Platform
 
 Platform is Kubernetes and the cluster services running on top of infrastructure.
 
 **Typical scope:**
+
 - Kubernetes manifests
 - Flux resources
 - Helm charts
@@ -63,17 +63,18 @@ Platform is Kubernetes and the cluster services running on top of infrastructure
 - Cluster services
 
 **Typical paths:**
+
 ```plaintext
 platform/
 docs/platform/
 ```
-
 
 ### Operations
 
 Operations is the way the lab is run, checked, maintained, backed up, restored, and troubleshot.
 
 **Typical scope:**
+
 - Taskfile entrypoints
 - Scripts
 - Tools
@@ -85,6 +86,7 @@ Operations is the way the lab is run, checked, maintained, backed up, restored, 
 - Troubleshooting procedures
 
 **Typical paths:**
+
 ```plaintext
 Taskfile.yml
 operations/
@@ -108,6 +110,7 @@ Operations defines operational workflows.
 Code should be boring.
 
 **Boring means:**
+
 - Easy to read
 - Easy to diff
 - Easy to run
@@ -116,6 +119,7 @@ Code should be boring.
 - Easy to recover from
 
 **Prefer:**
+
 - Small files
 - Clear names
 - Explicit inputs
@@ -124,6 +128,7 @@ Code should be boring.
 - Comments for non-obvious decisions
 
 **Avoid:**
+
 - Clever abstractions
 - Hidden side effects
 - Large inline scripts
@@ -135,6 +140,7 @@ Code should be boring.
 
 - Use lowercase names where practical.
 - Use hyphens for human-facing names and documentation paths:
+
   ```plaintext
   node-replacement.md
   zero-trust.md
@@ -142,6 +148,7 @@ Code should be boring.
   ```
 
 - Use underscores where the tool ecosystem expects them:
+
   ```plaintext
   group_vars
   host_vars
@@ -150,6 +157,7 @@ Code should be boring.
   ```
 
 - Use clear domain prefixes for commands and workflows:
+
   ```plaintext
   infrastructure:*
   platform:*
@@ -170,6 +178,7 @@ Code should be boring.
 - Complex logic belongs in scripts or tools.
 
 **Preferred shape:**
+
 ```yaml
 operations:health:
   desc: Run homelab health checks
@@ -185,12 +194,14 @@ operations:health:
 Operational shell scripts use Bash.
 
 **Standard header:**
+
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 ```
 
 **Preferred helpers:**
+
 ```bash
 log() {
   printf '[info] %s\n' "$*"
@@ -214,6 +225,7 @@ die() {
 Python is reserved for cases where shell becomes fragile or unreadable.
 
 **Good uses:**
+
 - JSON processing
 - YAML processing
 - API interaction
@@ -222,6 +234,7 @@ Python is reserved for cases where shell becomes fragile or unreadable.
 - Non-trivial data transformation
 
 - Operational Python tools belong under:
+
   ```plaintext
   operations/tools/
   ```
@@ -233,6 +246,7 @@ Python is reserved for cases where shell becomes fragile or unreadable.
 OpenTofu is used for declarative infrastructure state.
 
 **Typical layout:**
+
 ```plaintext
 infrastructure/opentofu/
 ├── modules/
@@ -240,6 +254,7 @@ infrastructure/opentofu/
 ```
 
 **Conventions:**
+
 - Reusable logic in `modules/`
 - Environment-specific state in `stacks/`
 - Explicit variables
@@ -255,6 +270,7 @@ infrastructure/opentofu/
 Ansible is used for host configuration and lifecycle tasks.
 
 **Typical layout:**
+
 ```plaintext
 infrastructure/ansible/
 ├── inventories/
@@ -263,6 +279,7 @@ infrastructure/ansible/
 ```
 
 **Conventions:**
+
 - Focused roles
 - Readable playbooks
 - Clear task names
@@ -275,6 +292,7 @@ infrastructure/ansible/
 Kubernetes and platform services belong to the Platform domain.
 
 **Conventions:**
+
 - Declarative manifests
 - Reconciliation over manual mutation
 - Clear separation between cluster services and applications
@@ -286,6 +304,7 @@ Kubernetes and platform services belong to the Platform domain.
 Secrets are encrypted with SOPS.
 
 **Secrets conventions:**
+
 - No plaintext secrets
 - No real tokens in examples
 - No secrets in logs, docs, plans, or generated output
@@ -293,6 +312,7 @@ Secrets are encrypted with SOPS.
 - Placeholders for documentation examples
 
 **Accepted placeholders:**
+
 ```plaintext
 REDACTED
 example
@@ -301,6 +321,7 @@ your-token-here
 ```
 
 **Sensitive artifacts include:**
+
 - OpenTofu state
 - OpenTofu plans
 - kubeconfigs
@@ -312,6 +333,7 @@ your-token-here
 Documentation is part of the system.
 
 **Suggested structure:**
+
 ```plaintext
 docs/architecture/
 docs/infrastructure/
@@ -320,6 +342,7 @@ docs/operations/
 ```
 
 **Documentation types:**
+
 - Architecture explains **why**
 - Infrastructure docs explain **what exists**
 - Platform docs explain **what runs on Kubernetes**
@@ -330,11 +353,13 @@ docs/operations/
 ## Commits
 
 **Commit format:**
+
 ```plaintext
 <domain>: <change>
 ```
 
 **Examples:**
+
 ```plaintext
 infrastructure: add proxmox talos vm module
 infrastructure: configure cloudflare tunnel access
@@ -351,11 +376,13 @@ secrets: add encrypted opentofu credentials
 ## Pull Requests
 
 **PR title format:**
+
 ```plaintext
 <domain>: <summary>
 ```
 
 **Preferred PR body:**
+
 ```markdown
 ## Summary
 
@@ -384,6 +411,7 @@ secrets: add encrypted opentofu credentials
 Use the narrowest relevant validation for the changed files.
 
 **Common checks:**
+
 ```bash
 nix flake check
 treefmt --check .
@@ -403,6 +431,7 @@ kubeconform
 The repository favors inspection, formatting, validation, and planning before mutation.
 
 **High-risk operations include:**
+
 - `infrastructure apply`
 - `infrastructure destroy`
 - Kubernetes `apply`/`delete`
