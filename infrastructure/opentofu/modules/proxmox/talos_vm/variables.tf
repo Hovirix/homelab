@@ -38,10 +38,13 @@ variable "memory_dedicated" {
   type = number
 }
 
+variable "iso_file_id" {
+  type = string
+}
+
 variable "boot_disk" {
   type = object({
     datastore_id = string
-    import_from  = string
     interface    = optional(string, "virtio0")
     iothread     = optional(bool, true)
     discard      = optional(string, "on")

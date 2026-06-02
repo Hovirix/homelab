@@ -1,16 +1,14 @@
 locals {
-  talos_image_url       = "https://factory.talos.dev/image/${var.talos_image_schematic_id}/${var.talos_version}/nocloud-amd64.raw.xz"
-  talos_image_filename  = "talos-${var.talos_version}-nocloud-amd64.raw"
-  proxmox_nodes         = toset([for node in values(var.nodes) : node.node_name])
+  talos_image_url = "https://factory.talos.dev/image/${var.talos_image_schematic_id}/${var.talos_version}/nocloud-amd64.iso"
+  proxmox_nodes   = toset([for node in values(var.nodes) : node.node_name])
 }
 
 resource "proxmox_download_file" "talos_nocloud" {
   for_each = local.proxmox_nodes
 
-  content_type        = "import"
+  content_type        = "iso"
   datastore_id        = var.image_datastore_id
   node_name           = each.key
-  file_name           = local.talos_image_filename
   url                 = local.talos_image_url
   overwrite_unmanaged = true
 }
@@ -30,9 +28,10 @@ module "node" {
   network_bridge   = var.network_bridge
   network_vlan_id  = var.network_vlan_id
 
+  iso_file_id = proxmox_download_file.talos_nocloud[each.value.node_name].id
+
   boot_disk = {
     datastore_id = var.boot_disk_datastore_id
-    import_from  = proxmox_download_file.talos_nocloud[each.value.node_name].id
     size         = var.boot_disk_size
   }
 }

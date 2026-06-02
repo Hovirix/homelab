@@ -7,6 +7,8 @@ resource "proxmox_virtual_environment_vm" "this" {
   protection      = var.protection
   stop_on_destroy = var.stop_on_destroy
 
+  boot_order = ["virtio0", "ide2"]
+
   cpu {
     cores = var.cpu_cores
     type  = var.cpu_type
@@ -18,11 +20,11 @@ resource "proxmox_virtual_environment_vm" "this" {
 
   disk {
     datastore_id = var.boot_disk.datastore_id
-    import_from  = var.boot_disk.import_from
     interface    = var.boot_disk.interface
     iothread     = var.boot_disk.iothread
     discard      = var.boot_disk.discard
     size         = var.boot_disk.size
+    file_format  = "raw"
   }
 
   dynamic "disk" {
@@ -36,6 +38,11 @@ resource "proxmox_virtual_environment_vm" "this" {
       ssd          = disk.value.ssd
       size         = disk.value.size
     }
+  }
+
+  cdrom {
+    interface = "ide2"
+    file_id   = var.iso_file_id
   }
 
   network_device {
