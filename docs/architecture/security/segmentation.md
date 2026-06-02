@@ -1,3 +1,0 @@
-# Network Segmentation
-
-> ⚠️ **Under Construction** - This section is being migrated and may be incomplete.
