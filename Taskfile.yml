@@ -1,0 +1,7 @@
+version: "3"
+
+includes:
+  ansible:
+    taskfile: operations/taskfiles/ansible.yml
+  tofu:
+    taskfile: operations/taskfiles/opentofu.yml

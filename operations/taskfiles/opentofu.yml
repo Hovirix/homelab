@@ -1,0 +1,36 @@
+version: "3"
+
+vars:
+  tofu_dir: infrastructure/opentofu
+  env: '{{default "prod" .env}}'
+
+tasks:
+  init:
+    desc: Initialize an OpenTofu stack
+    dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
+    cmds:
+      - tofu init {{.args}}
+
+  validate:
+    desc: Validate an OpenTofu stack
+    dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
+    cmds:
+      - tofu validate {{.args}}
+
+  plan:
+    desc: Plan an OpenTofu stack
+    dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
+    cmds:
+      - tofu plan {{.args}}
+
+  fmt:
+    desc: Format all OpenTofu files
+    dir: "{{.tofu_dir}}"
+    cmds:
+      - tofu fmt -recursive {{.args}}
+
+  fmt-check:
+    desc: Check OpenTofu formatting
+    dir: "{{.tofu_dir}}"
+    cmds:
+      - tofu fmt -recursive -check {{.args}}

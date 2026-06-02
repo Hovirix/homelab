@@ -1,0 +1,49 @@
+version: "3"
+
+vars:
+  ansible_dir: infrastructure/ansible
+
+tasks:
+  bootstrap:
+    desc: Bootstrap Proxmox hosts with Ansible
+    dir: "{{.ansible_dir}}"
+    cmds:
+      - ansible-playbook playbooks/bootstrap.yml {{.args}}
+
+  configure:
+    desc: Configure Proxmox hosts with Ansible
+    dir: "{{.ansible_dir}}"
+    cmds:
+      - ansible-playbook playbooks/configure.yml {{.args}}
+
+  networking:
+    desc: Configure Proxmox networking with Ansible
+    dir: "{{.ansible_dir}}"
+    cmds:
+      - ansible-playbook playbooks/networking.yml {{.args}}
+
+  maintenance:
+    desc: Run Proxmox maintenance with Ansible
+    dir: "{{.ansible_dir}}"
+    cmds:
+      - ansible-playbook playbooks/maintenance.yml {{.args}}
+
+  check:
+    desc: Run Ansible configure playbook in check mode
+    dir: "{{.ansible_dir}}"
+    cmds:
+      - ansible-playbook playbooks/configure.yml --check --diff {{.args}}
+
+  syntax:
+    desc: Run Ansible playbook syntax checks
+    dir: "{{.ansible_dir}}"
+    cmds:
+      - ansible-playbook playbooks/bootstrap.yml --syntax-check
+      - ansible-playbook playbooks/configure.yml --syntax-check
+      - ansible-playbook playbooks/networking.yml --syntax-check
+      - ansible-playbook playbooks/maintenance.yml --syntax-check
+
+  lint:
+    desc: Lint Ansible content
+    cmds:
+      - ANSIBLE_CONFIG={{.ansible_dir}}/ansible.cfg ansible-lint {{.ansible_dir}}
