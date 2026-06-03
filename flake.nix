@@ -44,6 +44,7 @@
               talosctl
 
               # Secrets
+              openssl
               sops
 
               # Security
