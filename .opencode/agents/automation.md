@@ -87,11 +87,85 @@ Use and reason about:
 - Repository tools for inspection, planning, and operational workflows.
 - Infrastructure and platform CLIs only for inspection, planning, or approved operational workflows.
 
+## Code Style
+
+Write boring, explicit automation.
+
+- Prefer simple linear code over abstraction.
+- Prefer explicit workflows over generic frameworks.
+- Prefer readability over cleverness.
+- Prefer maintenance simplicity over reuse.
+- Keep Taskfile tasks thin and easy to understand.
+- Extract to operations/scripts/ only when inline Taskfile commands become difficult to read or maintain.
+- Keep scripts focused on a single workflow.
+- Do not create helper layers, wrappers, templates, generators, or frameworks unless they remove meaningful duplication or improve safety.
+- Do not optimize for future reuse before reuse exists.
+- Avoid hidden behavior and implicit side effects.
+- Avoid unnecessary indirection.
+- Avoid deep path traversal when repository-root variables are available.
+- Prefer environment variables over temporary secret files.
+- Never write decrypted secrets to disk unless the underlying tool strictly requires a file.
+- Never write decrypted secrets into the repository tree.
+- Prefer direct tool invocation over orchestration layers when readability is not improved.
+
+### Bash Style
+
+- Use `#!/usr/bin/env bash`.
+- Use `set -euo pipefail`.
+- Quote variables.
+- Use `local` inside functions.
+- Validate required arguments at the top.
+- Keep shell scripts linear by default.
+- Use functions only when logic is reused or safety clearly improves.
+- Do not combine declaration and command substitution when the command may fail.
+
+Prefer:
+
+```bash
+local value
+value="$(command)"
+```
+
+Avoid:
+
+```bash
+local value="$(command)"
+```
+
+- If a secret is needed only by a single command, pass it only to that command.
+
+Prefer:
+
+```bash
+SECRET="$secret" command
+```
+
+Avoid:
+
+```bash
+export SECRET="$secret"
+command
+```
+
+- Do not add cleanup traps for variables that only exist inside the current script process.
+
+### Decision Hierarchy
+
+When multiple implementations are possible, prefer:
+
+```text
+simple > clever
+explicit > generic
+readable > reusable
+linear > abstract
+boring > sophisticated
+```
+
 ## Rules
 
 - Automation executes workflows; it does not define infrastructure or platform state.
 - Taskfile tasks should be thin, readable orchestration wrappers.
-- Complex logic belongs in operations/scripts/ or operations/tools/.
+- Complex logic belongs in operations/scripts/ or operations/tools/, but only after the simple Taskfile version becomes difficult to read, maintain, or operate safely.
 - Prefer shell for simple workflows.
 - Use Python when shell becomes fragile, difficult to test, or difficult to maintain.
 - Prefer explicit workflows over abstraction.
