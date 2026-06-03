@@ -3,25 +3,43 @@ version: "3"
 vars:
   tofu_dir: infrastructure/opentofu
   env: '{{default "prod" .env}}'
+  stack_dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
+  sops_file: "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml"
 
 tasks:
+  tofu:
+    internal: true
+    dir: "{{.stack_dir}}"
+    cmds:
+      - '{{.ROOT_DIR}}/operations/scripts/tofu {{.cmd}} "{{.sops_file}}" {{.args}}'
+
   init:
     desc: Initialize an OpenTofu stack
-    dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
     cmds:
-      - tofu init {{.args}}
+      - task: tofu
+        vars:
+          cmd: init
 
   validate:
     desc: Validate an OpenTofu stack
-    dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
     cmds:
-      - tofu validate {{.args}}
+      - task: tofu
+        vars:
+          cmd: validate
 
   plan:
     desc: Plan an OpenTofu stack
-    dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
     cmds:
-      - tofu plan {{.args}}
+      - task: tofu
+        vars:
+          cmd: plan
+
+  apply:
+    desc: Apply an OpenTofu stack
+    cmds:
+      - task: tofu
+        vars:
+          cmd: apply
 
   fmt:
     desc: Format all OpenTofu files
