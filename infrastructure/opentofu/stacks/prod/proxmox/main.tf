@@ -25,6 +25,6 @@ module "kubernetes_cluster" {
   cpu_cores              = 4
   memory_dedicated       = 8192
   network_vlan_id        = 40
-  boot_disk_datastore_id = "local-lvm"
+  boot_disk_datastore_id = "local-zfs"
   boot_disk_size         = 100
 }

@@ -15,8 +15,8 @@ proxmox_timezone: Etc/UTC
 # UPDATES
 # =============================================================================
 
-proxmox_updates_upgrade: false
-proxmox_updates_reboot: false
+proxmox_updates_upgrade: true
+proxmox_updates_reboot: true
 
 # =============================================================================
 # SSH
