@@ -29,5 +29,6 @@ Ansible playbooks are the operational entrypoints for Proxmox host configuration
 
 ## Notes
 
+- `bootstrap` prompts for the initial SSH password with `--ask-pass`; later runs should use SSH keys installed by the bootstrap playbook.
 - `networking.yml` and `maintenance.yml` use `serial: 1`.
 - `check` runs `configure.yml` in check mode with diff output.

@@ -8,7 +8,7 @@ tasks:
     desc: Bootstrap Proxmox hosts with Ansible
     dir: "{{.ansible_dir}}"
     cmds:
-      - ansible-playbook playbooks/bootstrap.yml {{.args}}
+      - ansible-playbook playbooks/bootstrap.yml --ask-pass {{.args}}
 
   configure:
     desc: Configure Proxmox hosts with Ansible
