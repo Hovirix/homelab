@@ -17,3 +17,4 @@ Operations documents how HX Lab is run.
 ## Sections
 
 - [Proxmox API Token](./runbooks/proxmox-api-token)
+- [Wake on LAN](./runbooks/wake-on-lan)
