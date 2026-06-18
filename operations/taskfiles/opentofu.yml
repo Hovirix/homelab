@@ -41,6 +41,13 @@ tasks:
         vars:
           cmd: apply
 
+  destroy:
+    desc: Destroy an OpenTofu stack
+    cmds:
+      - task: tofu
+        vars:
+          cmd: destroy
+
   fmt:
     desc: Format all OpenTofu files
     dir: "{{.tofu_dir}}"
