@@ -14,6 +14,9 @@
     - role: ssh
       tags: [ssh]
 
+    - role: wake_on_lan
+      tags: [wake-on-lan]
+
     - role: storage
       tags: [storage]
 
