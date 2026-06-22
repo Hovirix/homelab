@@ -14,6 +14,11 @@ locals {
       domain = "pve3.home.hovirix.dev"
       answer = "10.20.0.13"
     }
+
+    truenas = {
+      domain = "truenas.home.hovirix.dev"
+      answer = "10.30.0.106"
+    }
   }
 }
 
