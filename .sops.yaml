@@ -1,4 +1,4 @@
 creation_rules:
   - path_regex: ^secrets/.*
-    age: >-
-      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBjCf1PpvoMshFkoyjFOYUJ6/pLexwEFqr29COJawkoB
+    pgp: >-
+      82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F
