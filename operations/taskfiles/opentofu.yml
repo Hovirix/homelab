@@ -47,15 +47,3 @@ tasks:
       - task: tofu
         vars:
           cmd: destroy
-
-  fmt:
-    desc: Format all OpenTofu files
-    dir: "{{.tofu_dir}}"
-    cmds:
-      - tofu fmt -recursive {{.args}}
-
-  fmt-check:
-    desc: Check OpenTofu formatting
-    dir: "{{.tofu_dir}}"
-    cmds:
-      - tofu fmt -recursive -check {{.args}}
