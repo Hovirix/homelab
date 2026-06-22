@@ -69,7 +69,9 @@ export default defineConfig({
           text: "Runbooks",
           collapsed: false,
           items: [
-            { text: "Proxmox API Token", link: "/operations/runbooks/proxmox-api-token" }
+            { text: "Proxmox API Token", link: "/operations/runbooks/proxmox-api-token" },
+            { text: "TrueNAS SCALE Setup", link: "/operations/runbooks/truenas" },
+            { text: "Wake on LAN", link: "/operations/runbooks/wake-on-lan" }
           ]
         }
       ]
