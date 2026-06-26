@@ -39,8 +39,8 @@ OpenTofu provisions and maintains the production infrastructure stacks under `in
 
 ### AdGuard Home
 
-- Manages DNS rewrites for the Proxmox hosts.
-- Maps `pve1`, `pve2`, and `pve3` hostnames to the management network addresses.
+- Manages DNS rewrites for the Proxmox hosts and TrueNAS.
+- Maps `pve1`, `pve2`, `pve3`, and `truenas` hostnames to the management network addresses.
 
 - [Stack doc](./stacks/adguardhome)
 

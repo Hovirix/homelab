@@ -10,6 +10,7 @@ Ansible roles define the current host configuration behavior for Proxmox nodes.
 - `infrastructure/ansible/roles/ssh/`
 - `infrastructure/ansible/roles/kernel/`
 - `infrastructure/ansible/roles/networking/`
+- `infrastructure/ansible/roles/wake_on_lan/`
 - `infrastructure/ansible/roles/updates/`
 - `infrastructure/ansible/roles/storage/`
 - `infrastructure/ansible/roles/backup/`
@@ -27,6 +28,7 @@ Ansible roles define the current host configuration behavior for Proxmox nodes.
 - `ssh`: key-only root access and SSH drop-in config.
 - `kernel`: kernel command line and VFIO module configuration.
 - `networking`: `/etc/network/interfaces` for Proxmox VLAN networking.
+- `wake_on_lan`: installs `ethtool` and enables WOL on the physical interface.
 - `updates`: apt refresh, dist upgrade, and reboot if required.
 
 ## Empty Roles

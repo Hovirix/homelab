@@ -1,6 +1,6 @@
 # AdGuard Home Stack
 
-The AdGuard Home OpenTofu stack manages DNS rewrites for the Proxmox hostnames.
+The AdGuard Home OpenTofu stack manages DNS rewrites for the Proxmox and TrueNAS hostnames.
 
 ## Source Paths
 
@@ -8,7 +8,7 @@ The AdGuard Home OpenTofu stack manages DNS rewrites for the Proxmox hostnames.
 
 ## Current State
 
-- The stack defines DNS rewrites for `pve1.home.hovirix.dev`, `pve2.home.hovirix.dev`, and `pve3.home.hovirix.dev`.
+- The stack defines DNS rewrites for `pve1.home.hovirix.dev`, `pve2.home.hovirix.dev`, `pve3.home.hovirix.dev`, and `truenas.home.hovirix.dev`.
 - Each hostname maps to the management network address declared in the stack.
 - The stack uses SOPS-backed credentials for the AdGuard Home provider.
 

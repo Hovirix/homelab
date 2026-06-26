@@ -13,7 +13,7 @@ Ansible playbooks are the operational entrypoints for Proxmox host configuration
 ## Current Entry Points
 
 - `bootstrap.yml` bootstraps Proxmox hosts with repositories and SSH.
-- `configure.yml` applies the full host configuration.
+- `configure.yml` applies the full host configuration, including Wake-on-LAN.
 - `networking.yml` migrates hosts to VLAN networking one host at a time.
 - `maintenance.yml` runs package maintenance one host at a time.
 

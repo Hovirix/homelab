@@ -70,6 +70,9 @@ export default defineConfig({
           collapsed: false,
           items: [
             { text: "Proxmox API Token", link: "/operations/runbooks/proxmox-api-token" },
+            { text: "Proxmox Bootstrap, VLANs, and OpenWrt", link: "/operations/runbooks/proxmox-bootstrap-vlan-openwrt" },
+            { text: "DNS and Email", link: "/operations/runbooks/dns-and-email" },
+            { text: "Talos on Proxmox with OpenTofu", link: "/operations/runbooks/talos-proxmox-opentofu" },
             { text: "TrueNAS SCALE Setup", link: "/operations/runbooks/truenas" },
             { text: "Wake on LAN", link: "/operations/runbooks/wake-on-lan" }
           ]
