@@ -14,7 +14,7 @@ Ansible manages host configuration and operational tasks for Proxmox nodes.
 - Inventory and host variables.
 - Bootstrap and configuration playbooks.
 - Networking and maintenance playbooks.
-- Roles for common host setup, repositories, API access, SSH, kernel, networking, updates, and related tasks.
+- Roles for common host setup, repositories, API access, SSH, storage, notifications, kernel, networking, updates, and related tasks.
 
 ## Sections
 

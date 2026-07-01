@@ -1,0 +1,6 @@
+- name: Configure Proxmox notifications
+  hosts: proxmox
+
+  roles:
+    - role: notifications
+      tags: [notifications]

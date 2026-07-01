@@ -26,6 +26,8 @@ Ansible roles define the current host configuration behavior for Proxmox nodes.
 - `repositories`: Debian and Proxmox repository configuration.
 - `api`: Proxmox API role, user, ACL, and token lifecycle.
 - `ssh`: key-only root access and SSH drop-in config.
+- `storage`: ZFS pool validation and safe storage tuning.
+- `notifications`: Proxmox SMTP notification target and matcher.
 - `kernel`: kernel command line and VFIO module configuration.
 - `networking`: `/etc/network/interfaces` for Proxmox VLAN networking.
 - `wake_on_lan`: installs `ethtool` and enables WOL on the physical interface.
@@ -33,7 +35,6 @@ Ansible roles define the current host configuration behavior for Proxmox nodes.
 
 ## Empty Roles
 
-- `storage`
 - `backup`
 
 ## Comment-Only Roles
@@ -41,7 +42,6 @@ Ansible roles define the current host configuration behavior for Proxmox nodes.
 - `firewall`
 - `certificates`
 - `monitoring`
-- `notifications`
 - `cluster`
 
 ## Notes

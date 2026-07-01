@@ -42,15 +42,25 @@ proxmox_allowed_vlans:
 # STORAGE
 # =============================================================================
 
+proxmox_storage_zpool: rpool
+proxmox_storage_dataset: rpool/data
+proxmox_storage_min_pool_size_gib: 1500
+proxmox_storage_autotrim: true
+proxmox_storage_dataset_compression_target: lz4
+proxmox_storage_dataset_atime_target: "off"
+
 # Proxmox is installed with ZFS and manages the local-zfs storage.
 #
+# Managed by roles/storage:
+# - Validate pool health and capacity
+# - Enable autotrim on rpool
+# - Set compression on rpool/data
+# - Disable atime on rpool/data
+#
 # Future responsibilities:
-# - ZFS dataset management
 # - Local replication configuration
 # - Additional storage pools
-# - ZFS tuning
-#
-# Currently no storage configuration is managed by Ansible.
+# - Dataset layout beyond local-zfs
 
 # =============================================================================
 # KERNEL
@@ -102,16 +112,14 @@ proxmox_enable_vfio: true # load vfio modules
 # NOTIFICATIONS
 # =============================================================================
 
-# Notification configuration is intentionally unmanaged.
-#
-# Future responsibilities:
-# - SMTP notifications
-# - Gotify integration
-# - ntfy integration
-# - Webhook notifications
-# - Backup failure alerts
-# - Cluster health alerts
-# - Hardware monitoring alerts
+proxmox_notifications_target_name: hxlab-smtp
+proxmox_notifications_matcher_name: hxlab-alerts
+proxmox_notifications_mailto: homelab@hovirix.dev
+proxmox_notifications_from_address: proxmox@hovirix.dev
+proxmox_notifications_smtp_mode: starttls
+proxmox_notifications_match_severity:
+  - warning
+  - error
 
 # =============================================================================
 # BACKUP

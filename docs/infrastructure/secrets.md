@@ -8,11 +8,13 @@ HX Lab keeps infrastructure secrets in SOPS-encrypted files instead of plain tex
 - `operations/scripts/tofu`
 - `infrastructure/opentofu/stacks/prod/proxmox/providers.tf`
 - `infrastructure/ansible/roles/api/tasks/main.yml`
+- `infrastructure/ansible/roles/notifications/tasks/main.yml`
 
 ## Current State
 
 - OpenTofu reads the Proxmox API token from SOPS.
 - The Proxmox API token is created by Ansible and stored as a UUID value in SOPS.
+- Proxmox SMTP notification credentials are read from `secrets/infrastructure.sops.yaml`.
 - OpenTofu state encryption is configured per stack.
 
 ## Notes

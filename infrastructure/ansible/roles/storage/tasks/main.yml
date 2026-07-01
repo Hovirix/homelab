@@ -1,0 +1,119 @@
+- name: Read Proxmox storage status
+  ansible.builtin.command:
+    argv:
+      - pvesm
+      - status
+  register: proxmox_storage_status
+  changed_when: false
+
+- name: Verify expected Proxmox storages exist
+  ansible.builtin.assert:
+    that:
+      - proxmox_storage_status.stdout | regex_search('(?m)^local\s+dir\s+active\s+') is not none
+      - proxmox_storage_status.stdout | regex_search('(?m)^local-zfs\s+zfspool\s+active\s+') is not none
+    fail_msg: >-
+      Expected Proxmox storages local and local-zfs were not reported as active.
+- name: Derive desired storage values
+  ansible.builtin.set_fact:
+    proxmox_storage_min_pool_size_bytes: "{{ (proxmox_storage_min_pool_size_gib | int) * 1024 * 1024 * 1024 }}"
+    proxmox_storage_desired_autotrim: "{{ proxmox_storage_autotrim | bool | ternary('on', 'off') }}"
+
+- name: Read ZFS pool size
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - list
+      - -Hp
+      - -o
+      - size
+      - "{{ proxmox_storage_zpool }}"
+  register: proxmox_storage_pool_size
+  changed_when: false
+
+- name: Read ZFS pool health
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - list
+      - -H
+      - -o
+      - health
+      - "{{ proxmox_storage_zpool }}"
+  register: proxmox_storage_pool_health
+  changed_when: false
+
+- name: Read ZFS pool autotrim state
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - get
+      - -H
+      - -o
+      - value
+      - autotrim
+      - "{{ proxmox_storage_zpool }}"
+  register: proxmox_storage_pool_autotrim
+  changed_when: false
+
+- name: Verify ZFS pool capacity and health
+  ansible.builtin.assert:
+    that:
+      - proxmox_storage_pool_health.stdout | trim == 'ONLINE'
+      - (proxmox_storage_pool_size.stdout | trim | int) >= (proxmox_storage_min_pool_size_bytes | int)
+    fail_msg: >-
+      ZFS pool {{ proxmox_storage_zpool }} is not healthy or is smaller than the expected minimum size.
+- name: Enable ZFS autotrim
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - set
+      - autotrim={{ proxmox_storage_desired_autotrim }}
+      - "{{ proxmox_storage_zpool }}"
+  when: proxmox_storage_pool_autotrim.stdout | trim != proxmox_storage_desired_autotrim
+  changed_when: true
+
+- name: Read ZFS dataset compression state
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - get
+      - -H
+      - -o
+      - value
+      - compression
+      - "{{ proxmox_storage_dataset }}"
+  register: proxmox_storage_dataset_compression
+  changed_when: false
+
+- name: Read ZFS dataset atime state
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - get
+      - -H
+      - -o
+      - value
+      - atime
+      - "{{ proxmox_storage_dataset }}"
+  register: proxmox_storage_dataset_atime
+  changed_when: false
+
+- name: Enable ZFS dataset compression
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - set
+      - compression={{ proxmox_storage_dataset_compression_target }}
+      - "{{ proxmox_storage_dataset }}"
+  when: proxmox_storage_dataset_compression.stdout | trim != proxmox_storage_dataset_compression_target
+  changed_when: true
+
+- name: Disable ZFS dataset atime updates
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - set
+      - atime={{ proxmox_storage_dataset_atime_target }}
+      - "{{ proxmox_storage_dataset }}"
+  when: proxmox_storage_dataset_atime.stdout | trim != proxmox_storage_dataset_atime_target
+  changed_when: true

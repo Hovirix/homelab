@@ -14,6 +14,7 @@ Start here when changing DNS rewrites or TrueNAS email alerts.
 - AdGuard Home manages rewrites for `pve1.home.hovirix.dev`, `pve2.home.hovirix.dev`, `pve3.home.hovirix.dev`, and `truenas.home.hovirix.dev`.
 - Current answers are `10.20.0.11`, `10.20.0.12`, `10.20.0.13`, and `10.30.0.106`.
 - TrueNAS sends alerts through Resend SMTP at `smtp.resend.com:587` with STARTTLS.
+- Proxmox SMTP notifications use the same Resend SMTP relay through Ansible.
 - TrueNAS alert mail goes to `homelab@hovirix.dev`.
 
 ## DNS Rewrites

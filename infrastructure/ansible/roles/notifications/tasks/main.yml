@@ -1,21 +1,43 @@
-# =============================================================================
-# NOTIFICATIONS
-# =============================================================================
-#
-# Intentionally not managed yet.
-#
-# Future responsibilities:
-# - SMTP notifications
-# - Gotify integration
-# - ntfy integration
-# - Webhook notifications
-# - Backup failure alerts
-# - Cluster health alerts
-# - Hardware monitoring alerts
-#
-# Current state:
-# - Notification configuration is managed manually.
-# - No notification endpoints are configured by Ansible.
-#
-# References:
-# https://pve.proxmox.com/pve-docs/chapter-notifications.html
+- name: Load Proxmox notification secrets
+  community.sops.load_vars:
+    file: "{{ playbook_dir }}/../../../secrets/infrastructure.sops.yaml"
+    name: infrastructure_secrets
+  no_log: true
+  run_once: true
+
+- name: Render Proxmox notification files
+  ansible.builtin.set_fact:
+    proxmox_notification_files:
+      - path: /etc/pve/notifications.cfg
+        content: "{{ lookup('template', 'notifications.cfg.j2') }}"
+        secret: false
+      - path: /etc/pve/priv/notifications.cfg
+        content: "{{ lookup('template', 'notifications.priv.cfg.j2') }}"
+        secret: true
+  no_log: true
+  run_once: true
+
+- name: Read existing Proxmox notification files
+  ansible.builtin.slurp:
+    path: "{{ item.path }}"
+  register: proxmox_notification_existing
+  failed_when: false
+  changed_when: false
+  loop: "{{ proxmox_notification_files }}"
+  no_log: true
+  run_once: true
+
+- name: Write changed Proxmox notification files
+  ansible.builtin.command:
+    argv:
+      - sh
+      - -c
+      - >-
+        {% if item.0.secret %} umask 077 && tee {{ item.0.path }} >/dev/null {% else %} tee {{ item.0.path }} >/dev/null {% endif %}
+  args:
+    stdin: "{{ item.0.content }}"
+    stdin_add_newline: false
+  loop: "{{ proxmox_notification_files | zip(proxmox_notification_existing.results) | list }}"
+  when: item.1.failed or ((item.1.content | default('') | b64decode) != item.0.content)
+  no_log: "{{ item.0.secret }}"
+  run_once: true

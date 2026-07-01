@@ -1,0 +1,13 @@
+smtp: {{ proxmox_notifications_target_name }}
+        mailto {{ proxmox_notifications_mailto }}
+        from-address {{ proxmox_notifications_from_address }}
+        username {{ ansible_facts.infrastructure_secrets.smtp.user }}
+        server {{ ansible_facts.infrastructure_secrets.smtp.host }}
+        port {{ ansible_facts.infrastructure_secrets.smtp.port }}
+        mode {{ proxmox_notifications_smtp_mode }}
+        comment Managed by Ansible for HX Lab Proxmox hosts: {{ groups['proxmox'] | join(', ') }}
+
+matcher: {{ proxmox_notifications_matcher_name }}
+        match-severity {{ proxmox_notifications_match_severity | join(',') }}
+        target {{ proxmox_notifications_target_name }}
+        comment Managed by Ansible for HX Lab Proxmox hosts: {{ groups['proxmox'] | join(', ') }}
