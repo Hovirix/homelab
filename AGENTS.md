@@ -28,6 +28,12 @@ Operations defines how the lab is run.
 
 Route automation, checks, maintenance, backup, restore, troubleshooting, runbooks, and human entrypoints to the **Automation Agent**.
 
+### Tools
+
+Tools defines repository-level developer tooling and validation.
+
+Route root flake wiring, dev shells, formatters, linters, checks, and helper script plumbing to the **Automation Agent**.
+
 ### Documentation
 
 Documentation explains the engineering architecture, infrastructure deployed, platform states and foundations, and operations.
@@ -124,6 +130,13 @@ docs(operations): document backup restore workflow
 
 - Commit subjects are lowercase, concise, imperative, and do not end with a period.
 - Unrelated changes should be separate commits.
+
+Examples for repo tooling:
+
+```plaintext
+chore(tools): add flake checks
+chore(tools): refactor dev shells
+```
 
 ## Pull Requests
 
