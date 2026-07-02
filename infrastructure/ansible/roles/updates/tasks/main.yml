@@ -10,9 +10,9 @@
 - name: Check if reboot is required
   ansible.builtin.stat:
     path: /var/run/reboot-required
-  register: proxmox_reboot_required
+  register: updates_reboot_required
 
 - name: Reboot if required
   ansible.builtin.reboot:
     reboot_timeout: 900
-  when: proxmox_reboot_required.stat.exists
+  when: updates_reboot_required.stat.exists

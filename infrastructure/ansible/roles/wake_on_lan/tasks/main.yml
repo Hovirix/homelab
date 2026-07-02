@@ -28,5 +28,5 @@
       - "{{ proxmox_network_interface }}"
       - wol
       - g
-  register: proxmox_wake_on_lan_result
-  changed_when: "'Wake-on: g' not in proxmox_wake_on_lan_result.stdout"
+  register: wake_on_lan_result
+  changed_when: "'Wake-on: g' not in wake_on_lan_result.stdout"

@@ -20,11 +20,11 @@
       - --privs
       - "{{ item.privileges | join(' ') }}"
   loop: "{{ proxmox_api_roles | default([]) }}"
-  register: proxmox_api_role_add
-  changed_when: proxmox_api_role_add.rc == 0
+  register: api_role_add
+  changed_when: api_role_add.rc == 0
   failed_when:
-    - proxmox_api_role_add.rc != 0
-    - "'already exists' not in proxmox_api_role_add.stderr"
+    - api_role_add.rc != 0
+    - "'already exists' not in api_role_add.stderr"
 
 - name: Update Proxmox API role privileges
   ansible.builtin.command:
@@ -48,11 +48,11 @@
       - -comment
       - "{{ item.comment | default('Managed by Ansible') }}"
   loop: "{{ proxmox_api_users }}"
-  register: proxmox_api_user_add
-  changed_when: proxmox_api_user_add.rc == 0
+  register: api_user_add
+  changed_when: api_user_add.rc == 0
   failed_when:
-    - proxmox_api_user_add.rc != 0
-    - "'already exists' not in proxmox_api_user_add.stderr"
+    - api_user_add.rc != 0
+    - "'already exists' not in api_user_add.stderr"
 
 - name: Ensure Proxmox API user ACLs are applied
   ansible.builtin.command:
@@ -79,7 +79,7 @@
       - --output-format
       - json
   loop: "{{ proxmox_api_users }}"
-  register: proxmox_api_token_list
+  register: api_token_list
   changed_when: false
 
 - name: Delete Proxmox API tokens when regeneration is requested
@@ -91,7 +91,8 @@
       - delete
       - "{{ item.item.userid }}"
       - "{{ item.item.token_id }}"
-  loop: "{{ proxmox_api_token_list.results }}"
+  loop: "{{ api_token_list.results }}"
+  changed_when: true
   when:
     - item.item.token_regenerate | default(false) | bool
     - item.item.token_id in (item.stdout | from_json | map(attribute='tokenid') | list)
@@ -111,14 +112,9 @@
       - "{{ item.item.token_comment | default('Managed by Ansible') }}"
       - --output-format
       - json
-  loop: "{{ proxmox_api_token_list.results }}"
-  register: proxmox_api_token_create
+  loop: "{{ api_token_list.results }}"
+  register: api_token_create
+  changed_when: true
   when: >-
     item.item.token_regenerate | default(false) | bool or item.item.token_id not in (item.stdout | from_json | map(attribute='tokenid') | list)
-
-- name: Print generated Proxmox API tokens to store in SOPS
-  ansible.builtin.debug:
-    msg: >-
-      Store this token value in secrets/infrastructure.sops.yaml as proxmox.api_token: {{ (item.stdout | from_json).value }}
-  loop: "{{ proxmox_api_token_create.results | default([]) }}"
-  when: item.changed | default(false)
+  notify: Print generated Proxmox API tokens to store in SOPS
