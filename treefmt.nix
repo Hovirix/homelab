@@ -3,6 +3,10 @@
   programs = {
     nixfmt.enable = true;
     prettier.enable = true;
+    shfmt = {
+      enable = true;
+      includes = [ "operations/scripts/*.sh" ];
+    };
     yamlfmt = {
       enable = true;
       settings.formatter = {
