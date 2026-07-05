@@ -27,8 +27,9 @@ resource "proxmox_virtual_environment_vm" "this" {
   }
 
   network_device {
-    bridge  = var.network.bridge
-    vlan_id = var.network.vlan_id
+    bridge      = var.network.bridge
+    vlan_id     = var.network.vlan_id
+    mac_address = var.network.mac_address
   }
 
   operating_system {

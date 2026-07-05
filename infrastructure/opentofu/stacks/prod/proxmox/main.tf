@@ -10,17 +10,20 @@ module "kubernetes_cluster" {
     prod-k8s-01 = {
       proxmox_node = "pve1"
       vm_id        = 101
+      mac_address  = "02:40:00:00:00:01"
     }
 
     # TODO: Enable when pve2 and pve3 are available
     # prod-k8s-02 = {
     #   proxmox_node = "pve2"
     #   vm_id        = 102
+    #   mac_address  = "02:40:00:00:00:02"
     # }
 
     # prod-k8s-03 = {
     #   proxmox_node = "pve3"
     #   vm_id        = 103
+    #   mac_address  = "02:40:00:00:00:03"
     # }
   }
 
@@ -30,10 +33,13 @@ module "kubernetes_cluster" {
   }
 
   network = {
+    bridge  = "vmbr0"
     vlan_id = 40
   }
 
   storage = {
-    boot_disk_gb = 100
+    image_datastore = "local"
+    boot_datastore  = "local-zfs"
+    boot_disk_gb    = 100
   }
 }

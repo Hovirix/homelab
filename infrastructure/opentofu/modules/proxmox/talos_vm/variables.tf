@@ -31,7 +31,8 @@ variable "boot_disk" {
 
 variable "network" {
   type = object({
-    bridge  = string
-    vlan_id = number
+    bridge      = string
+    vlan_id     = number
+    mac_address = string
   })
 }

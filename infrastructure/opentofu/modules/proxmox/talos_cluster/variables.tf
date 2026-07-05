@@ -9,6 +9,7 @@ variable "nodes" {
   type = map(object({
     proxmox_node = string
     vm_id        = number
+    mac_address  = string
   }))
 }
 
@@ -21,15 +22,15 @@ variable "vm" {
 
 variable "network" {
   type = object({
-    bridge  = optional(string, "vmbr0")
+    bridge  = string
     vlan_id = number
   })
 }
 
 variable "storage" {
   type = object({
-    image_datastore = optional(string, "local")
-    boot_datastore  = optional(string, "local-zfs")
+    image_datastore = string
+    boot_datastore  = string
     boot_disk_gb    = number
   })
 }

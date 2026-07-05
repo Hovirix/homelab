@@ -29,8 +29,9 @@ module "node" {
   iso_file_id = proxmox_download_file.talos_nocloud[each.value.proxmox_node].id
 
   network = {
-    bridge  = var.network.bridge
-    vlan_id = var.network.vlan_id
+    bridge      = var.network.bridge
+    vlan_id     = var.network.vlan_id
+    mac_address = each.value.mac_address
   }
 
   boot_disk = {
