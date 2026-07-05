@@ -4,6 +4,8 @@ resource "proxmox_virtual_environment_vm" "this" {
   vm_id       = var.vm_id
   description = "Managed by OpenTofu"
 
+  stop_on_destroy = true
+
   cpu {
     cores = var.cpu_cores
     type  = "host"
