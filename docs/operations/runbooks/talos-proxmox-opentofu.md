@@ -12,10 +12,10 @@ Start here when provisioning or changing the current Talos VM stack on Proxmox.
 
 ## Current State
 
-- The stack currently manages one enabled VM: `prod-k8s-01` on `pve1` with VM ID `101`.
+- The stack currently manages one enabled VM: `prod-k8s-cp-01` on `pve1` with VM ID `101`.
 - Talos is pinned to `v1.13.3`.
 - The VM uses VLAN `40`.
-- `prod-k8s-02` and `prod-k8s-03` stay commented until `pve2` and `pve3` exist.
+- `prod-k8s-cp-02` and `prod-k8s-cp-03` stay commented until `pve2` and `pve3` exist.
 
 ## Provisioning Flow
 

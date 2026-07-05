@@ -16,8 +16,8 @@ OpenTofu provisions and maintains the production infrastructure stacks under `in
 ### Proxmox
 
 - Provisions a Talos-based Kubernetes cluster on Proxmox.
-- Currently enabled node: `prod-k8s-01` on `pve1` with VM ID `101`.
-- Planned nodes `prod-k8s-02` and `prod-k8s-03` are commented until `pve2` and `pve3` exist.
+- Currently enabled node: `prod-k8s-cp-01` on `pve1` with VM ID `101`.
+- Planned nodes `prod-k8s-cp-02` and `prod-k8s-cp-03` are commented until `pve2` and `pve3` exist.
 
 - [Stack doc](./stacks/proxmox)
 
