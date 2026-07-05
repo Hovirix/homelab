@@ -19,6 +19,21 @@ locals {
       domain = "truenas.home.hovirix.dev"
       answer = "10.30.0.106"
     }
+
+    prod-k8s-01 = {
+      domain = "prod-k8s-01.home.hovirix.dev"
+      answer = "10.40.0.1"
+    }
+
+    prod-k8s-02 = {
+      domain = "prod-k8s-02.home.hovirix.dev"
+      answer = "10.40.0.2"
+    }
+
+    prod-k8s-03 = {
+      domain = "prod-k8s-03.home.hovirix.dev"
+      answer = "10.40.0.3"
+    }
   }
 }
 
