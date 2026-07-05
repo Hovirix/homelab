@@ -1,45 +1,35 @@
-variable "talos_image_schematic_id" {
-  type = string
-}
-
-variable "talos_version" {
-  type = string
+variable "talos" {
+  type = object({
+    schematic_id = string
+    version      = string
+  })
 }
 
 variable "nodes" {
   type = map(object({
-    node_name = string
-    vm_id     = number
+    proxmox_node = string
+    vm_id        = number
   }))
 }
 
-variable "cpu_cores" {
-  type = number
+variable "vm" {
+  type = object({
+    cpu_cores = number
+    memory_mb = number
+  })
 }
 
-variable "memory_dedicated" {
-  type = number
+variable "network" {
+  type = object({
+    bridge  = optional(string, "vmbr0")
+    vlan_id = number
+  })
 }
 
-variable "network_vlan_id" {
-  type = number
-}
-
-variable "image_datastore_id" {
-  type    = string
-  default = "local"
-}
-
-variable "boot_disk_datastore_id" {
-  type    = string
-  default = "local-zfs"
-}
-
-variable "boot_disk_size" {
-  type = number
-}
-
-variable "network_bridge" {
-  type    = string
-  default = "vmbr0"
+variable "storage" {
+  type = object({
+    image_datastore = optional(string, "local")
+    boot_datastore  = optional(string, "local-zfs")
+    boot_disk_gb    = number
+  })
 }

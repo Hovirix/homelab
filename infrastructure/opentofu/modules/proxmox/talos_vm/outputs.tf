@@ -6,7 +6,7 @@ output "name" {
   value = proxmox_virtual_environment_vm.this.name
 }
 
-output "node_name" {
+output "proxmox_node" {
   value = proxmox_virtual_environment_vm.this.node_name
 }
 
