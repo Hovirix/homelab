@@ -1,6 +1,6 @@
 ephemeral "talos_machine_configuration" "controlplane" {
   cluster_name       = var.cluster_name
-  cluster_endpoint   = var.cluster_endpoint
+  cluster_endpoint   = local.kubernetes_endpoint
   machine_type       = "controlplane"
   machine_secrets    = local.machine_secrets
   talos_version      = var.talos_version
@@ -14,28 +14,25 @@ ephemeral "talos_machine_configuration" "controlplane" {
 ephemeral "talos_client_configuration" "cluster" {
   cluster_name    = var.cluster_name
   machine_secrets = local.machine_secrets
-  endpoints       = [var.talos_endpoint]
-  nodes           = local.controlplane_dns_names
+  endpoints       = [var.controlplane.endpoint]
+  nodes           = [var.controlplane.endpoint]
 }
 
-resource "talos_machine_configuration_apply" "controlplanes" {
-  for_each = var.controlplanes
-
-  node                           = each.value.dns_name
-  endpoint                       = each.value.dns_name
+resource "talos_machine_configuration_apply" "controlplane" {
+  node                           = var.controlplane.endpoint
+  endpoint                       = var.controlplane.endpoint
   client_configuration_wo        = ephemeral.talos_client_configuration.cluster.client_configuration
   machine_configuration_input_wo = ephemeral.talos_machine_configuration.controlplane.machine_configuration
-  apply_mode                     = "auto"
-  config_patches                 = [local.node_patches[each.key]]
+  config_patches                 = [local.node_patch]
 }
 
 resource "talos_machine_bootstrap" "cluster" {
   depends_on = [
-    talos_machine_configuration_apply.controlplanes,
+    talos_machine_configuration_apply.controlplane,
   ]
 
-  node                    = local.bootstrap_node
-  endpoint                = local.bootstrap_node
+  node                    = var.controlplane.endpoint
+  endpoint                = var.controlplane.endpoint
   client_configuration_wo = ephemeral.talos_client_configuration.cluster.client_configuration
 }
 
@@ -45,6 +42,6 @@ ephemeral "talos_cluster_kubeconfig" "cluster" {
   ]
 
   cluster_name    = var.cluster_name
-  endpoint        = var.cluster_endpoint
+  endpoint        = local.kubernetes_endpoint
   machine_secrets = local.machine_secrets
 }

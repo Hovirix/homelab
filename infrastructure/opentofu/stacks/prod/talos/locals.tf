@@ -33,26 +33,21 @@ locals {
     }
   }
 
-  controlplane_keys      = sort(keys(var.controlplanes))
-  controlplanes          = [for key in local.controlplane_keys : var.controlplanes[key]]
-  bootstrap_node         = local.controlplanes[0].dns_name
-  controlplane_dns_names = [for node in local.controlplanes : node.dns_name]
+  kubernetes_endpoint = "https://${var.controlplane.endpoint}:6443"
 
-  node_patches = {
-    for key, node in var.controlplanes : key => yamlencode({
-      machine = {
-        network = {
-          interfaces = [
-            {
-              interface = node.interface
-              dhcp      = true
-              vip = {
-                ip = var.controlplane_vip
-              }
-            },
-          ]
-        }
+  node_patch = yamlencode({
+    machine = {
+      network = {
+        interfaces = [
+          {
+            interface = var.controlplane.interface
+            dhcp      = true
+            vip = {
+              ip = var.controlplane_vip
+            }
+          },
+        ]
       }
-    })
-  }
+    }
+  })
 }
