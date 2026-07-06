@@ -28,6 +28,8 @@ resource "proxmox_virtual_environment_vm" "this" {
     file_id = var.iso_file_id
   }
 
+  boot_order = ["virtio0", "ide3"]
+
   network_device {
     bridge      = var.network.bridge
     vlan_id     = var.network.vlan_id
