@@ -31,8 +31,8 @@ resource "talos_machine_bootstrap" "cluster" {
     talos_machine_configuration_apply.controlplane,
   ]
 
-  node                    = var.controlplane.endpoint
-  endpoint                = var.controlplane.endpoint
+  node = "10.40.0.11"
+  # endpoint                = var.controlplane.endpoint
   client_configuration_wo = ephemeral.talos_client_configuration.cluster.client_configuration
 }
 
