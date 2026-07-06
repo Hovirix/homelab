@@ -1,0 +1,10 @@
+machine:
+  install:
+    disk: /dev/sda
+
+cluster:
+  network:
+    cni:
+      name: none
+
+  allowSchedulingOnControlPlanes: true
