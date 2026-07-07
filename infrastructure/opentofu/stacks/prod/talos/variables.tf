@@ -17,7 +17,7 @@ variable "cluster" {
     name               = "prod-k8s"
     vip                = "10.40.0.10"
     interface          = "ens18"
-    talos_version      = "v1.13.3"
+    talos_version      = "v1.13.5"
     kubernetes_version = "v1.35.4"
     bootstrap_node     = "cp1"
   }
