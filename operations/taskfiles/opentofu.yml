@@ -8,42 +8,7 @@ vars:
 
 tasks:
   tofu:
-    internal: true
+    desc: Run any OpenTofu command for a stack
     dir: "{{.stack_dir}}"
     cmds:
-      - '{{.ROOT_DIR}}/operations/scripts/tofu.sh {{.cmd}} "{{.sops_file}}" {{.args}}'
-
-  init:
-    desc: Initialize an OpenTofu stack
-    cmds:
-      - task: tofu
-        vars:
-          cmd: init
-
-  validate:
-    desc: Validate an OpenTofu stack
-    cmds:
-      - task: tofu
-        vars:
-          cmd: validate
-
-  plan:
-    desc: Plan an OpenTofu stack
-    cmds:
-      - task: tofu
-        vars:
-          cmd: plan
-
-  apply:
-    desc: Apply an OpenTofu stack
-    cmds:
-      - task: tofu
-        vars:
-          cmd: apply
-
-  destroy:
-    desc: Destroy an OpenTofu stack
-    cmds:
-      - task: tofu
-        vars:
-          cmd: destroy
+      - '{{.ROOT_DIR}}/operations/scripts/tofu.sh "{{.sops_file}}" {{.CLI_ARGS}}'

@@ -4,4 +4,5 @@ includes:
   ansible:
     taskfile: operations/taskfiles/ansible.yml
   tofu:
+    flatten: true
     taskfile: operations/taskfiles/opentofu.yml
