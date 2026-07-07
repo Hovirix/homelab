@@ -33,19 +33,52 @@ locals {
     }
   }
 
-  kubernetes_endpoint = "https://${var.controlplane.endpoint}:6443"
+  controlplane_nodes = {
+    for name, node in var.nodes : name => node
+    if node.role == "controlplane"
+  }
 
-  node_patch = yamlencode({
+  worker_nodes = {
+    for name, node in var.nodes : name => node
+    if node.role == "worker"
+  }
+
+  talos_endpoints = [
+    for node in values(local.controlplane_nodes) : node.hostname
+  ]
+
+  talos_nodes = [
+    for node in values(var.nodes) : node.hostname
+  ]
+
+  bootstrap_node = local.controlplane_nodes[var.cluster.bootstrap_node].hostname
+
+  cluster_endpoint = "https://${var.cluster.endpoint}:6443"
+
+  controlplane_node_patch = yamlencode({
     machine = {
+      certSANs = [
+        local.bootstrap_node
+      ]
+
       network = {
         interfaces = [
           {
-            interface = var.controlplane.interface
+            interface = var.cluster.interface
             dhcp      = true
+
             vip = {
-              ip = var.controlplane_vip
+              ip = var.cluster.vip
             }
-          },
+          }
+        ]
+      }
+    }
+
+    cluster = {
+      apiServer = {
+        certSANs = [
+          var.cluster.endpoint
         ]
       }
     }
