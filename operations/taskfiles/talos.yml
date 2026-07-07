@@ -1,0 +1,11 @@
+version: "3"
+
+vars:
+  env: '{{default "prod" .env}}'
+  stack_dir: "./infrastructure/opentofu/stacks/{{.env}}/talos"
+
+tasks:
+  export-configs:
+    desc: Export local talosconfig and kubeconfig files
+    cmds:
+      - '{{.ROOT_DIR}}/operations/scripts/talos-configs.sh "{{.ROOT_DIR}}/{{.stack_dir}}/config.yaml" "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml" "{{.ROOT_DIR}}/.talos"'

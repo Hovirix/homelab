@@ -6,3 +6,5 @@ includes:
   tofu:
     flatten: true
     taskfile: operations/taskfiles/opentofu.yml
+  talos:
+    taskfile: operations/taskfiles/talos.yml
