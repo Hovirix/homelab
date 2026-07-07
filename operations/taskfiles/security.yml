@@ -14,8 +14,13 @@ tasks:
 
   vuln:
     desc: Scan the repository for vulnerabilities
+    deps:
+      - sbom
     cmds:
-      - trivy --config "{{.security_dir}}/trivy.yaml" fs --scanners vuln .
+      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/infrastructure.cdx.json"
+      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/operations.cdx.json"
+      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/platform.cdx.json"
+      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/docs.cdx.json"
 
   iac:
     desc: Scan infrastructure and platform configuration
@@ -32,16 +37,15 @@ tasks:
     desc: Generate local SBOMs with syft
     cmds:
       - mkdir -p "{{.sbom_dir}}"
-      - syft dir:infrastructure -o cyclonedx-json="{{.sbom_dir}}/infrastructure.cdx.json"
-      - syft dir:operations -o cyclonedx-json="{{.sbom_dir}}/operations.cdx.json"
-      - syft dir:platform -o cyclonedx-json="{{.sbom_dir}}/platform.cdx.json"
-      - syft dir:docs -o cyclonedx-json="{{.sbom_dir}}/docs.cdx.json"
+      - syft --config "{{.security_dir}}/syft.yaml" dir:infrastructure -o cyclonedx-json="{{.sbom_dir}}/infrastructure.cdx.json"
+      - syft --config "{{.security_dir}}/syft.yaml" dir:operations -o cyclonedx-json="{{.sbom_dir}}/operations.cdx.json"
+      - syft --config "{{.security_dir}}/syft.yaml" dir:platform -o cyclonedx-json="{{.sbom_dir}}/platform.cdx.json"
+      - syft --config "{{.security_dir}}/syft.yaml" dir:docs -o cyclonedx-json="{{.sbom_dir}}/docs.cdx.json"
 
   all:
     desc: Run all local security checks
-    deps:
-      - secrets
-      - vuln
-      - iac
-      - kubernetes
-      - sbom
+    cmds:
+      - task: secrets
+      - task: vuln
+      - task: iac
+      - task: kubernetes

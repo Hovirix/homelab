@@ -23,6 +23,110 @@ let
         touch $out
       '';
 
+  sbom-infrastructure =
+    pkgs.runCommand "sbom-infrastructure"
+      {
+        nativeBuildInputs = [ pkgs.syft ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export SYFT_CACHE_DIR="$TMPDIR/syft"
+
+        syft --config ${self}/security/syft.yaml dir:${self}/infrastructure -o cyclonedx-json="$out"
+      '';
+
+  sbom-operations =
+    pkgs.runCommand "sbom-operations"
+      {
+        nativeBuildInputs = [ pkgs.syft ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export SYFT_CACHE_DIR="$TMPDIR/syft"
+
+        syft --config ${self}/security/syft.yaml dir:${self}/operations -o cyclonedx-json="$out"
+      '';
+
+  sbom-platform =
+    pkgs.runCommand "sbom-platform"
+      {
+        nativeBuildInputs = [ pkgs.syft ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export SYFT_CACHE_DIR="$TMPDIR/syft"
+
+        syft --config ${self}/security/syft.yaml dir:${self}/platform -o cyclonedx-json="$out"
+      '';
+
+  sbom-docs =
+    pkgs.runCommand "sbom-docs"
+      {
+        nativeBuildInputs = [ pkgs.syft ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export SYFT_CACHE_DIR="$TMPDIR/syft"
+
+        syft --config ${self}/security/syft.yaml dir:${self}/docs -o cyclonedx-json="$out"
+      '';
+
+  trivy-sbom-infrastructure =
+    pkgs.runCommand "trivy-sbom-infrastructure"
+      {
+        nativeBuildInputs = [ pkgs.trivy ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export TRIVY_CACHE_DIR="$TMPDIR/trivy"
+
+        trivy --config ${self}/security/trivy.yaml sbom --scanners vuln ${sbom-infrastructure}
+
+        touch $out
+      '';
+
+  trivy-sbom-operations =
+    pkgs.runCommand "trivy-sbom-operations"
+      {
+        nativeBuildInputs = [ pkgs.trivy ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export TRIVY_CACHE_DIR="$TMPDIR/trivy"
+
+        trivy --config ${self}/security/trivy.yaml sbom --scanners vuln ${sbom-operations}
+
+        touch $out
+      '';
+
+  trivy-sbom-platform =
+    pkgs.runCommand "trivy-sbom-platform"
+      {
+        nativeBuildInputs = [ pkgs.trivy ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export TRIVY_CACHE_DIR="$TMPDIR/trivy"
+
+        trivy --config ${self}/security/trivy.yaml sbom --scanners vuln ${sbom-platform}
+
+        touch $out
+      '';
+
+  trivy-sbom-docs =
+    pkgs.runCommand "trivy-sbom-docs"
+      {
+        nativeBuildInputs = [ pkgs.trivy ];
+      }
+      ''
+        export HOME="$TMPDIR"
+        export TRIVY_CACHE_DIR="$TMPDIR/trivy"
+
+        trivy --config ${self}/security/trivy.yaml sbom --scanners vuln ${sbom-docs}
+
+        touch $out
+      '';
+
   shellcheck =
     pkgs.runCommand "shellcheck"
       {
