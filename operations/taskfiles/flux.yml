@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  bootstrap:
+    desc: Apply Flux bootstrap manifests
+    cmds:
+      - kubectl apply -k platform/gitops
+      - kubectl -n flux-system rollout status deployment/source-controller --timeout=10m
+      - kubectl -n flux-system rollout status deployment/kustomize-controller --timeout=10m
+      - kubectl -n flux-system rollout status deployment/helm-controller --timeout=10m
+      - kubectl -n flux-system rollout status deployment/notification-controller --timeout=10m
+      - kubectl get pods -n flux-system

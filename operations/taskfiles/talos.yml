@@ -3,9 +3,27 @@ version: "3"
 vars:
   env: '{{default "prod" .env}}'
   stack_dir: "./infrastructure/opentofu/stacks/{{.env}}/talos"
+  cni_values: "{{.ROOT_DIR}}/platform/networking/cni/values.yaml"
+  cni_release: "{{.ROOT_DIR}}/platform/networking/cni/release.yaml"
 
 tasks:
   export-configs:
     desc: Export local talosconfig and kubeconfig files
     cmds:
       - '{{.ROOT_DIR}}/operations/scripts/talos-configs.sh "{{.ROOT_DIR}}/{{.stack_dir}}/config.yaml" "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml" "{{.ROOT_DIR}}/.talos"'
+
+  bootstrap:
+    desc: Bootstrap the Talos cluster network with Cilium
+    deps:
+      - export-configs
+    cmds:
+      - |
+        cilium_version="$(yq e -r '.spec.chart.spec.version' '{{.cni_release}}')"
+        helm upgrade --install cilium oci://quay.io/cilium/charts/cilium \
+          --version "$cilium_version" \
+          --namespace kube-system \
+          --create-namespace \
+          --values "{{.cni_values}}"
+      - kubectl -n kube-system rollout status ds/cilium --timeout=10m
+      - kubectl wait node --all --for=condition=Ready --timeout=10m
+      - kubectl get nodes -o wide

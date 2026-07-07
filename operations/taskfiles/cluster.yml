@@ -1,0 +1,8 @@
+version: "3"
+
+tasks:
+  bootstrap:
+    desc: Bootstrap Talos networking and Flux sync
+    cmds:
+      - task talos:bootstrap
+      - task flux:bootstrap
