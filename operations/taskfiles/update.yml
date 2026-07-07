@@ -16,8 +16,3 @@ tasks:
     desc: Update docs dependencies
     cmds:
       - pnpm --dir docs update
-
-  check:
-    desc: Validate the repository after updates
-    cmds:
-      - task: :checks:check:ci
