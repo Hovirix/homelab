@@ -1,10 +1,10 @@
 ephemeral "talos_machine_configuration" "controlplane" {
-  cluster_name       = var.cluster.name
+  cluster_name       = local.config.cluster.name
   cluster_endpoint   = local.cluster_endpoint
   machine_type       = "controlplane"
   machine_secrets    = local.machine_secrets
-  talos_version      = var.cluster.talos_version
-  kubernetes_version = var.cluster.kubernetes_version
+  talos_version      = local.config.cluster.talos_version
+  kubernetes_version = local.config.cluster.kubernetes_version
 
   config_patches = [
     file("${path.module}/patches/controlplane.yaml"),

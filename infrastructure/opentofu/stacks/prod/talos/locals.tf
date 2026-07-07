@@ -1,41 +1,42 @@
 locals {
+  config        = yamldecode(file("${path.module}/config.yaml"))
   talos_secrets = yamldecode(data.sops_file.infrastructure.raw).talos
 
   machine_secrets = {
     certs = {
       etcd = {
-        cert = local.talos_secrets.certs.etcd.crt
-        key  = local.talos_secrets.certs.etcd.key
+        cert = local.talos_secrets.machine_secrets.certs.etcd.crt
+        key  = local.talos_secrets.machine_secrets.certs.etcd.key
       }
       k8s = {
-        cert = local.talos_secrets.certs.k8s.crt
-        key  = local.talos_secrets.certs.k8s.key
+        cert = local.talos_secrets.machine_secrets.certs.k8s.crt
+        key  = local.talos_secrets.machine_secrets.certs.k8s.key
       }
       k8s_aggregator = {
-        cert = local.talos_secrets.certs.k8saggregator.crt
-        key  = local.talos_secrets.certs.k8saggregator.key
+        cert = local.talos_secrets.machine_secrets.certs.k8saggregator.crt
+        key  = local.talos_secrets.machine_secrets.certs.k8saggregator.key
       }
       k8s_serviceaccount = {
-        key = local.talos_secrets.certs.k8sserviceaccount.key
+        key = local.talos_secrets.machine_secrets.certs.k8sserviceaccount.key
       }
       os = {
-        cert = local.talos_secrets.certs.os.crt
-        key  = local.talos_secrets.certs.os.key
+        cert = local.talos_secrets.machine_secrets.certs.os.crt
+        key  = local.talos_secrets.machine_secrets.certs.os.key
       }
     }
-    cluster = local.talos_secrets.cluster
+    cluster = local.talos_secrets.machine_secrets.cluster
     secrets = {
-      bootstrap_token             = local.talos_secrets.secrets.bootstraptoken
-      secretbox_encryption_secret = local.talos_secrets.secrets.secretboxencryptionsecret
+      bootstrap_token             = local.talos_secrets.machine_secrets.secrets.bootstraptoken
+      secretbox_encryption_secret = local.talos_secrets.machine_secrets.secrets.secretboxencryptionsecret
     }
     trustdinfo = {
-      token = local.talos_secrets.trustdinfo.token
+      token = local.talos_secrets.machine_secrets.trustdinfo.token
     }
   }
 
   nodes = {
-    for key, node in var.nodes : key => merge(node, {
-      hostname = "${node.name}.${var.domain}"
+    for key, node in local.config.nodes : key => merge(node, {
+      hostname = "${node.name}.${local.config.domain}"
     })
   }
 
@@ -57,9 +58,9 @@ locals {
     for node in values(local.nodes) : node.hostname
   ]
 
-  bootstrap_node = local.controlplane_nodes[var.cluster.bootstrap_node].hostname
+  bootstrap_node = local.controlplane_nodes[local.config.cluster.bootstrap_node].hostname
 
-  cluster_hostname = "${var.cluster.name}.${var.domain}"
+  cluster_hostname = "${local.config.cluster.name}.${local.config.domain}"
   cluster_endpoint = "https://${local.cluster_hostname}:6443"
 
   controlplane_node_patch = yamlencode({
@@ -71,11 +72,11 @@ locals {
       network = {
         interfaces = [
           {
-            interface = var.cluster.interface
+            interface = local.config.cluster.interface
             dhcp      = true
 
             vip = {
-              ip = var.cluster.vip
+              ip = local.config.cluster.vip
             }
           }
         ]
