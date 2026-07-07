@@ -7,7 +7,7 @@ vars:
   cni_release: "{{.ROOT_DIR}}/platform/networking/cni/release.yaml"
 
 tasks:
-  export-configs:
+  gen-configs:
     desc: Export local talosconfig and kubeconfig files
     cmds:
       - '{{.ROOT_DIR}}/operations/scripts/talos-configs.sh "{{.ROOT_DIR}}/{{.stack_dir}}/config.yaml" "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml" "{{.ROOT_DIR}}/.talos"'

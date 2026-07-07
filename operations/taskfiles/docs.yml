@@ -3,6 +3,7 @@ version: "3"
 tasks:
   install:
     desc: Install docs dependencies
+    internal: true
     cmds:
       - pnpm --dir docs install --frozen-lockfile
 
