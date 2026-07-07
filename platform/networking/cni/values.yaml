@@ -3,6 +3,9 @@ ipam:
 
 kubeProxyReplacement: true
 
+operator:
+  replicas: 1
+
 k8sServiceHost: localhost
 k8sServicePort: 7445
 
