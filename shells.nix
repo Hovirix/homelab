@@ -24,7 +24,6 @@
       sops
 
       # Security
-      gitleaks
       trivy
       syft
 

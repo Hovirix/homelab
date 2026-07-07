@@ -1,7 +1,6 @@
 version: "3"
 
 vars:
-  artifacts_dir: "{{.ROOT_DIR}}/.artifacts"
   sbom_dir: "{{.ROOT_DIR}}/.artifacts/sbom"
   security_dir: "{{.ROOT_DIR}}/security"
 
@@ -9,8 +8,7 @@ tasks:
   secrets:
     desc: Scan the repository for secrets
     cmds:
-      - mkdir -p "{{.artifacts_dir}}/security"
-      - gitleaks detect --no-banner --redact --source . --config "{{.security_dir}}/gitleaks.toml" --report-format json --report-path "{{.artifacts_dir}}/security/gitleaks.json"
+      - trivy --config "{{.security_dir}}/trivy.yaml" fs --scanners secret .
 
   vuln:
     desc: Scan the repository for vulnerabilities

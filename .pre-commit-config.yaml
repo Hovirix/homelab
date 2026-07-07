@@ -7,9 +7,9 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-      - id: gitleaks
-        name: gitleaks
-        entry: gitleaks protect --staged --redact --no-banner
+      - id: trivy-secret
+        name: trivy secret scan
+        entry: trivy --config security/trivy.yaml fs --scanners secret .
         language: system
         pass_filenames: false
         always_run: true

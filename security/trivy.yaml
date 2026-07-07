@@ -1,6 +1,8 @@
 scan:
   skip-dirs:
+    - .direnv
     - .artifacts
+    - .git
     - .opencode
     - .talos
     - docs/.vitepress/cache

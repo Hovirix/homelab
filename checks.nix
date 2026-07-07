@@ -5,20 +5,16 @@
 }:
 
 let
-  gitleaks =
-    pkgs.runCommand "gitleaks"
+  trivy-secrets =
+    pkgs.runCommand "trivy-secrets"
       {
-        nativeBuildInputs = [
-          pkgs.gitleaks
-          pkgs.git
-        ];
+        nativeBuildInputs = [ pkgs.trivy ];
       }
       ''
         export HOME="$TMPDIR"
+        export TRIVY_CACHE_DIR="$TMPDIR/trivy"
 
-        cd ${self}
-
-        gitleaks detect --no-banner --redact --source . --report-format json --report-path "$TMPDIR/gitleaks.json"
+        trivy --config ${self}/security/trivy.yaml fs --scanners secret ${self}
 
         touch $out
       '';
@@ -192,7 +188,7 @@ in
   formatting = treefmtEval.config.build.check self;
 
   inherit
-    gitleaks
+    trivy-secrets
     shellcheck
     ansible-lint
     ansible-syntax
