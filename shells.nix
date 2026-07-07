@@ -44,6 +44,11 @@
       tofu-ls
       yaml-language-server
     ];
+
+    shellHook = ''
+      export TALOSCONFIG="$PWD/infrastructure/opentofu/stacks/prod/talos/talosconfig"
+      export KUBECONFIG="$PWD/infrastructure/opentofu/stacks/prod/talos/kubeconfig"
+    '';
   };
 
   docs = pkgs.mkShell {
