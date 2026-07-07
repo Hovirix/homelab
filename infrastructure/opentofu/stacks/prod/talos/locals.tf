@@ -33,13 +33,19 @@ locals {
     }
   }
 
+  nodes = {
+    for key, node in var.nodes : key => merge(node, {
+      hostname = "${node.name}.${var.domain}"
+    })
+  }
+
   controlplane_nodes = {
-    for name, node in var.nodes : name => node
+    for name, node in local.nodes : name => node
     if node.role == "controlplane"
   }
 
   worker_nodes = {
-    for name, node in var.nodes : name => node
+    for name, node in local.nodes : name => node
     if node.role == "worker"
   }
 
@@ -48,12 +54,13 @@ locals {
   ]
 
   talos_nodes = [
-    for node in values(var.nodes) : node.hostname
+    for node in values(local.nodes) : node.hostname
   ]
 
   bootstrap_node = local.controlplane_nodes[var.cluster.bootstrap_node].hostname
 
-  cluster_endpoint = "https://${var.cluster.endpoint}:6443"
+  cluster_hostname = "${var.cluster.name}.${var.domain}"
+  cluster_endpoint = "https://${local.cluster_hostname}:6443"
 
   controlplane_node_patch = yamlencode({
     machine = {
@@ -76,9 +83,13 @@ locals {
     }
 
     cluster = {
+      proxy = {
+        mode = "iptables"
+      }
+
       apiServer = {
         certSANs = [
-          var.cluster.endpoint
+          local.cluster_hostname,
         ]
       }
     }
