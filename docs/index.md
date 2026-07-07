@@ -33,4 +33,9 @@ features:
     title: Operations
     details: Task entrypoints and runbooks for repeatable administrative work.
     link: /operations/
+
+  - icon: 🛰️
+    title: Platform
+    details: Kubernetes platform state and cluster services.
+    link: /platform/
 ---
