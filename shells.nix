@@ -2,6 +2,10 @@
 {
   default = pkgs.mkShell {
     packages = with pkgs; [
+      # Documentation
+      nodejs
+      pnpm
+
       # Infrastructure
       ansible
       opentofu
@@ -20,7 +24,9 @@
       sops
 
       # Security
+      gitleaks
       trivy
+      syft
 
       # Automation
       go-task

@@ -13,5 +13,5 @@ Platform documentation maps directly to the code under `platform/`.
 
 ## Sections
 
-- [GitOps](./gitops)
+- [GitOps](./gitops/)
 - [Networking](./networking/cni)

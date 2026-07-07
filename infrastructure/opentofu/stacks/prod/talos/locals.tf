@@ -45,11 +45,6 @@ locals {
     if node.role == "controlplane"
   }
 
-  worker_nodes = {
-    for name, node in local.nodes : name => node
-    if node.role == "worker"
-  }
-
   talos_endpoints = [
     for node in values(local.controlplane_nodes) : node.hostname
   ]

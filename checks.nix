@@ -5,6 +5,24 @@
 }:
 
 let
+  gitleaks =
+    pkgs.runCommand "gitleaks"
+      {
+        nativeBuildInputs = [
+          pkgs.gitleaks
+          pkgs.git
+        ];
+      }
+      ''
+        export HOME="$TMPDIR"
+
+        cd ${self}
+
+        gitleaks detect --no-banner --redact --source . --report-format json --report-path "$TMPDIR/gitleaks.json"
+
+        touch $out
+      '';
+
   shellcheck =
     pkgs.runCommand "shellcheck"
       {
@@ -70,6 +88,7 @@ in
   formatting = treefmtEval.config.build.check self;
 
   inherit
+    gitleaks
     shellcheck
     ansible-lint
     ansible-syntax

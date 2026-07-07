@@ -1,0 +1,12 @@
+title = "homelab gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+paths = [
+  '''^\.artifacts/''',
+  '''^docs/\.vitepress/cache/''',
+  '''^docs/\.vitepress/dist/''',
+  '''^docs/node_modules/''',
+]

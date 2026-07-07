@@ -1,0 +1,28 @@
+version: "3"
+
+tasks:
+  install:
+    desc: Install docs dependencies
+    cmds:
+      - pnpm --dir docs install --frozen-lockfile
+
+  dev:
+    desc: Run the docs site locally
+    deps:
+      - install
+    cmds:
+      - pnpm --dir docs dev
+
+  build:
+    desc: Build the docs site
+    deps:
+      - install
+    cmds:
+      - pnpm --dir docs build
+
+  preview:
+    desc: Preview the built docs site
+    deps:
+      - install
+    cmds:
+      - pnpm --dir docs preview

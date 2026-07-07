@@ -51,3 +51,4 @@ Thumbs.db
 /docs/node_modules/
 /.ansible-lint
 /.yamllint
+.artifacts/

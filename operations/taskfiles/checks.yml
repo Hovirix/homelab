@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  fmt:
+    desc: Format the repository with nix fmt
+    cmds:
+      - nix fmt
+
+  check:
+    desc: Run the local validation suite
+    cmds:
+      - nix flake check

@@ -1,0 +1,47 @@
+version: "3"
+
+vars:
+  artifacts_dir: "{{.ROOT_DIR}}/.artifacts"
+  sbom_dir: "{{.ROOT_DIR}}/.artifacts/sbom"
+  security_dir: "{{.ROOT_DIR}}/security"
+
+tasks:
+  secrets:
+    desc: Scan the repository for secrets
+    cmds:
+      - mkdir -p "{{.artifacts_dir}}/security"
+      - gitleaks detect --no-banner --redact --source . --config "{{.security_dir}}/gitleaks.toml" --report-format json --report-path "{{.artifacts_dir}}/security/gitleaks.json"
+
+  vuln:
+    desc: Scan the repository for vulnerabilities
+    cmds:
+      - trivy --config "{{.security_dir}}/trivy.yaml" fs --scanners vuln .
+
+  iac:
+    desc: Scan infrastructure and platform configuration
+    cmds:
+      - trivy --config "{{.security_dir}}/trivy.yaml" config infrastructure
+      - trivy --config "{{.security_dir}}/trivy.yaml" config platform
+
+  kubernetes:
+    desc: Validate rendered Kubernetes manifests
+    cmds:
+      - kustomize build platform | kubeconform -strict -summary -ignore-missing-schemas
+
+  sbom:
+    desc: Generate local SBOMs with syft
+    cmds:
+      - mkdir -p "{{.sbom_dir}}"
+      - syft dir:infrastructure -o cyclonedx-json="{{.sbom_dir}}/infrastructure.cdx.json"
+      - syft dir:operations -o cyclonedx-json="{{.sbom_dir}}/operations.cdx.json"
+      - syft dir:platform -o cyclonedx-json="{{.sbom_dir}}/platform.cdx.json"
+      - syft dir:docs -o cyclonedx-json="{{.sbom_dir}}/docs.cdx.json"
+
+  all:
+    desc: Run all local security checks
+    deps:
+      - secrets
+      - vuln
+      - iac
+      - kubernetes
+      - sbom
