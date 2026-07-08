@@ -87,13 +87,8 @@ proxmox_enable_vfio: true # load vfio modules
 # CERTIFICATES
 # =============================================================================
 
-# Certificate configuration is intentionally unmanaged.
-#
-# Future responsibilities:
-# - ACME / Let's Encrypt
-# - DNS-01 challenge
-# - Internal CA
-# - Proxmox API/UI certificate replacement
+# Managed by roles/certificates.
+# Secret source: `secrets/infrastructure.sops.yaml` -> `proxmox.acme_token`
 
 # =============================================================================
 # MONITORING
