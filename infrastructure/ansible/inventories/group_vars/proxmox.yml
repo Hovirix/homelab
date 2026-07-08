@@ -1,185 +1,127 @@
-# =============================================================================
-# COMMON
-# =============================================================================
+pve:
+  system:
+    enabled: true
+    domain: home.hovirix.dev
+    timezone: Etc/UTC
 
-proxmox_domain: home.hovirix.dev
-proxmox_timezone: Etc/UTC
+  repositories:
+    enabled: true
 
-# =============================================================================
-# REPOSITORIES
-# =============================================================================
+  updates:
+    enabled: true
+    upgrade: true
+    reboot: true
 
-# Managed by roles/repositories.
+  ssh:
+    enabled: true
+    permit_root_login: prohibit-password
+    root_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
 
-# =============================================================================
-# UPDATES
-# =============================================================================
+  wake_on_lan:
+    enabled: true
 
-proxmox_updates_upgrade: true
-proxmox_updates_reboot: true
+  networking:
+    enabled: true
+    management:
+      vlan: 20
+      gateway: 10.20.0.1
+    allowed_vlans:
+      - id: 20
+        name: management
+      - id: 40
+        name: kubernetes
+      - id: 60
+        name: air-gapped-vms
 
-# =============================================================================
-# SSH
-# =============================================================================
+  storage:
+    enabled: true
+    zpool: rpool
+    dataset: rpool/data
+    min_pool_size_gib: 1500
+    autotrim: true
+    dataset_properties:
+      compression: lz4
+      atime: "off"
 
-proxmox_ssh_permit_root_login: prohibit-password
-proxmox_ssh_root_authorized_keys:
-  - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
+  kernel:
+    enabled: true
+    manage_cmdline: true
+    iommu:
+      enabled: true
+    vfio:
+      enabled: true
 
-# =============================================================================
-# NETWORKING
-# =============================================================================
+  firewall:
+    enabled: false
 
-proxmox_management_vlan: 20
-proxmox_management_gateway: 10.20.0.1
+  certificates:
+    enabled: true
 
-proxmox_allowed_vlans:
-  - 20 # Management
-  - 40 # Kubernetes
-  - 60 # Air-gapped VMs
+  monitoring:
+    enabled: false
 
-# =============================================================================
-# STORAGE
-# =============================================================================
+  notifications:
+    enabled: true
+    target_name: hxlab-smtp
+    matcher_name: hxlab-alerts
+    mailto: homelab@hovirix.dev
+    from_address: proxmox@hovirix.dev
+    smtp_mode: starttls
+    match_severity:
+      - warning
+      - error
 
-proxmox_storage_zpool: rpool
-proxmox_storage_dataset: rpool/data
-proxmox_storage_min_pool_size_gib: 1500
-proxmox_storage_autotrim: true
-proxmox_storage_dataset_compression_target: lz4
-proxmox_storage_dataset_atime_target: "off"
+  backup:
+    enabled: false
+    target_type: nfs
+    retention:
+      keep_daily: 7
+      keep_weekly: 4
+      keep_monthly: 12
 
-# Proxmox is installed with ZFS and manages the local-zfs storage.
-#
-# Managed by roles/storage:
-# - Validate pool health and capacity
-# - Enable autotrim on rpool
-# - Set compression on rpool/data
-# - Disable atime on rpool/data
-#
-# Future responsibilities:
-# - Local replication configuration
-# - Additional storage pools
-# - Dataset layout beyond local-zfs
+  cluster:
+    enabled: false
+    planned_nodes:
+      - pve1
+      - pve2
+      - pve3
 
-# =============================================================================
-# KERNEL
-# =============================================================================
+  api:
+    enabled: true
+    roles:
+      - name: OpenTofuProv
+        privileges:
+          - Datastore.Allocate
+          - Datastore.AllocateSpace
+          - Datastore.AllocateTemplate
+          - Datastore.Audit
+          - Pool.Allocate
+          - SDN.Use
+          - Sys.Audit
+          - Sys.Modify
+          - VM.Allocate
+          - VM.Audit
+          - VM.Clone
+          - VM.Config.CDROM
+          - VM.Config.CPU
+          - VM.Config.Cloudinit
+          - VM.Config.Disk
+          - VM.Config.HWType
+          - VM.Config.Memory
+          - VM.Config.Network
+          - VM.Config.Options
+          - VM.Migrate
+          - VM.PowerMgmt
 
-proxmox_kernel_manage: true # manage /etc/kernel/cmdline
-proxmox_enable_iommu: true # add intel_iommu=on or amd_iommu=on
-proxmox_enable_vfio: true # load vfio modules
-
-# =============================================================================
-# FIREWALL
-# =============================================================================
-
-# Firewall configuration is intentionally unmanaged.
-#
-# Future responsibilities:
-# - Datacenter firewall
-# - Node firewall
-# - SSH restrictions
-# - Proxmox UI/API restrictions
-# - Corosync rules
-
-# =============================================================================
-# CERTIFICATES
-# =============================================================================
-
-# Managed by roles/certificates.
-# Secret source: `secrets/infrastructure.sops.yaml` -> `proxmox.acme_token`
-
-# =============================================================================
-# MONITORING
-# =============================================================================
-
-# Monitoring configuration is intentionally unmanaged.
-#
-# Future responsibilities:
-# - Node Exporter
-# - Proxmox VE Exporter
-# - SMART monitoring
-# - Log collection
-# - OpenTelemetry / Alloy integration
-
-# =============================================================================
-# NOTIFICATIONS
-# =============================================================================
-
-proxmox_notifications_target_name: hxlab-smtp
-proxmox_notifications_matcher_name: hxlab-alerts
-proxmox_notifications_mailto: homelab@hovirix.dev
-proxmox_notifications_from_address: proxmox@hovirix.dev
-proxmox_notifications_smtp_mode: starttls
-proxmox_notifications_match_severity:
-  - warning
-  - error
-
-# =============================================================================
-# BACKUP
-# =============================================================================
-
-proxmox_backup_target_type: nfs
-
-proxmox_backup_retention:
-  keep_daily: 7
-  keep_weekly: 4
-  keep_monthly: 12
-
-# =============================================================================
-# CLUSTER
-# =============================================================================
-
-# Cluster configuration is intentionally unmanaged until all
-# Proxmox nodes are installed and available.
-#
-# Planned nodes:
-# - pve1
-# - pve2
-# - pve3
-#
-# Future responsibilities:
-# - Cluster creation
-# - Node joins
-# - Corosync configuration
-# - Cluster health validation
-
-# =============================================================================
-# API
-# =============================================================================
-
-proxmox_api_roles:
-  - name: OpenTofuProv
-    privileges:
-      - Datastore.Allocate
-      - Datastore.AllocateSpace
-      - Datastore.AllocateTemplate
-      - Datastore.Audit
-      - Pool.Allocate
-      - SDN.Use
-      - Sys.Audit
-      - Sys.Modify
-      - VM.Allocate
-      - VM.Audit
-      - VM.Clone
-      - VM.Config.CDROM
-      - VM.Config.CPU
-      - VM.Config.Cloudinit
-      - VM.Config.Disk
-      - VM.Config.HWType
-      - VM.Config.Memory
-      - VM.Config.Network
-      - VM.Config.Options
-      - VM.Migrate
-      - VM.PowerMgmt
-
-proxmox_api_users:
-  - userid: opentofu@pve
-    comment: OpenTofu lifecycle user
-    token_id: opentofu
-    token_comment: OpenTofu lifecycle token
-    token_privsep: false
-    token_regenerate: false
-    role: OpenTofuProv
-    acl_path: /
+    users:
+      - userid: opentofu@pve
+        comment: OpenTofu lifecycle user
+        token:
+          id: opentofu
+          comment: OpenTofu lifecycle token
+          privsep: false
+          regenerate: false
+        acl:
+          path: /
+          role: OpenTofuProv

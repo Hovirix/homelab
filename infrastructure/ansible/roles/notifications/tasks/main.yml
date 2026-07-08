@@ -38,7 +38,7 @@
     stdin: "{{ item.0.content }}"
     stdin_add_newline: false
   loop: "{{ notifications_files | zip(notifications_existing.results) | list }}"
-  when: item.1.failed or ((item.1.content | default('') | b64decode) != item.0.content)
+  when: item.1.failed or (item.1.content is defined and (item.1.content | b64decode) != item.0.content)
   changed_when: true
   no_log: "{{ item.0.secret }}"
   run_once: true

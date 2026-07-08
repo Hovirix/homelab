@@ -19,7 +19,7 @@
       - "{{ item.name }}"
       - --privs
       - "{{ item.privileges | join(' ') }}"
-  loop: "{{ proxmox_api_roles | default([]) }}"
+  loop: "{{ pve.api.roles }}"
   register: api_role_add
   changed_when: api_role_add.rc == 0
   failed_when:
@@ -35,7 +35,7 @@
       - "{{ item.name }}"
       - --privs
       - "{{ item.privileges | join(' ') }}"
-  loop: "{{ proxmox_api_roles | default([]) }}"
+  loop: "{{ pve.api.roles }}"
   changed_when: false
 
 - name: Ensure Proxmox API users exist
@@ -46,8 +46,8 @@
       - add
       - "{{ item.userid }}"
       - -comment
-      - "{{ item.comment | default('Managed by Ansible') }}"
-  loop: "{{ proxmox_api_users }}"
+      - "{{ item.comment }}"
+  loop: "{{ pve.api.users }}"
   register: api_user_add
   changed_when: api_user_add.rc == 0
   failed_when:
@@ -60,12 +60,12 @@
       - pveum
       - acl
       - modify
-      - "{{ item.acl_path | default('/') }}"
+      - "{{ item.acl.path }}"
       - --users
       - "{{ item.userid }}"
       - --roles
-      - "{{ item.role }}"
-  loop: "{{ proxmox_api_users }}"
+      - "{{ item.acl.role }}"
+  loop: "{{ pve.api.users }}"
   changed_when: false
 
 - name: Read Proxmox API tokens
@@ -78,7 +78,7 @@
       - "{{ item.userid }}"
       - --output-format
       - json
-  loop: "{{ proxmox_api_users }}"
+  loop: "{{ pve.api.users }}"
   register: api_token_list
   changed_when: false
 
@@ -90,12 +90,12 @@
       - token
       - delete
       - "{{ item.item.userid }}"
-      - "{{ item.item.token_id }}"
+      - "{{ item.item.token.id }}"
   loop: "{{ api_token_list.results }}"
   changed_when: true
   when:
-    - item.item.token_regenerate | default(false) | bool
-    - item.item.token_id in (item.stdout | from_json | map(attribute='tokenid') | list)
+    - item.item.token.regenerate | bool
+    - item.item.token.id in (item.stdout | from_json | map(attribute='tokenid') | list)
 
 - name: Create missing or regenerated Proxmox API tokens
   ansible.builtin.command:
@@ -105,16 +105,16 @@
       - token
       - add
       - "{{ item.item.userid }}"
-      - "{{ item.item.token_id }}"
+      - "{{ item.item.token.id }}"
       - --privsep
-      - "{{ (item.item.token_privsep | default(false)) | bool | ternary('1', '0') }}"
+      - "{{ item.item.token.privsep | bool | ternary('1', '0') }}"
       - --comment
-      - "{{ item.item.token_comment | default('Managed by Ansible') }}"
+      - "{{ item.item.token.comment }}"
       - --output-format
       - json
   loop: "{{ api_token_list.results }}"
   register: api_token_create
   changed_when: true
   when: >-
-    item.item.token_regenerate | default(false) | bool or item.item.token_id not in (item.stdout | from_json | map(attribute='tokenid') | list)
+    item.item.token.regenerate | bool or item.item.token.id not in (item.stdout | from_json | map(attribute='tokenid') | list)
   notify: Print generated Proxmox API tokens to store in SOPS

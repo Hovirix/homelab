@@ -1,2 +1,2 @@
-smtp: {{ proxmox_notifications_target_name }}
+smtp: {{ pve.notifications.target_name }}
         password {{ ansible_facts.infrastructure_secrets.smtp.password }}

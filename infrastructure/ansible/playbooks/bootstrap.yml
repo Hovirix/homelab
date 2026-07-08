@@ -3,7 +3,9 @@
 
   roles:
     - role: repositories
+      when: pve.repositories.enabled | bool
       tags: [repositories]
 
     - role: ssh
+      when: pve.ssh.enabled | bool
       tags: [ssh]

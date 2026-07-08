@@ -4,4 +4,5 @@
 
   roles:
     - role: networking
+      when: pve.networking.enabled | bool
       tags: [networking]

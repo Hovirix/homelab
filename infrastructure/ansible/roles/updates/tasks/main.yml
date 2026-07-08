@@ -6,6 +6,7 @@
 - name: Upgrade packages
   ansible.builtin.apt:
     upgrade: dist
+  when: pve.updates.upgrade | bool
 
 - name: Check if reboot is required
   ansible.builtin.stat:
@@ -15,4 +16,6 @@
 - name: Reboot if required
   ansible.builtin.reboot:
     reboot_timeout: 900
-  when: updates_reboot_required.stat.exists
+  when:
+    - pve.updates.reboot | bool
+    - updates_reboot_required.stat.exists

@@ -2,5 +2,5 @@
   ansible.builtin.debug:
     msg: >-
       Store this token value in secrets/infrastructure.sops.yaml as proxmox.api_token: {{ (item.stdout | from_json).value }}
-  loop: "{{ api_token_create.results | default([]) }}"
-  when: item.changed | default(false)
+  loop: "{{ api_token_create.results }}"
+  when: item.changed

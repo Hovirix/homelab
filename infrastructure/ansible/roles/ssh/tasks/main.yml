@@ -19,6 +19,6 @@
 - name: Configure root authorized keys
   ansible.posix.authorized_key:
     user: root
-    key: "{{ proxmox_ssh_root_authorized_keys | join('\n') }}"
+    key: "{{ pve.ssh.root_authorized_keys | join('\n') }}"
     exclusive: true
     state: present

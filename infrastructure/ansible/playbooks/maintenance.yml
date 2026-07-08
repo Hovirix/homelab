@@ -4,4 +4,5 @@
 
   roles:
     - role: updates
+      when: pve.updates.enabled | bool
       tags: [updates]

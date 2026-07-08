@@ -25,7 +25,7 @@
     argv:
       - ethtool
       - -s
-      - "{{ proxmox_network_interface }}"
+      - "{{ pve_node.network_interface }}"
       - wol
       - g
   register: wake_on_lan_result

@@ -1,3 +1,4 @@
-proxmox_hostname: pve3
-proxmox_management_address: 10.20.0.13/24
-proxmox_network_interface: nic0
+pve_node:
+  hostname: pve3
+  management_address: 10.20.0.13/24
+  network_interface: nic0

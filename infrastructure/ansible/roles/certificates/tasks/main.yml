@@ -16,7 +16,7 @@
     - name: Verify the ACME token exists
       ansible.builtin.assert:
         that:
-          - infrastructure_secrets.proxmox.acme_token | default('') | length > 0
+          - infrastructure_secrets.proxmox.acme_token | length > 0
       no_log: true
       run_once: true
 
@@ -52,7 +52,7 @@
           - account
           - register
           - default
-          - "{{ proxmox_notifications_mailto }}"
+          - "{{ pve.notifications.mailto }}"
           - --directory
           - https://acme-v02.api.letsencrypt.org/directory
         stdin: |
@@ -114,7 +114,7 @@
       - --acme
       - account=default
       - -acmedomain0
-      - "{{ proxmox_hostname }}.{{ proxmox_domain }},plugin=cloudflare"
+      - "{{ pve_node.hostname }}.{{ pve.system.domain }},plugin=cloudflare"
   changed_when: false
 
 - name: Order the Proxmox ACME certificate

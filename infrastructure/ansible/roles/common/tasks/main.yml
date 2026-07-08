@@ -1,6 +1,6 @@
 - name: Configure hostname
   ansible.builtin.hostname:
-    name: "{{ proxmox_hostname }}"
+    name: "{{ pve_node.hostname }}"
 
 - name: Configure /etc/hosts
   ansible.builtin.template:
@@ -12,4 +12,4 @@
 
 - name: Configure timezone
   community.general.timezone:
-    name: "{{ proxmox_timezone }}"
+    name: "{{ pve.system.timezone }}"

@@ -1,11 +1,11 @@
 [Unit]
-Description=Enable Wake-on-LAN for {{ proxmox_network_interface }}
+Description=Enable Wake-on-LAN for {{ pve_node.network_interface }}
 After=network.target
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/sbin/ethtool -s {{ proxmox_network_interface }} wol g
+ExecStart=/usr/sbin/ethtool -s {{ pve_node.network_interface }} wol g
 
 [Install]
 WantedBy=multi-user.target
