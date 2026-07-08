@@ -20,6 +20,11 @@
 
   "ignorePaths": [".opencode/**"],
 
+  "timezone": "UTC",
+  "schedule": ["before 6am on monday"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+
   "dependencyDashboard": true,
   "separateMajorMinor": true,
   "separateMinorPatch": true,
