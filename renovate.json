@@ -2,7 +2,23 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
 
-  "enabledManagers": ["custom.regex", "github-actions", "nix", "terraform"],
+  "enabledManagers": [
+    "custom.regex",
+    "flux",
+    "github-actions",
+    "nix",
+    "npm",
+    "terraform"
+  ],
+
+  "flux": {
+    "managerFilePatterns": [
+      "/^platform\\/gitops\\/.+\\.ya?ml$/",
+      "/^platform\\/networking\\/cni\\/.+\\.ya?ml$/"
+    ]
+  },
+
+  "ignorePaths": [".opencode/**"],
 
   "dependencyDashboard": true,
   "separateMajorMinor": true,
@@ -11,9 +27,26 @@
   "customManagers": [
     {
       "customType": "regex",
-      "managerFilePatterns": ["/(^|/)infrastructure/opentofu/.*\\.tf$/"],
-      "matchStrings": ["talos_version\\s*=\\s*\"v(?<currentValue>[^\"]+)\""],
+      "managerFilePatterns": [
+        "/(^|/)infrastructure/opentofu/stacks/prod/proxmox/main\\.tf$/",
+        "/(^|/)infrastructure/opentofu/stacks/prod/talos/config\\.ya?ml$/"
+      ],
+      "matchStrings": [
+        "version\\s*=\\s*\"(?<currentValue>v[^\"]+)\"",
+        "talos_version:\\s*(?<currentValue>v[^\"\\s]+)"
+      ],
       "depNameTemplate": "siderolabs/talos",
+      "datasourceTemplate": "github-releases",
+      "versioningTemplate": "semver",
+      "extractVersionTemplate": "^v(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/(^|/)infrastructure/opentofu/stacks/prod/talos/config\\.ya?ml$/"
+      ],
+      "matchStrings": ["kubernetes_version:\\s*(?<currentValue>v[^\"\\s]+)"],
+      "depNameTemplate": "kubernetes/kubernetes",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver",
       "extractVersionTemplate": "^v(?<version>.*)$"
@@ -33,6 +66,13 @@
       "description": "Require manual review for OpenTofu provider updates",
       "matchManagers": ["terraform"],
       "matchDatasources": ["terraform-provider"],
+      "automerge": false
+    },
+    {
+      "description": "Group Flux system manifest updates",
+      "matchManagers": ["flux"],
+      "matchFileNames": ["platform/gitops/gotk-components.yaml"],
+      "groupName": "flux system",
       "automerge": false
     },
     {
