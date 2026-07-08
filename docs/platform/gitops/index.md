@@ -5,7 +5,7 @@ Use this directory for the GitOps bootstrap manifests.
 ## Source Paths
 
 - `platform/gitops/kustomization.yaml`
-- `platform/gitops/components.yaml`
+- `platform/gitops/gotk-components.yaml`
 - `platform/gitops/sync.yaml`
 
 ## Current State
