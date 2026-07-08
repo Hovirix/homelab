@@ -1,5 +1,5 @@
 module "cloudflare" {
-  source = "../../../modules/authentik/oauth2_application"
+  source = "../../modules/authentik/oauth2_application"
 
   name = "Cloudflare"
   slug = "cloudflare"
@@ -13,7 +13,7 @@ module "cloudflare" {
 }
 
 module "grafana" {
-  source = "../../../modules/authentik/oauth2_application"
+  source = "../../modules/authentik/oauth2_application"
 
   name = "Grafana"
   slug = "grafana"
@@ -27,7 +27,7 @@ module "grafana" {
 }
 
 module "immich" {
-  source = "../../../modules/authentik/oauth2_application"
+  source = "../../modules/authentik/oauth2_application"
 
   name = "Immich"
   slug = "immich"
@@ -43,7 +43,7 @@ module "immich" {
 }
 
 module "paperless" {
-  source = "../../../modules/authentik/oauth2_application"
+  source = "../../modules/authentik/oauth2_application"
 
   name = "Paperless"
   slug = "paperless"

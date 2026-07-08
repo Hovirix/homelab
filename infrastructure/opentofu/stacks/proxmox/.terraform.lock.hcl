@@ -5,7 +5,19 @@ provider "registry.opentofu.org/bpg/proxmox" {
   version     = "0.107.0"
   constraints = "0.107.0"
   hashes = [
+    "h1:0q3370h4Rfl5WM5ODDZ6OrzcQ2QzE1Cic9BzttwBpf0=",
+    "h1:8GaLgb7ndYDg7VVCRl9KuO/GvfLcKavY/8KY33deoEY=",
+    "h1:BP04385Wj8QzytXp2vVV684W0XCUzvV5z57CKyATmYA=",
+    "h1:CeM51dy76/4mRaqx1XUDU5dFFKoAgVFoXkslFJoHqn0=",
+    "h1:HlV8ogq29TIGs3UVpMfsvExaFbA0tsfDzQIIHHeevlk=",
+    "h1:LymsbnDoM+8dDQNtUy7SzkWI5ZkfYOs567fyRlx16KU=",
+    "h1:Of6gFBfzE2Y7vynmZ89k8Bv5qSkV015TB7RnMBPSqbc=",
+    "h1:Ow8js7RmsQ+jmpiLo74SPFf43JUCrIsaVmsKJd8SgBk=",
+    "h1:THU5BKb+B9heDPKkgeARA09ZEY63U1JkOGa0OwCWGI8=",
     "h1:W/DuNEQCgP510F1LfeRCvJa4vXGNT2byH7DzbknpEO4=",
+    "h1:iGz/xB1/6WISUxYjYzo4FJNBclxcFhZChHpTExEFJtE=",
+    "h1:lUnDpfoqitHPCXjng/6k69Zk7fQTbVHNfQWQ5D6on/c=",
+    "h1:zTDkVcyQ/Kx9jflreJFMKZEnsSHgPZiMESlCiFtXsEo=",
     "zh:3c1e298f4f0d954e83d11aaf2400ec242b835ca294f8a94d67bb5ce0b30da0e9",
     "zh:4776f7f262728f8e2252360f7d1a4adc853d87d86a7515f4780375c2932ef763",
     "zh:53633a48f7fad5561a30b349e7b46c6a7a10a54c99225a4d30a7a24086921098",
@@ -27,7 +39,13 @@ provider "registry.opentofu.org/carlpett/sops" {
   version     = "1.4.1"
   constraints = "1.4.1"
   hashes = [
+    "h1:++2JmC1ykEcRLHiB7kRhqq9kfxH3H28zWWCGYJt6xwE=",
+    "h1:Bxls7vaSoHFx5oLyCC4BKWkF9A24QyYI+LDR0xwjyBo=",
+    "h1:CtjK3CV+eu5920uq2ma3cJrtPXgYqAhKoyNPsjsi2cE=",
     "h1:HyIxpskyTiLdJhGFJYzCk45IsG7zMe3K+y7em3k23BE=",
+    "h1:nTX8t1aP800EVoUFK9p7/IfSihRN3CAgTiawINe2CLY=",
+    "h1:vmBW+4J2FkW/zuDesBHYHpS4eqGZveI43AHwvDczzSw=",
+    "h1:znlUxdbGKlHDWA0hZ4E2nEW4h2x0fTsQD4pau4+KyRw=",
     "zh:4df8dea170a4cd926ca6ef0b9fa6fd1d8c1fa9bc9e78333d544a74c24e269cf9",
     "zh:5cf661333ec5d5cce3b7c0fc399052cf8f8c50f6cb0a50f5aec2f91d83685e1e",
     "zh:680616383404bc836a2d740a0dfae4691c18c8616f346e8fa795a1d790a2d888",

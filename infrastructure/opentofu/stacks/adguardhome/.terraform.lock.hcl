@@ -5,7 +5,13 @@ provider "registry.opentofu.org/carlpett/sops" {
   version     = "1.4.1"
   constraints = "1.4.1"
   hashes = [
+    "h1:++2JmC1ykEcRLHiB7kRhqq9kfxH3H28zWWCGYJt6xwE=",
+    "h1:Bxls7vaSoHFx5oLyCC4BKWkF9A24QyYI+LDR0xwjyBo=",
+    "h1:CtjK3CV+eu5920uq2ma3cJrtPXgYqAhKoyNPsjsi2cE=",
     "h1:HyIxpskyTiLdJhGFJYzCk45IsG7zMe3K+y7em3k23BE=",
+    "h1:nTX8t1aP800EVoUFK9p7/IfSihRN3CAgTiawINe2CLY=",
+    "h1:vmBW+4J2FkW/zuDesBHYHpS4eqGZveI43AHwvDczzSw=",
+    "h1:znlUxdbGKlHDWA0hZ4E2nEW4h2x0fTsQD4pau4+KyRw=",
     "zh:4df8dea170a4cd926ca6ef0b9fa6fd1d8c1fa9bc9e78333d544a74c24e269cf9",
     "zh:5cf661333ec5d5cce3b7c0fc399052cf8f8c50f6cb0a50f5aec2f91d83685e1e",
     "zh:680616383404bc836a2d740a0dfae4691c18c8616f346e8fa795a1d790a2d888",
@@ -20,7 +26,19 @@ provider "registry.opentofu.org/gmichels/adguard" {
   version     = "1.7.0"
   constraints = "1.7.0"
   hashes = [
+    "h1:1vvJ6KcLUR8U2BHNtj7tMsgEsGXzTKMIFsHfcZYEVyc=",
+    "h1:5BDrsrU/Sdain/+KkhbNzxVL81rh69wG4iKOIBf9qys=",
+    "h1:70gWtux/jVZQgsDjr8+j0aRHKkGZqRWCmzoX9ddC7f4=",
+    "h1:Qdqipgukxph9vqXiEKVzFSgXfEmGiGw1JrrQvwJOtco=",
     "h1:QveIrziFNxu+Go7pl7qjH5tqPOb8pgzfTdunVgsJ3vg=",
+    "h1:UrJdOlCLAWC7/I2Co02RtOKT3tSGb8TwOgJ7s0sOtCo=",
+    "h1:W6nZfQzWb3Ds1JRytBqzsZoNBa6x4OOe9J87f1nyCRA=",
+    "h1:c3RK8fSEr2yfPySC0WemOC/CR3608Ra4vFwGhvdrswg=",
+    "h1:jizPinVWDQUN6rKwiBgRm7PcgUJe4AWlCWghgH0v7xI=",
+    "h1:lb9gv3IiUZDA4P/kpuvOqZmidWMIbpG+sUecM1QclNo=",
+    "h1:sRIMccvZq71/CxTknprnRozCChEZSq4Nmt+M+DOjTq8=",
+    "h1:uOdtIfvNVEHheucpt51bSCYtX2W1LKELlOkBTbjBm6o=",
+    "h1:woGvhSgZDFj5+yH5uHonXSIn6AaeZekb3t9oXMZB/DQ=",
     "zh:0b83aa1ade1a6f7c9b1af0488dad43bf00e733d1517463d4bee51c17612546da",
     "zh:15d784c16545efaf6c368b642995bb0d0ef61b6961e67b072430d445ef6c02fc",
     "zh:1c4da4d20c98795fee1ac0cd9ffd880a68f06992d6fe849342c4b19f79c8aff9",

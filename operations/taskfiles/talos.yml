@@ -1,8 +1,7 @@
 version: "3"
 
 vars:
-  env: '{{default "prod" .env}}'
-  stack_dir: "./infrastructure/opentofu/stacks/{{.env}}/talos"
+  stack_dir: "./infrastructure/opentofu/stacks/talos"
   cni_values: "{{.ROOT_DIR}}/platform/networking/cni/values.yaml"
   cni_release: "{{.ROOT_DIR}}/platform/networking/cni/release.yaml"
 
@@ -15,7 +14,7 @@ tasks:
   bootstrap:
     desc: Bootstrap the Talos cluster network with Cilium
     deps:
-      - export-configs
+      - gen-configs
     cmds:
       - |
         cilium_version="$(yq e -r '.spec.chart.spec.version' '{{.cni_release}}')"

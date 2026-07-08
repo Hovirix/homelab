@@ -71,7 +71,7 @@ let
         nativeBuildInputs = [ pkgs.tflint ];
       }
       ''
-        cd ${self}/infrastructure/opentofu/stacks/prod
+        cd ${self}/infrastructure/opentofu/stacks
 
         for stack in */; do
           tflint --chdir="$stack"

@@ -33,8 +33,8 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/(^|/)infrastructure/opentofu/stacks/prod/proxmox/main\\.tf$/",
-        "/(^|/)infrastructure/opentofu/stacks/prod/talos/config\\.ya?ml$/"
+        "/(^|/)infrastructure/opentofu/stacks/proxmox/main\\.tf$/",
+        "/(^|/)infrastructure/opentofu/stacks/talos/config\\.ya?ml$/"
       ],
       "matchStrings": [
         "version\\s*=\\s*\"(?<currentValue>v[^\"]+)\"",
@@ -48,7 +48,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/(^|/)infrastructure/opentofu/stacks/prod/talos/config\\.ya?ml$/"
+        "/(^|/)infrastructure/opentofu/stacks/talos/config\\.ya?ml$/"
       ],
       "matchStrings": ["kubernetes_version:\\s*(?<currentValue>v[^\"\\s]+)"],
       "depNameTemplate": "kubernetes/kubernetes",

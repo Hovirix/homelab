@@ -1,5 +1,5 @@
 module "kubernetes_cluster" {
-  source = "../../../modules/proxmox/talos_cluster"
+  source = "../../modules/proxmox/talos_cluster"
 
   talos = {
     schematic_id = "ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515"

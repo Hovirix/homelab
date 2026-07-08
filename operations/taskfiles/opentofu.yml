@@ -2,8 +2,7 @@ version: "3"
 
 vars:
   tofu_dir: infrastructure/opentofu
-  env: '{{default "prod" .env}}'
-  stack_dir: "{{.tofu_dir}}/stacks/{{.env}}/{{.stack}}"
+  stack_dir: "{{.tofu_dir}}/stacks/{{.stack}}"
   sops_file: "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml"
 
 tasks:
