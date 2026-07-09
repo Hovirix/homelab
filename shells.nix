@@ -1,5 +1,24 @@
 { pkgs }:
 {
+  ci = pkgs.mkShell {
+    packages = with pkgs; [
+      # Automation
+      go-task
+
+      # Security
+      syft
+      trivy
+
+      # Security validation
+      kubeconform
+      kustomize
+
+      # Utilities used by task entrypoints
+      jq
+      yq-go
+    ];
+  };
+
   default = pkgs.mkShell {
     packages = with pkgs; [
       # Documentation

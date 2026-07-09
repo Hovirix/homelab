@@ -14,7 +14,8 @@
   "flux": {
     "managerFilePatterns": [
       "/^platform\\/gitops\\/.+\\.ya?ml$/",
-      "/^platform\\/networking\\/cni\\/.+\\.ya?ml$/"
+      "/^platform\\/networking\\/cni\\/.+\\.ya?ml$/",
+      "/^platform\\/networking\\/certificates\\/.+\\.ya?ml$/"
     ]
   },
 
