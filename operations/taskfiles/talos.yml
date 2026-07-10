@@ -18,11 +18,7 @@ tasks:
     cmds:
       - |
         cilium_version="$(yq e -r '.spec.chart.spec.version' '{{.cni_release}}')"
-        helm upgrade --install cilium oci://quay.io/cilium/charts/cilium \
-          --version "$cilium_version" \
-          --namespace kube-system \
-          --create-namespace \
-          --values "{{.cni_values}}"
+        bash '{{.ROOT_DIR}}/operations/scripts/bootstrap-cilium.sh' kube-system cilium oci://quay.io/cilium/charts/cilium "$cilium_version" '{{.cni_values}}'
       - kubectl -n kube-system rollout status ds/cilium --timeout=10m
       - kubectl wait node --all --for=condition=Ready --timeout=10m
       - kubectl get nodes -o wide

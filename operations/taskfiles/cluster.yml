@@ -2,7 +2,7 @@ version: "3"
 
 tasks:
   bootstrap:
-    desc: Bootstrap Talos networking and Flux sync
+    desc: Bootstrap Talos networking, Flux, and SOPS Age decryption
     cmds:
       - task talos:bootstrap
       - task flux:bootstrap

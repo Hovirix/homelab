@@ -1,12 +1,20 @@
 version: "3"
 
 tasks:
-  bootstrap:
-    desc: Apply Flux bootstrap manifests
+  apply-sops-age-secret:
+    desc: Create or update the Flux SOPS Age Secret from local SOPS data
     cmds:
-      - kubectl apply -k platform/gitops
+      - test -f {{.ROOT_DIR}}/secrets/platform.sops.yaml
+      - bash -o pipefail -c 'sops -d --output-type json {{.ROOT_DIR}}/secrets/platform.sops.yaml | jq -r ".flux.sops_age_key" | kubectl -n flux-system create secret generic sops-age --from-file=age.agekey=/dev/stdin --dry-run=client -o yaml | kubectl apply -f -'
+
+  bootstrap:
+    desc: Apply Flux bootstrap manifests and SOPS Age key
+    cmds:
+      - kubectl apply -f platform/gitops/gotk-components.yaml
       - kubectl -n flux-system rollout status deployment/source-controller --timeout=10m
       - kubectl -n flux-system rollout status deployment/kustomize-controller --timeout=10m
       - kubectl -n flux-system rollout status deployment/helm-controller --timeout=10m
       - kubectl -n flux-system rollout status deployment/notification-controller --timeout=10m
+      - task: apply-sops-age-secret
+      - kubectl apply -f platform/gitops/gotk-sync.yaml
       - kubectl get pods -n flux-system
