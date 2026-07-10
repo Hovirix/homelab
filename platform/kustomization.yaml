@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
   - gitops
   - networking/cni
+  - networking/certificates
