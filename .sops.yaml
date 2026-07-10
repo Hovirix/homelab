@@ -1,4 +1,5 @@
 creation_rules:
-  - path_regex: ^secrets/.*
-    pgp: >-
-      82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F
+  - path_regex: ^.*\.sops\.ya?ml$
+    encrypted_regex: ^(data|stringData)$
+    age: age1997u9c7xd73r2dmkrs5tu2jjwfh8xxn4uc333rdlgafhpegg596sl75qyk
+    pgp: 82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F
