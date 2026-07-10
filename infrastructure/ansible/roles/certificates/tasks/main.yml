@@ -12,7 +12,8 @@
   register: certificates_acme_plugin_file
   run_once: true
 
-- block:
+- name: Manage Proxmox ACME account and plugin
+  block:
     - name: Verify the ACME token exists
       ansible.builtin.assert:
         that:
