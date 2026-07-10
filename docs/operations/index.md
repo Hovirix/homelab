@@ -20,6 +20,7 @@ Operations documents how HX Lab is run.
 - [Proxmox Bootstrap, VLANs, and OpenWrt](./runbooks/proxmox-bootstrap-vlan-openwrt)
 - [Cluster Bootstrap](./runbooks/cluster-bootstrap)
 - [DNS and Email](./runbooks/dns-and-email)
+- [Flux SOPS Age Decryption](./runbooks/sops-age-flux)
 - [Talos on Proxmox with OpenTofu](./runbooks/talos-proxmox-opentofu)
 - [TrueNAS SCALE Setup Runbook](./runbooks/truenas)
 - [Wake on LAN](./runbooks/wake-on-lan)
