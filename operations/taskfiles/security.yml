@@ -1,30 +1,34 @@
 version: "3"
 
 vars:
-  sbom_dir: "{{.ROOT_DIR}}/.artifacts/sbom"
-  security_dir: "{{.ROOT_DIR}}/security"
+  SBOM_DIR: "{{.ROOT_DIR}}/.artifacts/sbom"
+  SECURITY_DIR: "{{.ROOT_DIR}}/security"
+
+env:
+  TRIVY_CONFIG: "{{.SECURITY_DIR}}/trivy.yaml"
+  SYFT_CONFIG: "{{.SECURITY_DIR}}/syft.yaml"
 
 tasks:
   secrets:
     desc: Scan the repository for secrets
     cmds:
-      - trivy --config "{{.security_dir}}/trivy.yaml" fs --scanners secret .
+      - trivy fs --scanners secret .
 
   vuln:
     desc: Scan the repository for vulnerabilities
     deps:
       - sbom
     cmds:
-      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/infrastructure.cdx.json"
-      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/operations.cdx.json"
-      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/platform.cdx.json"
-      - trivy --config "{{.security_dir}}/trivy.yaml" sbom --scanners vuln "{{.sbom_dir}}/docs.cdx.json"
+      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/infrastructure.cdx.json"
+      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/operations.cdx.json"
+      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/platform.cdx.json"
+      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/docs.cdx.json"
 
   iac:
     desc: Scan infrastructure and platform configuration
     cmds:
-      - trivy --config "{{.security_dir}}/trivy.yaml" config infrastructure
-      - trivy --config "{{.security_dir}}/trivy.yaml" config platform
+      - trivy config infrastructure
+      - trivy config platform
 
   kubernetes:
     desc: Validate rendered Kubernetes manifests
@@ -34,11 +38,11 @@ tasks:
   sbom:
     desc: Generate local SBOMs with syft
     cmds:
-      - mkdir -p "{{.sbom_dir}}"
-      - syft --config "{{.security_dir}}/syft.yaml" dir:infrastructure -o cyclonedx-json="{{.sbom_dir}}/infrastructure.cdx.json"
-      - syft --config "{{.security_dir}}/syft.yaml" dir:operations -o cyclonedx-json="{{.sbom_dir}}/operations.cdx.json"
-      - syft --config "{{.security_dir}}/syft.yaml" dir:platform -o cyclonedx-json="{{.sbom_dir}}/platform.cdx.json"
-      - syft --config "{{.security_dir}}/syft.yaml" dir:docs -o cyclonedx-json="{{.sbom_dir}}/docs.cdx.json"
+      - mkdir -p "{{.SBOM_DIR}}"
+      - syft dir:infrastructure -o cyclonedx-json="{{.SBOM_DIR}}/infrastructure.cdx.json"
+      - syft dir:operations -o cyclonedx-json="{{.SBOM_DIR}}/operations.cdx.json"
+      - syft dir:platform -o cyclonedx-json="{{.SBOM_DIR}}/platform.cdx.json"
+      - syft dir:docs -o cyclonedx-json="{{.SBOM_DIR}}/docs.cdx.json"
 
   all:
     desc: Run all local security checks
