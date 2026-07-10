@@ -14,5 +14,6 @@ tasks:
 
   docs:
     desc: Update docs dependencies
+    dir: ./docs
     cmds:
-      - pnpm --dir docs update
+      - pnpm update

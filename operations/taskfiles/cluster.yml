@@ -2,7 +2,37 @@ version: "3"
 
 tasks:
   bootstrap:
-    desc: Bootstrap Talos networking, Flux, and SOPS Age decryption
+    desc: Bootstrap the cluster
     cmds:
-      - task talos:bootstrap
-      - task flux:bootstrap
+      - task: gen-configs
+      - task: cni
+      - task: flux
+      - task: sops-key
+
+  gen-configs:
+    internal: true
+    desc: Generate Talos configs
+    vars:
+      CONFIG_FILE: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/talos/config.yaml"
+      SOPS_FILE: "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml"
+      OUTPUT_DIR: "{{.ROOT_DIR}}/.talos"
+    cmds:
+      - "{{.ROOT_DIR}}/operations/scripts/gen-talos-configs.sh {{.CONFIG_FILE}} {{.SOPS_FILE}} {{.OUTPUT_DIR}}"
+
+  cni:
+    internal: true
+    desc: Install Cilium
+    cmds:
+      - "{{.ROOT_DIR}}/operations/scripts/install-cilium.sh"
+
+  flux:
+    internal: true
+    desc: Install Flux controllers
+    cmds:
+      - "{{.ROOT_DIR}}/operations/scripts/bootstrap-flux.sh"
+
+  sops-key:
+    internal: true
+    desc: Apply SOPS Age key
+    cmds:
+      - "{{.ROOT_DIR}}/operations/scripts/apply-sops-key.sh"

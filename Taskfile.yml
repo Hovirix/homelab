@@ -2,22 +2,26 @@ version: "3"
 
 includes:
   ansible:
+    dir: ./infrastructure/ansible
     taskfile: operations/taskfiles/ansible.yml
+
   cluster:
     taskfile: operations/taskfiles/cluster.yml
+
   checks:
     flatten: true
     taskfile: operations/taskfiles/checks.yml
+
   docs:
     taskfile: operations/taskfiles/docs.yml
-  flux:
-    taskfile: operations/taskfiles/flux.yml
+    dir: ./docs
+
   security:
     taskfile: operations/taskfiles/security.yml
+
   tofu:
     flatten: true
     taskfile: operations/taskfiles/opentofu.yml
+
   update:
     taskfile: operations/taskfiles/update.yml
-  talos:
-    taskfile: operations/taskfiles/talos.yml

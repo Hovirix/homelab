@@ -1,29 +1,22 @@
 version: "3"
 
-vars:
-  ansible_dir: infrastructure/ansible
-
 tasks:
   bootstrap:
     desc: Bootstrap Proxmox hosts with Ansible
-    dir: "{{.ansible_dir}}"
     cmds:
       - ansible-playbook playbooks/bootstrap.yml --ask-pass {{.args}}
 
   configure:
     desc: Configure Proxmox hosts with Ansible
-    dir: "{{.ansible_dir}}"
     cmds:
       - ansible-playbook playbooks/configure.yml {{.args}}
 
   networking:
     desc: Configure Proxmox networking with Ansible
-    dir: "{{.ansible_dir}}"
     cmds:
       - ansible-playbook playbooks/networking.yml {{.args}}
 
   maintenance:
     desc: Run Proxmox maintenance with Ansible
-    dir: "{{.ansible_dir}}"
     cmds:
       - ansible-playbook playbooks/maintenance.yml {{.args}}

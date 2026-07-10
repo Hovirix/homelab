@@ -1,13 +1,10 @@
 version: "3"
 
-vars:
-  tofu_dir: infrastructure/opentofu
-  stack_dir: "{{.tofu_dir}}/stacks/{{.stack}}"
-  sops_file: "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml"
-
 tasks:
   tofu:
     desc: Run any OpenTofu command for a stack
+    vars:
+      stack_dir: infrastructure/opentofu/stacks/{{.stack}}
     dir: "{{.stack_dir}}"
     cmds:
-      - '{{.ROOT_DIR}}/operations/scripts/tofu.sh "{{.sops_file}}" {{.CLI_ARGS}}'
+      - "{{.ROOT_DIR}}/operations/scripts/tofu.sh {{.ROOT_DIR}}/secrets/infrastructure.sops.yaml {{.CLI_ARGS}}"
