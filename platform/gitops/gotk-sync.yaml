@@ -18,6 +18,10 @@ spec:
   interval: 10m
   path: ./platform
   prune: true
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-age
   sourceRef:
     kind: GitRepository
     name: homelab
