@@ -9,6 +9,13 @@ tasks:
       - task: flux
       - task: sops-key
 
+  reconcile:
+    desc: Reconcile the GitOps state
+    silent: true
+    cmds:
+      - flux reconcile source git flux-system
+      - flux reconcile kustomization flux-system
+
   gen-configs:
     internal: true
     silent: true
