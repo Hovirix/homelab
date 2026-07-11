@@ -12,44 +12,37 @@ permissions:
 jobs:
   security:
     runs-on: ubuntu-latest
-    container:
-      image: nixos/nix:2.28.5
     env:
-      NIX_CONFIG: experimental-features = nix-command flakes
-      SYFT_CACHE_DIR: /github/home/.cache/syft
-      TRIVY_CACHE_DIR: /github/home/.cache/trivy
+      SYFT_CACHE_DIR: /home/runner/.cache/syft
+      TRIVY_CACHE_DIR: /home/runner/.cache/trivy
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7.0.0
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v22
+
+      - name: Cache Nix
+        uses: DeterminateSystems/magic-nix-cache-action@v14
 
       - name: Cache security DBs
-        uses: actions/cache@v4
+        uses: actions/cache@v6.1.0
         with:
           path: |
-            /github/home/.cache/syft
-            /github/home/.cache/trivy
+            /home/runner/.cache/syft
+            /home/runner/.cache/trivy
           key: security-${{ runner.os }}-${{ hashFiles('security/syft.yaml', 'security/trivy.yaml', 'flake.lock') }}
+          restore-keys: |
+            security-${{ runner.os }}-
 
-      - name: Generate SBOMs
-        run: nix develop .#ci --command task security:sbom
+      - name: Run security checks
+        run: nix develop .#ci --command task security:all
 
       - name: Upload SBOM artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: sbom
           path: .artifacts/sbom
           if-no-files-found: warn
           retention-days: 14
-
-      - name: Scan secrets
-        run: nix develop .#ci --command task security:secrets
-
-      - name: Scan IaC
-        run: nix develop .#ci --command task security:iac
-
-      - name: Validate Kubernetes
-        run: nix develop .#ci --command task security:kubernetes
-
-      - name: Scan SBOM vulnerabilities
-        run: nix develop .#ci --command task security:vuln
