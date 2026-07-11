@@ -11,6 +11,7 @@ tasks:
 
   gen-configs:
     internal: true
+    silent: true
     desc: Generate Talos configs
     vars:
       CONFIG_FILE: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/talos/config.yaml"
@@ -21,18 +22,21 @@ tasks:
 
   cni:
     internal: true
+    silent: true
     desc: Install Cilium
     cmds:
       - "{{.ROOT_DIR}}/operations/scripts/install-cilium.sh"
 
   flux:
     internal: true
+    silent: true
     desc: Install Flux controllers
     cmds:
       - "{{.ROOT_DIR}}/operations/scripts/bootstrap-flux.sh"
 
   sops-key:
     internal: true
+    silent: true
     desc: Apply SOPS Age key
     cmds:
       - "{{.ROOT_DIR}}/operations/scripts/apply-sops-key.sh"
