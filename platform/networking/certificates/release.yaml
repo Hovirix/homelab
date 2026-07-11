@@ -7,8 +7,6 @@ spec:
   releaseName: cert-manager
   interval: 1h
   targetNamespace: cert-manager
-  install:
-    createNamespace: true
   chart:
     spec:
       chart: cert-manager
