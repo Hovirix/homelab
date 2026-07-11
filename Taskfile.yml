@@ -9,7 +9,6 @@ includes:
     taskfile: operations/taskfiles/cluster.yml
 
   checks:
-    flatten: true
     taskfile: operations/taskfiles/checks.yml
 
   docs:

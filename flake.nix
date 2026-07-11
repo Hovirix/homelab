@@ -23,9 +23,7 @@
       {
         formatter = treefmtEval.config.build.wrapper;
 
-        checks = import ./checks.nix {
-          inherit self pkgs treefmtEval;
-        };
+        checks = { };
 
         devShells = import ./shells.nix { inherit pkgs; };
       }

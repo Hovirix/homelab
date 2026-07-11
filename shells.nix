@@ -10,8 +10,12 @@
       trivy
 
       # Security validation
+      ansible
+      ansible-lint
       kubeconform
       kustomize
+      shellcheck
+      tflint
 
       # Utilities used by task entrypoints
       jq
@@ -27,7 +31,10 @@
 
       # Infrastructure
       ansible
+      ansible-lint
       opentofu
+      shellcheck
+      tflint
 
       # Kubernetes & GitOps
       fluxcd
@@ -51,10 +58,8 @@
       pre-commit
 
       # Validation & Linting
-      ansible-lint
       kubeconform
       shfmt
-      shellcheck
       yamllint
 
       # General Utilities
