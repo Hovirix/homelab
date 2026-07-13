@@ -28,6 +28,9 @@ securityContext:
       - SYS_ADMIN
       - SYS_RESOURCE
 
+gatewayAPI:
+  enabled: true
+
 cgroup:
   autoMount:
     enabled: false

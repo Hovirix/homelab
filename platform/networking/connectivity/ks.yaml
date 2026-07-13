@@ -1,36 +1,32 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cert-manager-install
+  name: connectivity
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./platform/networking/certificates/install
+  path: ./platform/networking/connectivity/install
   prune: true
   wait: true
   timeout: 5m
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: homelab
 
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: cert-manager-config
+  name: connectivity-config
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./platform/networking/certificates/config
+  path: ./platform/networking/connectivity/config
   prune: true
   wait: true
   timeout: 5m
   dependsOn:
-    - name: cert-manager-install
+    - name: connectivity
   sourceRef:
     kind: GitRepository
-    name: flux-system
-  decryption:
-    provider: sops
-    secretRef:
-      name: sops-age
+    name: homelab
