@@ -34,12 +34,6 @@ Tools defines repository-level developer tooling and validation.
 
 Route root flake wiring, dev shells, formatters, linters, checks, and helper script plumbing to the **Automation Agent**.
 
-### Documentation
-
-Documentation explains the engineering architecture, infrastructure deployed, platform states and foundations, and operations.
-
-Route documentation writing, structure, cleanup, and knowledge capture to the **Documenter Agent**.
-
 ### Security
 
 Security is a review function.
