@@ -1,0 +1,43 @@
+ingressClass:
+  enabled: false
+
+providers:
+  kubernetesIngress:
+    enabled: false
+  kubernetesGateway:
+    enabled: true
+
+gateway:
+  enabled: true
+  listeners:
+    web:
+      port: 80
+      protocol: HTTP
+      namespacePolicy: All
+    websecure:
+      port: 443
+      protocol: HTTPS
+      namespacePolicy: All
+      mode: Terminate
+      certificateRefs:
+        - kind: Secret
+          name: home-hovirix-dev-tls
+          namespace: traefik
+
+ports:
+  web:
+    port: 80
+    redirectTo:
+      port: websecure
+  websecure:
+    port: 443
+
+service:
+  enabled: true
+  type: LoadBalancer
+
+api:
+  dashboard: false
+
+log:
+  level: INFO
