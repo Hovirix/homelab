@@ -9,6 +9,8 @@ spec:
   prune: true
   wait: true
   timeout: 5m
+  dependsOn:
+    - name: tls-config
   sourceRef:
     kind: GitRepository
     name: homelab
