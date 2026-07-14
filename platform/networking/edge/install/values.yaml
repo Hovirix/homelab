@@ -22,7 +22,7 @@ gateway:
       certificateRefs:
         - kind: Secret
           name: home-hovirix-dev-tls
-          namespace: traefik
+          namespace: cert-manager
 
 ports:
   web:

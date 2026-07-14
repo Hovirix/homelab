@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
   - cloudflare-token-secret.sops.yaml
   - cluster-issuer.yaml
+  - reference-grant.yaml
   - wildcard-certificate.yaml
