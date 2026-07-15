@@ -39,6 +39,11 @@ locals {
       domain = "prod-k8s.home.hovirix.dev"
       answer = "10.40.0.10"
     }
+
+    grafana = {
+      domain = "grafana.home.hovirix.dev"
+      answer = "10.40.0.200"
+    }
   }
 }
 
