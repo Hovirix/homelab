@@ -1,0 +1,7 @@
+persistence:
+  enabled: false
+
+grafana.ini:
+  server:
+    domain: grafana.home.hovirix.dev
+    root_url: https://grafana.home.hovirix.dev/

@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - gitops
+  - monitoring/grafana/ks.yaml
   - networking/connectivity/ks.yaml
   - networking/tls/ks.yaml
   - networking/edge/ks.yaml

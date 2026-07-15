@@ -1,0 +1,33 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: grafana-install
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./platform/monitoring/grafana/install
+  prune: true
+  wait: true
+  timeout: 5m
+  sourceRef:
+    kind: GitRepository
+    name: homelab
+
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: grafana-config
+  namespace: flux-system
+spec:
+  interval: 10m
+  path: ./platform/monitoring/grafana/config
+  prune: true
+  wait: true
+  timeout: 5m
+  dependsOn:
+    - name: grafana-install
+    - name: edge-install
+  sourceRef:
+    kind: GitRepository
+    name: homelab
