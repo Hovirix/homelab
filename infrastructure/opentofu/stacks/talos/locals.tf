@@ -58,36 +58,43 @@ locals {
   cluster_hostname = "${local.config.cluster.name}.${local.config.domain}"
   cluster_endpoint = "https://${local.cluster_hostname}:6443"
 
-  controlplane_node_patch = yamlencode({
-    machine = {
-      certSANs = [
-        local.bootstrap_node
-      ]
+  talos_cert_sans = concat(
+    [local.cluster_hostname],
+    [for node in values(local.controlplane_nodes) : node.hostname]
+  )
 
-      network = {
-        interfaces = [
-          {
+  controlplane_node_patches = {
+    for name, node in local.controlplane_nodes : name => yamlencode({
+      machine = {
+        certSANs = local.talos_cert_sans
+
+        network = {
+          interfaces = [{
             interface = local.config.cluster.interface
-            dhcp      = true
+            dhcp      = false
+            addresses = [node.address]
 
             vip = {
               ip = local.config.cluster.vip
             }
-          }
-        ]
-      }
-    }
 
-    cluster = {
-      proxy = {
-        mode = "iptables"
+            routes = [{
+              network = "0.0.0.0/0"
+              gateway = local.config.cluster.gateway
+            }]
+          }]
+        }
       }
 
-      apiServer = {
-        certSANs = [
-          local.cluster_hostname,
-        ]
+      cluster = {
+        proxy = {
+          mode = "iptables"
+        }
+
+        apiServer = {
+          certSANs = local.talos_cert_sans
+        }
       }
-    }
-  })
+    })
+  }
 }

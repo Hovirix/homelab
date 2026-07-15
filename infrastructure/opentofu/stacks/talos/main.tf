@@ -12,11 +12,13 @@ ephemeral "talos_machine_configuration" "controlplane" {
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
-  node                           = local.bootstrap_node
-  endpoint                       = local.bootstrap_node
+  for_each = local.controlplane_nodes
+
+  node                           = each.value.hostname
+  endpoint                       = each.value.hostname
   client_configuration_wo        = ephemeral.talos_client_configuration.cluster.client_configuration
   machine_configuration_input_wo = ephemeral.talos_machine_configuration.controlplane.machine_configuration
-  config_patches                 = [local.controlplane_node_patch]
+  config_patches                 = [local.controlplane_node_patches[each.key]]
 }
 
 resource "talos_machine_bootstrap" "cluster" {
