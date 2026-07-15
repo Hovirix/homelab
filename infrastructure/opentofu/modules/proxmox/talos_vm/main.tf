@@ -5,6 +5,7 @@ resource "proxmox_virtual_environment_vm" "this" {
   description = "Managed by OpenTofu"
 
   stop_on_destroy = true
+  protection      = var.protection
 
   cpu {
     cores = var.cpu_cores

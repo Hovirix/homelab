@@ -38,4 +38,6 @@ module "node" {
     datastore_id = var.storage.boot_datastore
     size_gb      = var.storage.boot_disk_gb
   }
+
+  protection = var.protection
 }

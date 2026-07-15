@@ -29,6 +29,11 @@ variable "boot_disk" {
   })
 }
 
+variable "protection" {
+  type    = bool
+  default = true
+}
+
 variable "network" {
   type = object({
     bridge      = string
