@@ -53,7 +53,7 @@
           - account
           - register
           - default
-          - "{{ pve.notifications.mailto }}"
+          - "{{ proxmox.notifications.mailto }}"
           - --directory
           - https://acme-v02.api.letsencrypt.org/directory
         stdin: |
@@ -115,7 +115,7 @@
       - --acme
       - account=default
       - -acmedomain0
-      - "{{ pve_node.hostname }}.{{ pve.system.domain }},plugin=cloudflare"
+      - "{{ pve_node.hostname }}.{{ host.system.domain }},plugin=cloudflare"
   changed_when: false
 
 - name: Order the Proxmox ACME certificate

@@ -7,7 +7,7 @@
     mode: "0644"
   notify: Refresh bootloader
   when:
-    - pve.kernel.manage_cmdline | bool
+    - host.kernel.manage_cmdline | bool
 
 - name: Configure VFIO modules
   ansible.builtin.copy:
@@ -22,5 +22,5 @@
       vfio_virqfd
   notify: Update initramfs
   when:
-    - pve.kernel.manage_cmdline | bool
-    - pve.kernel.vfio.enabled | bool
+    - host.kernel.manage_cmdline | bool
+    - host.kernel.vfio.enabled | bool

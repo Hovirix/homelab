@@ -1,55 +1,27 @@
 - name: Configure Proxmox hosts
-  hosts: proxmox
+  hosts: hosts
 
   roles:
     - role: common
-      when: pve.system.enabled | bool
+      when: host.system.enabled | bool
       tags: [common]
 
     - role: repositories
-      when: pve.repositories.enabled | bool
+      when: host.repositories.enabled | bool
       tags: [repositories]
 
-    - role: api
-      when: pve.api.enabled | bool
-      tags: [api]
-
     - role: ssh
-      when: pve.ssh.enabled | bool
+      when: host.ssh.enabled | bool
       tags: [ssh]
 
     - role: wake_on_lan
-      when: pve.wake_on_lan.enabled | bool
+      when: host.wake_on_lan.enabled | bool
       tags: [wake-on-lan]
 
     - role: storage
-      when: pve.storage.enabled | bool
+      when: host.storage.enabled | bool
       tags: [storage]
 
-    - role: backup
-      when: pve.backup.enabled | bool
-      tags: [backup]
-
     - role: kernel
-      when: pve.kernel.enabled | bool
+      when: host.kernel.enabled | bool
       tags: [kernel]
-
-    - role: firewall
-      when: pve.firewall.enabled | bool
-      tags: [firewall]
-
-    - role: certificates
-      when: pve.certificates.enabled | bool
-      tags: [certificates]
-
-    - role: monitoring
-      when: pve.monitoring.enabled | bool
-      tags: [monitoring]
-
-    - role: notifications
-      when: pve.notifications.enabled | bool
-      tags: [notifications]
-
-    - role: cluster
-      when: pve.cluster.enabled | bool
-      tags: [cluster]

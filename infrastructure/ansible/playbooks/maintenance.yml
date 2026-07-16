@@ -1,8 +1,8 @@
 - name: Maintain Proxmox hosts
-  hosts: proxmox
+  hosts: hosts
   serial: 1
 
   roles:
     - role: updates
-      when: pve.updates.enabled | bool
+      when: host.updates.enabled | bool
       tags: [updates]

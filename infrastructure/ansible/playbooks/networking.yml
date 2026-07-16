@@ -1,8 +1,8 @@
 - name: Migrate Proxmox hosts to VLAN networking
-  hosts: proxmox
+  hosts: hosts
   serial: 1
 
   roles:
     - role: networking
-      when: pve.networking.enabled | bool
+      when: host.networking.enabled | bool
       tags: [networking]

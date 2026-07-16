@@ -15,8 +15,8 @@
       Expected Proxmox storages local and local-zfs were not reported as active.
 - name: Derive desired storage values
   ansible.builtin.set_fact:
-    storage_min_pool_size_bytes: "{{ (pve.storage.min_pool_size_gib | int) * 1024 * 1024 * 1024 }}"
-    storage_desired_autotrim: "{{ pve.storage.autotrim | bool | ternary('on', 'off') }}"
+    storage_min_pool_size_bytes: "{{ (host.storage.min_pool_size_gib | int) * 1024 * 1024 * 1024 }}"
+    storage_desired_autotrim: "{{ host.storage.autotrim | bool | ternary('on', 'off') }}"
 
 - name: Read ZFS pool size
   ansible.builtin.command:
@@ -26,7 +26,7 @@
       - -Hp
       - -o
       - size
-      - "{{ pve.storage.zpool }}"
+      - "{{ host.storage.zpool }}"
   register: storage_pool_size
   changed_when: false
 
@@ -38,7 +38,7 @@
       - -H
       - -o
       - health
-      - "{{ pve.storage.zpool }}"
+      - "{{ host.storage.zpool }}"
   register: storage_pool_health
   changed_when: false
 
@@ -51,7 +51,7 @@
       - -o
       - value
       - autotrim
-      - "{{ pve.storage.zpool }}"
+      - "{{ host.storage.zpool }}"
   register: storage_pool_autotrim
   changed_when: false
 
@@ -61,14 +61,14 @@
       - storage_pool_health.stdout | trim == 'ONLINE'
       - (storage_pool_size.stdout | trim | int) >= (storage_min_pool_size_bytes | int)
     fail_msg: >-
-      ZFS pool {{ pve.storage.zpool }} is not healthy or is smaller than the expected minimum size.
+      ZFS pool {{ host.storage.zpool }} is not healthy or is smaller than the expected minimum size.
 - name: Enable ZFS autotrim
   ansible.builtin.command:
     argv:
       - zpool
       - set
       - autotrim={{ storage_desired_autotrim }}
-      - "{{ pve.storage.zpool }}"
+      - "{{ host.storage.zpool }}"
   when: storage_pool_autotrim.stdout | trim != storage_desired_autotrim
   changed_when: true
 
@@ -81,7 +81,7 @@
       - -o
       - value
       - compression
-      - "{{ pve.storage.dataset }}"
+      - "{{ host.storage.dataset }}"
   register: storage_dataset_compression
   changed_when: false
 
@@ -94,7 +94,7 @@
       - -o
       - value
       - atime
-      - "{{ pve.storage.dataset }}"
+      - "{{ host.storage.dataset }}"
   register: storage_dataset_atime
   changed_when: false
 
@@ -103,9 +103,9 @@
     argv:
       - zfs
       - set
-      - compression={{ pve.storage.dataset_properties.compression }}
-      - "{{ pve.storage.dataset }}"
-  when: storage_dataset_compression.stdout | trim != pve.storage.dataset_properties.compression
+      - compression={{ host.storage.dataset_properties.compression }}
+      - "{{ host.storage.dataset }}"
+  when: storage_dataset_compression.stdout | trim != host.storage.dataset_properties.compression
   changed_when: true
 
 - name: Disable ZFS dataset atime updates
@@ -113,7 +113,7 @@
     argv:
       - zfs
       - set
-      - atime={{ pve.storage.dataset_properties.atime }}
-      - "{{ pve.storage.dataset }}"
-  when: storage_dataset_atime.stdout | trim != pve.storage.dataset_properties.atime
+      - atime={{ host.storage.dataset_properties.atime }}
+      - "{{ host.storage.dataset }}"
+  when: storage_dataset_atime.stdout | trim != host.storage.dataset_properties.atime
   changed_when: true

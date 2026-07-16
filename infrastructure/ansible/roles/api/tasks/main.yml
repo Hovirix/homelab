@@ -19,7 +19,7 @@
       - "{{ item.name }}"
       - --privs
       - "{{ item.privileges | join(' ') }}"
-  loop: "{{ pve.api.roles }}"
+  loop: "{{ proxmox.api.roles }}"
   register: api_role_add
   changed_when: api_role_add.rc == 0
   failed_when:
@@ -35,7 +35,7 @@
       - "{{ item.name }}"
       - --privs
       - "{{ item.privileges | join(' ') }}"
-  loop: "{{ pve.api.roles }}"
+  loop: "{{ proxmox.api.roles }}"
   changed_when: false
 
 - name: Ensure Proxmox API users exist
@@ -47,7 +47,7 @@
       - "{{ item.userid }}"
       - -comment
       - "{{ item.comment }}"
-  loop: "{{ pve.api.users }}"
+  loop: "{{ proxmox.api.users }}"
   register: api_user_add
   changed_when: api_user_add.rc == 0
   failed_when:
@@ -65,7 +65,7 @@
       - "{{ item.userid }}"
       - --roles
       - "{{ item.acl.role }}"
-  loop: "{{ pve.api.users }}"
+  loop: "{{ proxmox.api.users }}"
   changed_when: false
 
 - name: Read Proxmox API tokens
@@ -78,7 +78,7 @@
       - "{{ item.userid }}"
       - --output-format
       - json
-  loop: "{{ pve.api.users }}"
+  loop: "{{ proxmox.api.users }}"
   register: api_token_list
   changed_when: false
 

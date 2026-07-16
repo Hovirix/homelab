@@ -1,0 +1,31 @@
+- name: Configure Proxmox API resources
+  hosts: proxmox
+
+  roles:
+    - role: api
+      when: proxmox.api.enabled | bool
+      tags: [api]
+
+    - role: backup
+      when: proxmox.backup.enabled | bool
+      tags: [backup]
+
+    - role: firewall
+      when: proxmox.firewall.enabled | bool
+      tags: [firewall]
+
+    - role: certificates
+      when: proxmox.certificates.enabled | bool
+      tags: [certificates]
+
+    - role: monitoring
+      when: proxmox.monitoring.enabled | bool
+      tags: [monitoring]
+
+    - role: notifications
+      when: proxmox.notifications.enabled | bool
+      tags: [notifications]
+
+    - role: cluster
+      when: proxmox.cluster.enabled | bool
+      tags: [cluster]

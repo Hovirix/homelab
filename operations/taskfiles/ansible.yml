@@ -11,6 +11,11 @@ tasks:
     cmds:
       - ansible-playbook playbooks/configure.yml {{.args}}
 
+  proxmox:
+    desc: Configure Proxmox API resources with Ansible
+    cmds:
+      - ansible-playbook playbooks/proxmox.yml {{.args}}
+
   networking:
     desc: Configure Proxmox networking with Ansible
     cmds:

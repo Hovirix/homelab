@@ -9,9 +9,9 @@ iface vmbr0 inet manual
     bridge-stp off
     bridge-fd 0
     bridge-vlan-aware yes
-    bridge-vids {{ pve.networking.allowed_vlans | map(attribute='id') | map('string') | join(' ') }}
+    bridge-vids {{ host.networking.allowed_vlans | map(attribute='id') | map('string') | join(' ') }}
 
-auto vmbr0.{{ pve.networking.management.vlan }}
-iface vmbr0.{{ pve.networking.management.vlan }} inet static
+auto vmbr0.{{ host.networking.management.vlan }}
+iface vmbr0.{{ host.networking.management.vlan }} inet static
     address {{ pve_node.management_address }}
-    gateway {{ pve.networking.management.gateway }}
+    gateway {{ host.networking.management.gateway }}

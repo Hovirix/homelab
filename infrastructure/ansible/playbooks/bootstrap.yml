@@ -1,11 +1,11 @@
 - name: Bootstrap Proxmox hosts
-  hosts: proxmox
+  hosts: hosts
 
   roles:
     - role: repositories
-      when: pve.repositories.enabled | bool
+      when: host.repositories.enabled | bool
       tags: [repositories]
 
     - role: ssh
-      when: pve.ssh.enabled | bool
+      when: host.ssh.enabled | bool
       tags: [ssh]
