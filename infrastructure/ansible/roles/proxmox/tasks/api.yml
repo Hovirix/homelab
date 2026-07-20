@@ -1,0 +1,120 @@
+# Behavior:
+#
+# ✓ Creates API roles if missing
+# ✓ Updates API role privileges
+# ✓ Creates API users if missing
+# ✓ Assigns user ACLs
+# ✓ Creates API tokens if missing
+# ✓ Regenerates API tokens when requested
+# ✓ Safe to run multiple times
+# ✗ Does not update existing user properties
+# ✗ ACL task always executes
+
+- name: Ensure Proxmox API roles exist
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - add
+      - "{{ item.name }}"
+      - --privs
+      - "{{ item.privileges | join(' ') }}"
+  loop: "{{ proxmox.api.roles }}"
+  register: proxmox_api_role_add
+  changed_when: proxmox_api_role_add.rc == 0
+  failed_when:
+    - proxmox_api_role_add.rc != 0
+    - "'already exists' not in proxmox_api_role_add.stderr"
+
+- name: Update Proxmox API role privileges
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - modify
+      - "{{ item.name }}"
+      - --privs
+      - "{{ item.privileges | join(' ') }}"
+  loop: "{{ proxmox.api.roles }}"
+  changed_when: false
+
+- name: Ensure Proxmox API users exist
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - add
+      - "{{ item.userid }}"
+      - -comment
+      - "{{ item.comment }}"
+  loop: "{{ proxmox.api.users }}"
+  register: proxmox_api_user_add
+  changed_when: proxmox_api_user_add.rc == 0
+  failed_when:
+    - proxmox_api_user_add.rc != 0
+    - "'already exists' not in proxmox_api_user_add.stderr"
+
+- name: Ensure Proxmox API user ACLs are applied
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - "{{ item.acl.path }}"
+      - --users
+      - "{{ item.userid }}"
+      - --roles
+      - "{{ item.acl.role }}"
+  loop: "{{ proxmox.api.users }}"
+  changed_when: false
+
+- name: Read Proxmox API tokens
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - token
+      - list
+      - "{{ item.userid }}"
+      - --output-format
+      - json
+  loop: "{{ proxmox.api.users }}"
+  register: proxmox_api_token_list
+  changed_when: false
+
+- name: Delete Proxmox API tokens when regeneration is requested
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - token
+      - delete
+      - "{{ item.item.userid }}"
+      - "{{ item.item.token.id }}"
+  loop: "{{ proxmox_api_token_list.results }}"
+  changed_when: true
+  when:
+    - item.item.token.regenerate | bool
+    - item.item.token.id in (item.stdout | from_json | map(attribute='tokenid') | list)
+
+- name: Create missing or regenerated Proxmox API tokens
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - token
+      - add
+      - "{{ item.item.userid }}"
+      - "{{ item.item.token.id }}"
+      - --privsep
+      - "{{ item.item.token.privsep | bool | ternary('1', '0') }}"
+      - --comment
+      - "{{ item.item.token.comment }}"
+      - --output-format
+      - json
+  loop: "{{ proxmox_api_token_list.results }}"
+  register: proxmox_api_token_create
+  changed_when: true
+  when: >-
+    item.item.token.regenerate | bool or item.item.token.id not in (item.stdout | from_json | map(attribute='tokenid') | list)
+  notify: Print generated Proxmox API tokens to store in SOPS

@@ -1,8 +1,11 @@
-- name: Migrate Proxmox hosts to VLAN networking
-  hosts: hosts
+- name: Migrate Proxmox nodes to VLAN networking
+  hosts: nodes
   serial: 1
 
-  roles:
-    - role: networking
+  tasks:
+    - name: Configure node networking
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: networking
       when: host.networking.enabled | bool
       tags: [networking]

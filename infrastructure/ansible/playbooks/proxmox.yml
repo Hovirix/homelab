@@ -1,31 +1,52 @@
 - name: Configure Proxmox API resources
   hosts: proxmox
 
-  roles:
-    - role: api
+  tasks:
+    - name: Configure Proxmox API resources
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: api
       when: proxmox.api.enabled | bool
       tags: [api]
 
-    - role: backup
+    - name: Configure Proxmox backup
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: backup
       when: proxmox.backup.enabled | bool
       tags: [backup]
 
-    - role: firewall
+    - name: Configure Proxmox firewall
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: firewall
       when: proxmox.firewall.enabled | bool
       tags: [firewall]
 
-    - role: certificates
+    - name: Configure Proxmox certificates
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: certificates
       when: proxmox.certificates.enabled | bool
       tags: [certificates]
 
-    - role: monitoring
+    - name: Configure Proxmox monitoring
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: monitoring
       when: proxmox.monitoring.enabled | bool
       tags: [monitoring]
 
-    - role: notifications
+    - name: Configure Proxmox notifications
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: notifications
       when: proxmox.notifications.enabled | bool
       tags: [notifications]
 
-    - role: cluster
+    - name: Configure Proxmox cluster
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: cluster
       when: proxmox.cluster.enabled | bool
       tags: [cluster]

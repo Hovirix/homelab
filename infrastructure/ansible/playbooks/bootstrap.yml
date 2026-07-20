@@ -1,11 +1,24 @@
-- name: Bootstrap Proxmox hosts
-  hosts: hosts
+- name: Bootstrap Proxmox nodes
+  hosts: nodes
 
-  roles:
-    - role: repositories
+  tasks:
+    - name: Configure node repositories
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: repositories
       when: host.repositories.enabled | bool
       tags: [repositories]
 
-    - role: ssh
+    - name: Configure Proxmox repositories
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: repositories
+      when: host.repositories.enabled | bool
+      tags: [repositories]
+
+    - name: Configure node SSH
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: ssh
       when: host.ssh.enabled | bool
       tags: [ssh]

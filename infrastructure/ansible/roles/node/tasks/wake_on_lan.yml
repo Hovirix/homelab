@@ -1,0 +1,32 @@
+- name: Install Wake-on-LAN tooling
+  ansible.builtin.apt:
+    name: ethtool
+    state: present
+
+- name: Configure Wake-on-LAN systemd service
+  ansible.builtin.template:
+    src: wake-on-lan.service.j2
+    dest: /etc/systemd/system/wake-on-lan.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable Wake-on-LAN service
+  ansible.builtin.systemd_service:
+    name: wake-on-lan.service
+    enabled: true
+    state: started
+    daemon_reload: true
+  when:
+    - not ansible_check_mode
+
+- name: Enable Wake-on-LAN on the physical interface
+  ansible.builtin.command:
+    argv:
+      - ethtool
+      - -s
+      - "{{ pve_node.network_interface }}"
+      - wol
+      - g
+  register: node_wake_on_lan_result
+  changed_when: "'Wake-on: g' not in node_wake_on_lan_result.stdout"

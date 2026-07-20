@@ -1,8 +1,11 @@
-- name: Maintain Proxmox hosts
-  hosts: hosts
+- name: Maintain Proxmox nodes
+  hosts: nodes
   serial: 1
 
-  roles:
-    - role: updates
+  tasks:
+    - name: Configure node updates
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: updates
       when: host.updates.enabled | bool
       tags: [updates]

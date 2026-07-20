@@ -1,0 +1,19 @@
+- name: Remove unnecessary Debian repository files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/sources.list
+    - /etc/apt/sources.list.d/debian.sources
+
+- name: Configure Debian repositories
+  ansible.builtin.template:
+    src: debian.j2
+    dest: /etc/apt/sources.list.d/debian.sources
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true

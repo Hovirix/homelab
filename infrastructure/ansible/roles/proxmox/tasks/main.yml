@@ -1,0 +1,44 @@
+- name: Configure Proxmox repositories
+  ansible.builtin.import_tasks: repositories.yml
+  when: host.repositories.enabled | bool
+  tags: [repositories]
+
+- name: Configure Proxmox storage
+  ansible.builtin.import_tasks: storage.yml
+  when: host.storage.enabled | bool
+  tags: [storage]
+
+- name: Configure Proxmox API resources
+  ansible.builtin.import_tasks: api.yml
+  when: proxmox.api.enabled | bool
+  tags: [api]
+
+- name: Configure Proxmox backup
+  ansible.builtin.import_tasks: backup.yml
+  when: proxmox.backup.enabled | bool
+  tags: [backup]
+
+- name: Configure Proxmox firewall
+  ansible.builtin.import_tasks: firewall.yml
+  when: proxmox.firewall.enabled | bool
+  tags: [firewall]
+
+- name: Configure Proxmox certificates
+  ansible.builtin.import_tasks: certificates.yml
+  when: proxmox.certificates.enabled | bool
+  tags: [certificates]
+
+- name: Configure Proxmox monitoring
+  ansible.builtin.import_tasks: monitoring.yml
+  when: proxmox.monitoring.enabled | bool
+  tags: [monitoring]
+
+- name: Configure Proxmox notifications
+  ansible.builtin.import_tasks: notifications.yml
+  when: proxmox.notifications.enabled | bool
+  tags: [notifications]
+
+- name: Configure Proxmox cluster
+  ansible.builtin.import_tasks: cluster.yml
+  when: proxmox.cluster.enabled | bool
+  tags: [cluster]
