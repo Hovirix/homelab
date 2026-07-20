@@ -1,4 +1,4 @@
-host:
+node:
   system:
     enabled: true
     domain: home.hovirix.dev

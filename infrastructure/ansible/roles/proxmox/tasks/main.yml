@@ -1,11 +1,11 @@
 - name: Configure Proxmox repositories
   ansible.builtin.import_tasks: repositories.yml
-  when: host.repositories.enabled | bool
+  when: node.repositories.enabled | bool
   tags: [repositories]
 
 - name: Configure Proxmox storage
   ansible.builtin.import_tasks: storage.yml
-  when: host.storage.enabled | bool
+  when: node.storage.enabled | bool
   tags: [storage]
 
 - name: Configure Proxmox API resources

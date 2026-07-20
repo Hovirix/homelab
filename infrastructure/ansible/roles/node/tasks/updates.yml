@@ -6,7 +6,7 @@
 - name: Upgrade packages
   ansible.builtin.apt:
     upgrade: dist
-  when: host.updates.upgrade | bool
+  when: node.updates.upgrade | bool
 
 - name: Check if reboot is required
   ansible.builtin.stat:
@@ -17,5 +17,5 @@
   ansible.builtin.reboot:
     reboot_timeout: 900
   when:
-    - host.updates.reboot | bool
+    - node.updates.reboot | bool
     - node_updates_reboot_required.stat.exists

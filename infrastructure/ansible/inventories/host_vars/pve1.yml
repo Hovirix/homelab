@@ -1,4 +1,4 @@
-pve_node:
+node:
   hostname: pve1
   management_address: 10.20.0.11/24
   network_interface: nic0

@@ -1,1 +1,1 @@
-boot=zfs{% if host.kernel.iommu.enabled | bool %} amd_iommu=on iommu=pt{% endif %}
+boot=zfs{% if node.kernel.iommu.enabled | bool %} amd_iommu=on iommu=pt{% endif %}

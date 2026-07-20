@@ -6,54 +6,54 @@
       ansible.builtin.import_role:
         name: node
         tasks_from: common
-      when: host.system.enabled | bool
+      when: node.system.enabled | bool
       tags: [common]
 
     - name: Configure node repositories
       ansible.builtin.import_role:
         name: node
         tasks_from: repositories
-      when: host.repositories.enabled | bool
+      when: node.repositories.enabled | bool
       tags: [repositories]
 
     - name: Configure Proxmox repositories
       ansible.builtin.import_role:
         name: proxmox
         tasks_from: repositories
-      when: host.repositories.enabled | bool
+      when: node.repositories.enabled | bool
       tags: [repositories]
 
     - name: Configure node SSH
       ansible.builtin.import_role:
         name: node
         tasks_from: ssh
-      when: host.ssh.enabled | bool
+      when: node.ssh.enabled | bool
       tags: [ssh]
 
     - name: Configure node Wake-on-LAN
       ansible.builtin.import_role:
         name: node
         tasks_from: wake_on_lan
-      when: host.wake_on_lan.enabled | bool
+      when: node.wake_on_lan.enabled | bool
       tags: [wake-on-lan]
 
     - name: Configure Proxmox storage
       ansible.builtin.import_role:
         name: proxmox
         tasks_from: storage
-      when: host.storage.enabled | bool
+      when: node.storage.enabled | bool
       tags: [storage]
 
     - name: Configure node storage
       ansible.builtin.import_role:
         name: node
         tasks_from: storage
-      when: host.storage.enabled | bool
+      when: node.storage.enabled | bool
       tags: [storage]
 
     - name: Configure node kernel
       ansible.builtin.import_role:
         name: node
         tasks_from: kernel
-      when: host.kernel.enabled | bool
+      when: node.kernel.enabled | bool
       tags: [kernel]

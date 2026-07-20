@@ -1,29 +1,29 @@
 - name: Configure node system
   ansible.builtin.import_tasks: common.yml
-  when: host.system.enabled | bool
+  when: node.system.enabled | bool
   tags: [common]
 
 - name: Configure node repositories
   ansible.builtin.import_tasks: repositories.yml
-  when: host.repositories.enabled | bool
+  when: node.repositories.enabled | bool
   tags: [repositories]
 
 - name: Configure node SSH
   ansible.builtin.import_tasks: ssh.yml
-  when: host.ssh.enabled | bool
+  when: node.ssh.enabled | bool
   tags: [ssh]
 
 - name: Configure node Wake-on-LAN
   ansible.builtin.import_tasks: wake_on_lan.yml
-  when: host.wake_on_lan.enabled | bool
+  when: node.wake_on_lan.enabled | bool
   tags: [wake-on-lan]
 
 - name: Configure node storage
   ansible.builtin.import_tasks: storage.yml
-  when: host.storage.enabled | bool
+  when: node.storage.enabled | bool
   tags: [storage]
 
 - name: Configure node kernel
   ansible.builtin.import_tasks: kernel.yml
-  when: host.kernel.enabled | bool
+  when: node.kernel.enabled | bool
   tags: [kernel]

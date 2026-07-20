@@ -115,7 +115,7 @@
       - --acme
       - account=default
       - -acmedomain0
-      - "{{ pve_node.hostname }}.{{ host.system.domain }},plugin=cloudflare"
+      - "{{ node.hostname }}.{{ node.system.domain }},plugin=cloudflare"
   changed_when: false
 
 - name: Order the Proxmox ACME certificate

@@ -7,5 +7,5 @@
       ansible.builtin.import_role:
         name: node
         tasks_from: updates
-      when: host.updates.enabled | bool
+      when: node.updates.enabled | bool
       tags: [updates]
