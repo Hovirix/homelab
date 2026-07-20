@@ -57,3 +57,27 @@
         tasks_from: kernel
       when: node.kernel.enabled | bool
       tags: [kernel]
+
+- name: Configure Proxmox node networking
+  hosts: nodes
+  serial: 1
+
+  tasks:
+    - name: Configure node networking
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: networking
+      when: node.networking.enabled | bool
+      tags: [networking]
+
+- name: Maintain Proxmox nodes
+  hosts: nodes
+  serial: 1
+
+  tasks:
+    - name: Configure node updates
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: updates
+      when: node.updates.enabled | bool
+      tags: [updates]

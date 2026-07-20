@@ -1,27 +1,12 @@
 version: "3"
 
 tasks:
-  bootstrap:
-    desc: Bootstrap Proxmox hosts with Ansible
+  nodes:
+    desc: Configure Proxmox nodes with Ansible
     cmds:
-      - ansible-playbook playbooks/bootstrap.yml --ask-pass {{.args}}
-
-  configure:
-    desc: Configure Proxmox hosts with Ansible
-    cmds:
-      - ansible-playbook playbooks/configure.yml {{.args}}
+      - ansible-playbook playbooks/nodes.yml {{.args}}
 
   proxmox:
     desc: Configure Proxmox API resources with Ansible
     cmds:
       - ansible-playbook playbooks/proxmox.yml {{.args}}
-
-  networking:
-    desc: Configure Proxmox networking with Ansible
-    cmds:
-      - ansible-playbook playbooks/networking.yml {{.args}}
-
-  maintenance:
-    desc: Run Proxmox maintenance with Ansible
-    cmds:
-      - ansible-playbook playbooks/maintenance.yml {{.args}}
