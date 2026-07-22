@@ -3,6 +3,18 @@
   run_once: true
 
   tasks:
+    - name: Configure Proxmox VE storage
+      ansible.builtin.import_role:
+        name: datacenter
+        tasks_from: storage
+      tags: [storage]
+
+    - name: Configure Proxmox VE backup jobs
+      ansible.builtin.import_role:
+        name: datacenter
+        tasks_from: backup
+      tags: [backup]
+
     - name: Configure Proxmox VE API resources
       ansible.builtin.import_role:
         name: datacenter

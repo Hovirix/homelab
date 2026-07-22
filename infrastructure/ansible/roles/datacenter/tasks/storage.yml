@@ -1,0 +1,39 @@
+- name: Query Proxmox storage configuration
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - get
+      - /storage
+      - --output-format
+      - json
+  register: datacenter_storage
+  changed_when: false
+  run_once: true
+
+- name: Add TrueNAS backup storage
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - create
+      - /storage
+      - --storage
+      - truenas-backups
+      - --type
+      - nfs
+      - --server
+      - truenas.home.hovirix.dev
+      - --export
+      - /mnt/tank/backups/proxmox
+      - --content
+      - backup
+      - --options
+      - vers=4.2
+  when: >-
+    'truenas-backups' not in (
+      datacenter_storage.stdout
+      | from_json
+      | map(attribute='storage')
+      | list
+    )
+  changed_when: true
+  run_once: true

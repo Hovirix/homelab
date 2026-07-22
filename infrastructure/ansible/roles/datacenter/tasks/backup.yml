@@ -1,0 +1,41 @@
+- name: Query Proxmox backup jobs
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - get
+      - /cluster/backup
+      - --output-format
+      - json
+  register: datacenter_backup_jobs
+  changed_when: false
+  run_once: true
+
+- name: Create nightly Proxmox backup job
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - create
+      - /cluster/backup
+      - --id
+      - nightly-truenas
+      - --storage
+      - truenas-backups
+      - --all
+      - "1"
+      - --mode
+      - snapshot
+      - --compress
+      - zstd
+      - --schedule
+      - "*-*-* 02:00:00"
+      - --prune-backups
+      - keep-last=7,keep-weekly=4,keep-monthly=6
+  when: >-
+    'nightly-truenas' not in (
+      datacenter_backup_jobs.stdout
+      | from_json
+      | map(attribute='id')
+      | list
+    )
+  changed_when: true
+  run_once: true
