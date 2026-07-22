@@ -1,10 +1,9 @@
-- name: Configure kernel command line
-  ansible.builtin.template:
-    src: cmdline.j2
-    dest: /etc/kernel/cmdline
-    owner: root
-    group: root
-    mode: "0644"
+- name: Enable IOMMU kernel parameters
+  ansible.builtin.lineinfile:
+    path: /etc/kernel/cmdline
+    regexp: "^(.*?)(?:\\s+amd_iommu=on)?(?:\\s+iommu=pt)?$"
+    line: '\1 amd_iommu=on iommu=pt'
+    backrefs: true
   notify: Refresh bootloader
 
 - name: Configure VFIO modules
