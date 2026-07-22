@@ -1,8 +1,0 @@
-[Unit]
-Description=HX Lab scheduled Proxmox full-upgrade
-Wants=network-online.target
-After=network-online.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/flock -n /run/hxlab-proxmox-update.lock /usr/local/sbin/hxlab-proxmox-update

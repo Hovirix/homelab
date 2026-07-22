@@ -10,13 +10,13 @@
     owner: root
     group: root
     mode: "0644"
+  notify: Reload systemd
 
 - name: Enable Wake-on-LAN service
   ansible.builtin.systemd_service:
     name: wake-on-lan.service
     enabled: true
     state: started
-    daemon_reload: true
   when:
     - not ansible_check_mode
 
@@ -28,5 +28,5 @@
       - nic0
       - wol
       - g
-  register: node_wake_on_lan_result
-  changed_when: "'Wake-on: g' not in node_wake_on_lan_result.stdout"
+  register: host_wake_on_lan_result
+  changed_when: "'Wake-on: g' not in host_wake_on_lan_result.stdout"

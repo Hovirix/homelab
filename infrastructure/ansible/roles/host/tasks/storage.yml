@@ -7,7 +7,7 @@
       - -o
       - size
       - rpool
-  register: node_storage_rpool_size
+  register: host_storage_rpool_size
   changed_when: false
 
 - name: Read ZFS pool health
@@ -19,14 +19,14 @@
       - -o
       - health
       - rpool
-  register: node_storage_rpool_health
+  register: host_storage_rpool_health
   changed_when: false
 
 - name: Validate ZFS pool
   ansible.builtin.assert:
     that:
-      - node_storage_rpool_health.stdout | trim == "ONLINE"
-      - node_storage_rpool_size.stdout | trim | int >= 1500 * 1024**3
+      - host_storage_rpool_health.stdout | trim == "ONLINE"
+      - host_storage_rpool_size.stdout | trim | int >= 1500 * 1024**3
     fail_msg: >-
       ZFS pool rpool must be ONLINE and at least 1500 GiB.
 - name: Read ZFS pool autotrim property
@@ -39,7 +39,7 @@
       - value
       - autotrim
       - rpool
-  register: node_storage_rpool_autotrim
+  register: host_storage_rpool_autotrim
   changed_when: false
 
 - name: Enable ZFS pool autotrim
@@ -49,7 +49,7 @@
       - set
       - autotrim=on
       - rpool
-  when: node_storage_rpool_autotrim.stdout | trim != "on"
+  when: host_storage_rpool_autotrim.stdout | trim != "on"
   changed_when: true
 
 - name: Read ZFS dataset compression property
@@ -62,7 +62,7 @@
       - value
       - compression
       - rpool/data
-  register: node_storage_data_compression
+  register: host_storage_data_compression
   changed_when: false
 
 - name: Enable ZFS dataset compression
@@ -72,7 +72,7 @@
       - set
       - compression=lz4
       - rpool/data
-  when: node_storage_data_compression.stdout | trim != "lz4"
+  when: host_storage_data_compression.stdout | trim != "lz4"
   changed_when: true
 
 - name: Read ZFS dataset atime property
@@ -85,7 +85,7 @@
       - value
       - atime
       - rpool/data
-  register: node_storage_data_atime
+  register: host_storage_data_atime
   changed_when: false
 
 - name: Disable ZFS dataset atime updates
@@ -95,7 +95,7 @@
       - set
       - atime=off
       - rpool/data
-  when: node_storage_data_atime.stdout | trim != "off"
+  when: host_storage_data_atime.stdout | trim != "off"
   changed_when: true
 
 - name: Read ZFS dataset xattr property
@@ -108,7 +108,7 @@
       - value
       - xattr
       - rpool/data
-  register: node_storage_data_xattr
+  register: host_storage_data_xattr
   changed_when: false
 
 - name: Enable ZFS dataset xattr=sa
@@ -118,5 +118,5 @@
       - set
       - xattr=sa
       - rpool/data
-  when: node_storage_data_xattr.stdout | trim != "sa"
+  when: host_storage_data_xattr.stdout | trim != "sa"
   changed_when: true

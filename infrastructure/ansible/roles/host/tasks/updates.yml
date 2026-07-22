@@ -10,40 +10,41 @@
 - name: Check if reboot is required
   ansible.builtin.stat:
     path: /var/run/reboot-required
-  register: node_updates_reboot_required
+  register: host_updates_reboot_required
 
 - name: Reboot if required
   ansible.builtin.reboot:
     reboot_timeout: 900
-  when: node_updates_reboot_required.stat.exists
+  when: host_updates_reboot_required.stat.exists
 
-- name: Install scheduled Proxmox update script
+- name: Install scheduled host update script
   ansible.builtin.template:
-    src: hxlab-proxmox-update.sh.j2
-    dest: /usr/local/sbin/hxlab-proxmox-update
+    src: hxlab-host-update.sh.j2
+    dest: /usr/local/sbin/hxlab-host-update
     owner: root
     group: root
     mode: "0755"
 
-- name: Configure scheduled Proxmox update service
+- name: Configure scheduled host update service
   ansible.builtin.template:
-    src: hxlab-proxmox-update.service.j2
-    dest: /etc/systemd/system/hxlab-proxmox-update.service
+    src: hxlab-host-update.service.j2
+    dest: /etc/systemd/system/hxlab-host-update.service
     owner: root
     group: root
     mode: "0644"
+  notify: Reload systemd
 
-- name: Configure scheduled Proxmox update timer
+- name: Configure scheduled host update timer
   ansible.builtin.template:
-    src: hxlab-proxmox-update.timer.j2
-    dest: /etc/systemd/system/hxlab-proxmox-update.timer
+    src: hxlab-host-update.timer.j2
+    dest: /etc/systemd/system/hxlab-host-update.timer
     owner: root
     group: root
     mode: "0644"
+  notify: Reload systemd
 
-- name: Enable scheduled Proxmox updates
+- name: Enable scheduled host updates
   ansible.builtin.systemd_service:
-    name: hxlab-proxmox-update.timer
+    name: hxlab-host-update.timer
     enabled: true
     state: started
-    daemon_reload: true

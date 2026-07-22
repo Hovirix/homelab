@@ -1,4 +1,4 @@
-- name: Configure Proxmox network interfaces
+- name: Configure host network interfaces
   ansible.builtin.template:
     src: interfaces.j2
     dest: /etc/network/interfaces
