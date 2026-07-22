@@ -1,12 +1,22 @@
 version: "3"
 
 tasks:
-  nodes:
-    desc: Configure Proxmox nodes with Ansible
+  hosts:
+    desc: Configure hosts with Ansible
     cmds:
-      - ansible-playbook playbooks/nodes.yml {{.args}}
+      - ansible-playbook playbooks/hosts.yml {{.args}}
 
-  proxmox:
-    desc: Configure Proxmox API resources with Ansible
+  pve:
+    desc: Configure Proxmox VE nodes with Ansible
     cmds:
-      - ansible-playbook playbooks/proxmox.yml {{.args}}
+      - ansible-playbook playbooks/pve.yml {{.args}}
+
+  datacenter:
+    desc: Configure Proxmox VE datacenter with Ansible
+    cmds:
+      - ansible-playbook playbooks/datacenter.yml {{.args}}
+
+  site:
+    desc: Apply full Ansible site configuration
+    cmds:
+      - ansible-playbook playbooks/site.yml {{.args}}
