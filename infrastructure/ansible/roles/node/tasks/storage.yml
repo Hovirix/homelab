@@ -97,3 +97,26 @@
       - rpool/data
   when: node_storage_data_atime.stdout | trim != "off"
   changed_when: true
+
+- name: Read ZFS dataset xattr property
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - get
+      - -H
+      - -o
+      - value
+      - xattr
+      - rpool/data
+  register: node_storage_data_xattr
+  changed_when: false
+
+- name: Enable ZFS dataset xattr=sa
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - set
+      - xattr=sa
+      - rpool/data
+  when: node_storage_data_xattr.stdout | trim != "sa"
+  changed_when: true
