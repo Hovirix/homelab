@@ -5,8 +5,8 @@
     - name: Configure node system
       ansible.builtin.import_role:
         name: node
-        tasks_from: common
-      tags: [common]
+        tasks_from: system
+      tags: [system]
 
     - name: Configure node repositories
       ansible.builtin.import_role:
