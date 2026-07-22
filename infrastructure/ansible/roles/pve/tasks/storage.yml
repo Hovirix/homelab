@@ -3,13 +3,13 @@
     argv:
       - pvesm
       - status
-  register: proxmox_storage_status
+  register: pve_storage_status
   changed_when: false
 
 - name: Verify expected Proxmox storages exist
   ansible.builtin.assert:
     that:
-      - proxmox_storage_status.stdout | regex_search('(?m)^local\s+dir\s+active\s+') is not none
-      - proxmox_storage_status.stdout | regex_search('(?m)^local-zfs\s+zfspool\s+active\s+') is not none
+      - pve_storage_status.stdout | regex_search('(?m)^local\s+dir\s+active\s+') is not none
+      - pve_storage_status.stdout | regex_search('(?m)^local-zfs\s+zfspool\s+active\s+') is not none
     fail_msg: >-
       Expected Proxmox storages local and local-zfs were not reported as active.

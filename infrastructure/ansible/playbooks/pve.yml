@@ -1,0 +1,22 @@
+- name: Configure Proxmox VE nodes
+  hosts: nodes
+  serial: 1
+
+  tasks:
+    - name: Configure Proxmox VE repositories
+      ansible.builtin.import_role:
+        name: pve
+        tasks_from: repositories
+      tags: [repositories]
+
+    - name: Configure Proxmox VE storage
+      ansible.builtin.import_role:
+        name: pve
+        tasks_from: storage
+      tags: [storage]
+
+    - name: Configure Proxmox VE certificates
+      ansible.builtin.import_role:
+        name: pve
+        tasks_from: certificates
+      tags: [certificates]

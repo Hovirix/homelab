@@ -1,0 +1,98 @@
+- name: Load Proxmox certificate secrets
+  community.sops.load_vars:
+    file: "{{ playbook_dir }}/../../../secrets/infrastructure.sops.yaml"
+    name: infrastructure_secrets
+  no_log: true
+
+- name: Verify Cloudflare ACME token
+  ansible.builtin.assert:
+    that:
+      - infrastructure_secrets.proxmox.acme_token | length > 0
+    fail_msg: Cloudflare ACME token is missing.
+  no_log: true
+
+- name: Create temporary Cloudflare credentials file
+  ansible.builtin.tempfile:
+    state: file
+    suffix: -cloudflare
+  register: datacenter_certificates_cloudflare_credentials
+
+- name: Write Cloudflare credentials
+  ansible.builtin.copy:
+    dest: "{{ datacenter_certificates_cloudflare_credentials.path }}"
+    mode: "0600"
+    content: |
+      CF_Token={{ infrastructure_secrets.proxmox.acme_token }}
+  no_log: true
+
+- name: Query ACME account
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - account
+      - info
+      - default
+      - --output-format
+      - json
+  register: datacenter_certificates_account
+  changed_when: false
+  failed_when: false
+  run_once: true
+
+- name: Register ACME account
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - account
+      - register
+      - default
+      - homelab@hovirix.dev
+      - --directory
+      - https://acme-v02.api.letsencrypt.org/directory
+    stdin: |
+      y
+  when: datacenter_certificates_account.rc != 0
+  changed_when: true
+  run_once: true
+
+- name: Query Cloudflare ACME plugin
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - plugin
+      - config
+      - cloudflare
+      - --output-format
+      - json
+  register: datacenter_certificates_plugin
+  changed_when: false
+  failed_when: false
+  run_once: true
+
+- name: Create Cloudflare ACME plugin
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - plugin
+      - add
+      - dns
+      - cloudflare
+      - --api
+      - cf
+      - --data
+      - "{{ datacenter_certificates_cloudflare_credentials.path }}"
+      - --validation-delay
+      - "60"
+  when: datacenter_certificates_plugin.rc != 0
+  changed_when: true
+  run_once: true
+
+- name: Remove temporary Cloudflare credentials
+  ansible.builtin.file:
+    path: "{{ datacenter_certificates_cloudflare_credentials.path }}"
+    state: absent
+  when: datacenter_certificates_cloudflare_credentials is defined

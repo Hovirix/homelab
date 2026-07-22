@@ -1,0 +1,20 @@
+- name: Configure ACME domain
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - set
+      - --acme
+      - account=default
+      - -acmedomain0
+      - "{{ inventory_hostname }}.{{ domain }},plugin=cloudflare"
+
+- name: Order ACME certificate
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - cert
+      - order
+      - --force
+      - "1"

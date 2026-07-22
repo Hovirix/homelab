@@ -1,0 +1,22 @@
+- name: Configure Proxmox VE datacenter
+  hosts: nodes
+  run_once: true
+
+  tasks:
+    - name: Configure Proxmox VE API resources
+      ansible.builtin.import_role:
+        name: datacenter
+        tasks_from: api
+      tags: [api]
+
+    - name: Configure Proxmox VE datacenter certificates
+      ansible.builtin.import_role:
+        name: datacenter
+        tasks_from: certificates
+      tags: [certificates]
+
+    - name: Configure Proxmox VE notifications
+      ansible.builtin.import_role:
+        name: datacenter
+        tasks_from: notifications
+      tags: [notifications]

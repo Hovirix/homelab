@@ -1,0 +1,111 @@
+- name: Read Proxmox API users
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - list
+      - --output-format
+      - json
+  register: datacenter_api_users
+  changed_when: false
+  run_once: true
+
+- name: Create OpenTofu API user
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - add
+      - opentofu@pve
+      - --comment
+      - OpenTofu VM lifecycle
+  when: >-
+    'opentofu@pve' not in (datacenter_api_users.stdout | from_json | map(attribute='userid') | list)
+  changed_when: true
+  run_once: true
+
+- name: Assign VM administration permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - /
+      - --users
+      - opentofu@pve
+      - --roles
+      - PVEVMAdmin
+  changed_when: false
+  run_once: true
+
+- name: Assign datastore administration permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - /storage/local-zfs
+      - --users
+      - opentofu@pve
+      - --roles
+      - PVEDatastoreAdmin
+  changed_when: false
+  run_once: true
+
+- name: Assign node audit permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - /nodes
+      - --users
+      - opentofu@pve
+      - --roles
+      - PVEAuditor
+  changed_when: false
+  run_once: true
+
+- name: Read OpenTofu API tokens
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - token
+      - list
+      - opentofu@pve
+      - --output-format
+      - json
+  register: datacenter_api_tokens
+  changed_when: false
+  run_once: true
+
+- name: Create OpenTofu API token
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - user
+      - token
+      - add
+      - opentofu@pve
+      - opentofu
+      - --privsep
+      - "0"
+      - --comment
+      - OpenTofu VM lifecycle
+      - --output-format
+      - json
+  register: datacenter_api_token
+  when: >-
+    'opentofu' not in (datacenter_api_tokens.stdout | from_json | map(attribute='tokenid') | list)
+  changed_when: true
+  no_log: true
+  run_once: true
+
+- name: Display generated OpenTofu API token
+  ansible.builtin.debug:
+    msg:
+      token_id: opentofu@pve!opentofu
+      token_secret: "{{ (datacenter_api_token.stdout | from_json).value }}"
+  when: datacenter_api_token is changed
+  run_once: true

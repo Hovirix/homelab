@@ -1,2 +1,0 @@
-- name: Leave Proxmox backup unmanaged
-  ansible.builtin.meta: noop

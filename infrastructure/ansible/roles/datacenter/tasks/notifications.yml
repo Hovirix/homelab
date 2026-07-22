@@ -7,7 +7,7 @@
 
 - name: Render Proxmox notification files
   ansible.builtin.set_fact:
-    proxmox_notifications_files:
+    datacenter_notifications_files:
       - path: /etc/pve/notifications.cfg
         content: "{{ lookup('template', 'notifications.cfg.j2') }}"
         secret: false
@@ -20,10 +20,10 @@
 - name: Read existing Proxmox notification files
   ansible.builtin.slurp:
     path: "{{ item.path }}"
-  register: proxmox_notifications_existing
+  register: datacenter_notifications_existing
   failed_when: false
   changed_when: false
-  loop: "{{ proxmox_notifications_files }}"
+  loop: "{{ datacenter_notifications_files }}"
   no_log: true
   run_once: true
 
@@ -37,7 +37,7 @@
   args:
     stdin: "{{ item.0.content }}"
     stdin_add_newline: false
-  loop: "{{ proxmox_notifications_files | zip(proxmox_notifications_existing.results) | list }}"
+  loop: "{{ datacenter_notifications_files | zip(datacenter_notifications_existing.results) | list }}"
   when: item.1.failed or (item.1.content is defined and (item.1.content | b64decode) != item.0.content)
   changed_when: true
   no_log: "{{ item.0.secret }}"
