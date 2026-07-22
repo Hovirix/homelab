@@ -1,7 +1,3 @@
-- name: Derive desired storage values
-  ansible.builtin.set_fact:
-    node_storage_min_pool_size_bytes: "{{ 1500 * 1024 * 1024 * 1024 }}"
-
 - name: Read ZFS pool size
   ansible.builtin.command:
     argv:
@@ -11,7 +7,7 @@
       - -o
       - size
       - rpool
-  register: node_storage_pool_size
+  register: node_storage_rpool_size
   changed_when: false
 
 - name: Read ZFS pool health
@@ -23,10 +19,17 @@
       - -o
       - health
       - rpool
-  register: node_storage_pool_health
+  register: node_storage_rpool_health
   changed_when: false
 
-- name: Read ZFS pool autotrim state
+- name: Validate ZFS pool
+  ansible.builtin.assert:
+    that:
+      - node_storage_rpool_health.stdout | trim == "ONLINE"
+      - node_storage_rpool_size.stdout | trim | int >= 1500 * 1024**3
+    fail_msg: >-
+      ZFS pool rpool must be ONLINE and at least 1500 GiB.
+- name: Read ZFS pool autotrim property
   ansible.builtin.command:
     argv:
       - zpool
@@ -36,27 +39,20 @@
       - value
       - autotrim
       - rpool
-  register: node_storage_pool_autotrim
+  register: node_storage_rpool_autotrim
   changed_when: false
 
-- name: Verify ZFS pool capacity and health
-  ansible.builtin.assert:
-    that:
-      - node_storage_pool_health.stdout | trim == 'ONLINE'
-      - (node_storage_pool_size.stdout | trim | int) >= (node_storage_min_pool_size_bytes | int)
-    fail_msg: ZFS pool rpool is not healthy or is smaller than the expected minimum size.
-
-- name: Enable ZFS autotrim
+- name: Enable ZFS pool autotrim
   ansible.builtin.command:
     argv:
       - zpool
       - set
       - autotrim=on
       - rpool
-  when: node_storage_pool_autotrim.stdout | trim != 'on'
+  when: node_storage_rpool_autotrim.stdout | trim != "on"
   changed_when: true
 
-- name: Read ZFS dataset compression state
+- name: Read ZFS dataset compression property
   ansible.builtin.command:
     argv:
       - zfs
@@ -66,20 +62,7 @@
       - value
       - compression
       - rpool/data
-  register: node_storage_dataset_compression
-  changed_when: false
-
-- name: Read ZFS dataset atime state
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - get
-      - -H
-      - -o
-      - value
-      - atime
-      - rpool/data
-  register: node_storage_dataset_atime
+  register: node_storage_data_compression
   changed_when: false
 
 - name: Enable ZFS dataset compression
@@ -89,8 +72,21 @@
       - set
       - compression=lz4
       - rpool/data
-  when: node_storage_dataset_compression.stdout | trim != 'lz4'
+  when: node_storage_data_compression.stdout | trim != "lz4"
   changed_when: true
+
+- name: Read ZFS dataset atime property
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - get
+      - -H
+      - -o
+      - value
+      - atime
+      - rpool/data
+  register: node_storage_data_atime
+  changed_when: false
 
 - name: Disable ZFS dataset atime updates
   ansible.builtin.command:
@@ -99,5 +95,5 @@
       - set
       - atime=off
       - rpool/data
-  when: node_storage_dataset_atime.stdout | trim != 'off'
+  when: node_storage_data_atime.stdout | trim != "off"
   changed_when: true
