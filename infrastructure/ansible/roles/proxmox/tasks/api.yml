@@ -16,15 +16,16 @@
       - pveum
       - role
       - add
-      - "{{ item.name }}"
+      - OpenTofuProv
       - --privs
-      - "{{ item.privileges | join(' ') }}"
-  loop: "{{ proxmox.api.roles }}"
+      - >-
+        Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit Sys.Audit VM.Allocate VM.Audit VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.PowerMgmt
   register: proxmox_api_role_add
   changed_when: proxmox_api_role_add.rc == 0
   failed_when:
     - proxmox_api_role_add.rc != 0
     - "'already exists' not in proxmox_api_role_add.stderr"
+  run_once: true
 
 - name: Update Proxmox API role privileges
   ansible.builtin.command:
@@ -32,11 +33,12 @@
       - pveum
       - role
       - modify
-      - "{{ item.name }}"
+      - OpenTofuProv
       - --privs
-      - "{{ item.privileges | join(' ') }}"
-  loop: "{{ proxmox.api.roles }}"
+      - >-
+        Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit Sys.Audit VM.Allocate VM.Audit VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.PowerMgmt
   changed_when: false
+  run_once: true
 
 - name: Ensure Proxmox API users exist
   ansible.builtin.command:
@@ -44,15 +46,15 @@
       - pveum
       - user
       - add
-      - "{{ item.userid }}"
+      - opentofu@pve
       - -comment
-      - "{{ item.comment }}"
-  loop: "{{ proxmox.api.users }}"
+      - OpenTofu lifecycle user
   register: proxmox_api_user_add
   changed_when: proxmox_api_user_add.rc == 0
   failed_when:
     - proxmox_api_user_add.rc != 0
     - "'already exists' not in proxmox_api_user_add.stderr"
+  run_once: true
 
 - name: Ensure Proxmox API user ACLs are applied
   ansible.builtin.command:
@@ -60,13 +62,13 @@
       - pveum
       - acl
       - modify
-      - "{{ item.acl.path }}"
+      - /
       - --users
-      - "{{ item.userid }}"
+      - opentofu@pve
       - --roles
-      - "{{ item.acl.role }}"
-  loop: "{{ proxmox.api.users }}"
+      - OpenTofuProv
   changed_when: false
+  run_once: true
 
 - name: Read Proxmox API tokens
   ansible.builtin.command:
@@ -75,46 +77,30 @@
       - user
       - token
       - list
-      - "{{ item.userid }}"
+      - opentofu@pve
       - --output-format
       - json
-  loop: "{{ proxmox.api.users }}"
   register: proxmox_api_token_list
   changed_when: false
+  run_once: true
 
-- name: Delete Proxmox API tokens when regeneration is requested
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - user
-      - token
-      - delete
-      - "{{ item.item.userid }}"
-      - "{{ item.item.token.id }}"
-  loop: "{{ proxmox_api_token_list.results }}"
-  changed_when: true
-  when:
-    - item.item.token.regenerate | bool
-    - item.item.token.id in (item.stdout | from_json | map(attribute='tokenid') | list)
-
-- name: Create missing or regenerated Proxmox API tokens
+- name: Create missing Proxmox API token
   ansible.builtin.command:
     argv:
       - pveum
       - user
       - token
       - add
-      - "{{ item.item.userid }}"
-      - "{{ item.item.token.id }}"
+      - opentofu@pve
+      - opentofu
       - --privsep
-      - "{{ item.item.token.privsep | bool | ternary('1', '0') }}"
+      - "0"
       - --comment
-      - "{{ item.item.token.comment }}"
+      - OpenTofu lifecycle token
       - --output-format
       - json
-  loop: "{{ proxmox_api_token_list.results }}"
   register: proxmox_api_token_create
   changed_when: true
-  when: >-
-    item.item.token.regenerate | bool or item.item.token.id not in (item.stdout | from_json | map(attribute='tokenid') | list)
+  when: "'opentofu' not in (proxmox_api_token_list.stdout | from_json | map(attribute='tokenid') | list)"
   notify: Print generated Proxmox API tokens to store in SOPS
+  run_once: true

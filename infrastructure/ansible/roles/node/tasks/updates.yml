@@ -3,10 +3,9 @@
     update_cache: true
     cache_valid_time: 3600
 
-- name: Upgrade packages
+- name: Full-upgrade packages
   ansible.builtin.apt:
     upgrade: dist
-  when: node.updates.upgrade | bool
 
 - name: Check if reboot is required
   ansible.builtin.stat:
@@ -16,6 +15,35 @@
 - name: Reboot if required
   ansible.builtin.reboot:
     reboot_timeout: 900
-  when:
-    - node.updates.reboot | bool
-    - node_updates_reboot_required.stat.exists
+  when: node_updates_reboot_required.stat.exists
+
+- name: Install scheduled Proxmox update script
+  ansible.builtin.template:
+    src: hxlab-proxmox-update.sh.j2
+    dest: /usr/local/sbin/hxlab-proxmox-update
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure scheduled Proxmox update service
+  ansible.builtin.template:
+    src: hxlab-proxmox-update.service.j2
+    dest: /etc/systemd/system/hxlab-proxmox-update.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure scheduled Proxmox update timer
+  ansible.builtin.template:
+    src: hxlab-proxmox-update.timer.j2
+    dest: /etc/systemd/system/hxlab-proxmox-update.timer
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable scheduled Proxmox updates
+  ansible.builtin.systemd_service:
+    name: hxlab-proxmox-update.timer
+    enabled: true
+    state: started
+    daemon_reload: true

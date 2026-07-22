@@ -6,8 +6,6 @@
     group: root
     mode: "0644"
   notify: Refresh bootloader
-  when:
-    - node.kernel.manage_cmdline | bool
 
 - name: Configure VFIO modules
   ansible.builtin.copy:
@@ -21,6 +19,3 @@
       vfio_pci
       vfio_virqfd
   notify: Update initramfs
-  when:
-    - node.kernel.manage_cmdline | bool
-    - node.kernel.vfio.enabled | bool

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DEBIAN_FRONTEND=noninteractive
+
+if command -v zpool >/dev/null 2>&1; then
+  zpool status -x
+fi
+
+apt-get update
+apt-get -y full-upgrade
+apt-get -y autoremove
+
+if [ -e /var/run/reboot-required ]; then
+  systemd-cat -t hxlab-proxmox-update printf '%s\n' 'Reboot required after scheduled Proxmox update; reboot manually during a maintenance window.'
+fi

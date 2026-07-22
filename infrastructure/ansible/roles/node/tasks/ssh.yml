@@ -19,6 +19,6 @@
 - name: Configure root authorized keys
   ansible.posix.authorized_key:
     user: root
-    key: "{{ node.ssh.root_authorized_keys | join('\n') }}"
+    key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
     exclusive: true
     state: present

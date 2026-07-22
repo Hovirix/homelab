@@ -1,13 +1,13 @@
-smtp: {{ proxmox.notifications.target_name }}
-        mailto {{ proxmox.notifications.mailto }}
-        from-address {{ proxmox.notifications.from_address }}
-        username {{ ansible_facts.infrastructure_secrets.smtp.user }}
-        server {{ ansible_facts.infrastructure_secrets.smtp.host }}
-        port {{ ansible_facts.infrastructure_secrets.smtp.port }}
-        mode {{ proxmox.notifications.smtp_mode }}
-        comment Managed by Ansible for HX Lab Proxmox hosts: {{ groups['proxmox'] | join(', ') }}
+smtp: hxlab-smtp
+        mailto homelab@hovirix.dev
+        from-address proxmox@hovirix.dev
+        username {{ infrastructure_secrets.smtp.user }}
+        server {{ infrastructure_secrets.smtp.host }}
+        port {{ infrastructure_secrets.smtp.port }}
+        mode starttls
+        comment Managed by Ansible
 
-matcher: {{ proxmox.notifications.matcher_name }}
-        match-severity {{ proxmox.notifications.match_severity | join(',') }}
-        target {{ proxmox.notifications.target_name }}
-        comment Managed by Ansible for HX Lab Proxmox hosts: {{ groups['proxmox'] | join(', ') }}
+matcher: hxlab-alerts
+        match-severity warning,error
+        target hxlab-smtp
+        comment Managed by Ansible

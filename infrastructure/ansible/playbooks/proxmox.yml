@@ -1,52 +1,33 @@
-- name: Configure Proxmox API resources
-  hosts: proxmox
+- name: Configure Proxmox resources
+  hosts: nodes
 
   tasks:
+    - name: Configure Proxmox repositories
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: repositories
+      tags: [repositories]
+
+    - name: Configure Proxmox storage
+      ansible.builtin.import_role:
+        name: proxmox
+        tasks_from: storage
+      tags: [storage]
+
     - name: Configure Proxmox API resources
       ansible.builtin.import_role:
         name: proxmox
         tasks_from: api
-      when: proxmox.api.enabled | bool
       tags: [api]
-
-    - name: Configure Proxmox backup
-      ansible.builtin.import_role:
-        name: proxmox
-        tasks_from: backup
-      when: proxmox.backup.enabled | bool
-      tags: [backup]
-
-    - name: Configure Proxmox firewall
-      ansible.builtin.import_role:
-        name: proxmox
-        tasks_from: firewall
-      when: proxmox.firewall.enabled | bool
-      tags: [firewall]
 
     - name: Configure Proxmox certificates
       ansible.builtin.import_role:
         name: proxmox
         tasks_from: certificates
-      when: proxmox.certificates.enabled | bool
       tags: [certificates]
-
-    - name: Configure Proxmox monitoring
-      ansible.builtin.import_role:
-        name: proxmox
-        tasks_from: monitoring
-      when: proxmox.monitoring.enabled | bool
-      tags: [monitoring]
 
     - name: Configure Proxmox notifications
       ansible.builtin.import_role:
         name: proxmox
         tasks_from: notifications
-      when: proxmox.notifications.enabled | bool
       tags: [notifications]
-
-    - name: Configure Proxmox cluster
-      ansible.builtin.import_role:
-        name: proxmox
-        tasks_from: cluster
-      when: proxmox.cluster.enabled | bool
-      tags: [cluster]

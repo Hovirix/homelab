@@ -53,7 +53,7 @@
           - account
           - register
           - default
-          - "{{ proxmox.notifications.mailto }}"
+          - homelab@hovirix.dev
           - --directory
           - https://acme-v02.api.letsencrypt.org/directory
         stdin: |
@@ -115,7 +115,7 @@
       - --acme
       - account=default
       - -acmedomain0
-      - "{{ node.hostname }}.{{ node.system.domain }},plugin=cloudflare"
+      - "{{ inventory_hostname }}.{{ domain }},plugin=cloudflare"
   changed_when: false
 
 - name: Order the Proxmox ACME certificate

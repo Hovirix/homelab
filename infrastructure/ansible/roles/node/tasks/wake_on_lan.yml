@@ -25,7 +25,7 @@
     argv:
       - ethtool
       - -s
-      - "{{ node.network_interface }}"
+      - nic0
       - wol
       - g
   register: node_wake_on_lan_result

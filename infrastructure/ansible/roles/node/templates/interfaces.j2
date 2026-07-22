@@ -1,17 +1,17 @@
 auto lo
 iface lo inet loopback
 
-iface {{ node.network_interface }} inet manual
+iface nic0 inet manual
 
 auto vmbr0
 iface vmbr0 inet manual
-    bridge-ports {{ node.network_interface }}
+    bridge-ports nic0
     bridge-stp off
     bridge-fd 0
     bridge-vlan-aware yes
-    bridge-vids {{ node.networking.allowed_vlans | map(attribute='id') | map('string') | join(' ') }}
+    bridge-vids 20 40 60
 
-auto vmbr0.{{ node.networking.management.vlan }}
-iface vmbr0.{{ node.networking.management.vlan }} inet static
-    address {{ node.management_address }}
-    gateway {{ node.networking.management.gateway }}
+auto vmbr0.20
+iface vmbr0.20 inet static
+    address {{ ip }}/24
+    gateway 10.20.0.1

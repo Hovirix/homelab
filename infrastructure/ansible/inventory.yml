@@ -1,0 +1,14 @@
+all:
+  children:
+    nodes:
+      hosts:
+        pve1:
+          ip: 10.20.0.11
+          # pve2:
+          #   ip: 10.20.0.12
+          # pve3:
+          #   ip: 10.20.0.13
+      vars:
+        ansible_host: "{{ inventory_hostname }}.{{ domain }}"
+        ansible_user: root
+        domain: home.hovirix.dev

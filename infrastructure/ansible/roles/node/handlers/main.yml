@@ -14,3 +14,7 @@
 - name: Reload networking
   ansible.builtin.command: ifreload -a
   changed_when: true
+
+- name: Reload systemd
+  ansible.builtin.systemd_service:
+    daemon_reload: true

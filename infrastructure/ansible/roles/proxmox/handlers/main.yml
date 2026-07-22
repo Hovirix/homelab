@@ -1,6 +1,5 @@
 - name: Print generated Proxmox API tokens to store in SOPS
   ansible.builtin.debug:
     msg: >-
-      Store this token value in secrets/infrastructure.sops.yaml as proxmox.api_token: {{ (item.stdout | from_json).value }}
-  loop: "{{ proxmox_api_token_create.results }}"
-  when: item.changed
+      Store this token value in secrets/infrastructure.sops.yaml as proxmox.api_token: {{ (proxmox_api_token_create.stdout | from_json).value }}
+  when: proxmox_api_token_create.changed

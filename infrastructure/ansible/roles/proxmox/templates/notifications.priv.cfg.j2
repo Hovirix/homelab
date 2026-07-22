@@ -1,2 +1,2 @@
-smtp: {{ proxmox.notifications.target_name }}
-        password {{ ansible_facts.infrastructure_secrets.smtp.password }}
+smtp: hxlab-smtp
+        password {{ infrastructure_secrets.smtp.password }}

@@ -6,56 +6,36 @@
       ansible.builtin.import_role:
         name: node
         tasks_from: common
-      when: node.system.enabled | bool
       tags: [common]
 
     - name: Configure node repositories
       ansible.builtin.import_role:
         name: node
         tasks_from: repositories
-      when: node.repositories.enabled | bool
-      tags: [repositories]
-
-    - name: Configure Proxmox repositories
-      ansible.builtin.import_role:
-        name: proxmox
-        tasks_from: repositories
-      when: node.repositories.enabled | bool
       tags: [repositories]
 
     - name: Configure node SSH
       ansible.builtin.import_role:
         name: node
         tasks_from: ssh
-      when: node.ssh.enabled | bool
       tags: [ssh]
 
     - name: Configure node Wake-on-LAN
       ansible.builtin.import_role:
         name: node
         tasks_from: wake_on_lan
-      when: node.wake_on_lan.enabled | bool
       tags: [wake-on-lan]
-
-    - name: Configure Proxmox storage
-      ansible.builtin.import_role:
-        name: proxmox
-        tasks_from: storage
-      when: node.storage.enabled | bool
-      tags: [storage]
 
     - name: Configure node storage
       ansible.builtin.import_role:
         name: node
         tasks_from: storage
-      when: node.storage.enabled | bool
       tags: [storage]
 
     - name: Configure node kernel
       ansible.builtin.import_role:
         name: node
         tasks_from: kernel
-      when: node.kernel.enabled | bool
       tags: [kernel]
 
 - name: Configure Proxmox node networking
@@ -67,7 +47,6 @@
       ansible.builtin.import_role:
         name: node
         tasks_from: networking
-      when: node.networking.enabled | bool
       tags: [networking]
 
 - name: Maintain Proxmox nodes
@@ -79,5 +58,4 @@
       ansible.builtin.import_role:
         name: node
         tasks_from: updates
-      when: node.updates.enabled | bool
       tags: [updates]
