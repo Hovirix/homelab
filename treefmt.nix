@@ -17,7 +17,11 @@
   };
 
   settings = {
-    global.excludes = [ "secrets/**" ];
+    global.excludes = [
+      "platform/gitops/**"
+      "platform/flux-system/**"
+      "secrets/**"
+    ];
     formatter.opentofu = {
       command = "${pkgs.opentofu}/bin/tofu";
       options = [ "fmt" ];
