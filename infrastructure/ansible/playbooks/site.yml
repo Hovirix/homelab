@@ -1,0 +1,8 @@
+- name: Apply host configuration
+  ansible.builtin.import_playbook: hosts.yml
+
+- name: Apply node-local Proxmox VE configuration
+  ansible.builtin.import_playbook: pve.yml
+
+- name: Apply Proxmox VE datacenter configuration
+  ansible.builtin.import_playbook: datacenter.yml
