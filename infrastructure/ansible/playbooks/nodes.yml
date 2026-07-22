@@ -38,6 +38,12 @@
         tasks_from: kernel
       tags: [kernel]
 
+    - name: Configure node sysctl
+      ansible.builtin.import_role:
+        name: node
+        tasks_from: sysctl
+      tags: [sysctl]
+
 - name: Configure Proxmox node networking
   hosts: nodes
   serial: 1
