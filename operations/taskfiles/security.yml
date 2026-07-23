@@ -33,7 +33,7 @@ tasks:
   kubernetes:
     desc: Validate rendered Kubernetes manifests
     cmds:
-      - kustomize build platform | kubeconform -strict -summary -ignore-missing-schemas
+      - kustomize build platform/clusters/prod | kubeconform -strict -summary -ignore-missing-schemas
 
   sbom:
     desc: Generate local SBOMs with syft

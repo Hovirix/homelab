@@ -14,7 +14,7 @@ tasks:
     silent: true
     cmds:
       - flux reconcile source git flux-system
-      - flux reconcile kustomization flux-system
+      - flux reconcile kustomization platform
 
   gen-configs:
     internal: true

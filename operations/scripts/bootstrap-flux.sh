@@ -6,6 +6,6 @@ flux bootstrap github \
   --owner=hovirix \
   --repository=homelab \
   --branch=main \
-  --path=platform \
+  --path=platform/clusters/prod \
   --personal \
   --private=false
