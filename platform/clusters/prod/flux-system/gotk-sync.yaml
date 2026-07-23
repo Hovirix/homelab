@@ -16,7 +16,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m
-  path: ./platform
+  path: ./platform/clusters/prod
   prune: true
   decryption:
     provider: sops

@@ -18,8 +18,7 @@
 
   settings = {
     global.excludes = [
-      "platform/gitops/**"
-      "platform/flux-system/**"
+      "platform/clusters/prod/flux-system/**"
       "secrets/**"
     ];
     formatter.opentofu = {

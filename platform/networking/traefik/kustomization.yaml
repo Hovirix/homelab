@@ -3,11 +3,11 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - source.yaml
+  - repository.yaml
   - release.yaml
 
 configMapGenerator:
-  - name: grafana-values
+  - name: traefik-values
     namespace: flux-system
     files:
       - values.yaml

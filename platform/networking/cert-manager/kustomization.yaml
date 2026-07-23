@@ -3,11 +3,11 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - source.yaml
+  - repository.yaml
   - release.yaml
 
 configMapGenerator:
-  - name: traefik-values
+  - name: cert-manager-values
     namespace: flux-system
     files:
       - values.yaml
