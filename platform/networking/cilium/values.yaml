@@ -3,6 +3,9 @@ ipam:
 
 kubeProxyReplacement: true
 
+l2announcements:
+  enabled: true
+
 operator:
   replicas: 1
 
@@ -29,7 +32,7 @@ securityContext:
       - SYS_RESOURCE
 
 gatewayAPI:
-  enabled: true
+  enabled: false
 
 cgroup:
   autoMount:

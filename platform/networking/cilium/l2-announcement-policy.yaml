@@ -1,0 +1,9 @@
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: traefik-load-balancer
+spec:
+  loadBalancerIPs: true
+  serviceSelector:
+    matchLabels:
+      app.kubernetes.io/name: traefik

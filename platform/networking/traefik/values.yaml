@@ -39,6 +39,8 @@ ports:
 service:
   enabled: true
   type: LoadBalancer
+  spec:
+    loadBalancerIP: 10.40.0.200
 
 api:
   dashboard: false
