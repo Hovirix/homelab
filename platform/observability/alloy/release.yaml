@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: alloy
+  namespace: flux-system
+spec:
+  releaseName: alloy
+  interval: 1h
+  targetNamespace: observability
+  chart:
+    spec:
+      chart: alloy
+      version: 1.11.0
+      sourceRef:
+        kind: HelmRepository
+        name: alloy
+        namespace: flux-system
+  valuesFrom:
+    - kind: ConfigMap
+      name: alloy-values
+      valuesKey: values.yaml
