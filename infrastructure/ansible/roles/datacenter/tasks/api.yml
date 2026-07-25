@@ -24,6 +24,44 @@
   changed_when: true
   run_once: true
 
+- name: Read Proxmox API roles
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - list
+      - --output-format
+      - json
+  register: datacenter_api_roles
+  changed_when: false
+  run_once: true
+
+- name: Create OpenTofu provisioning role
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - add
+      - OpenTofuProv
+      - --privs
+      - Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit SDN.Use Sys.Audit Sys.Modify VM.Allocate VM.Audit VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.PowerMgmt
+  when: >-
+    'OpenTofuProv' not in (datacenter_api_roles.stdout | from_json | map(attribute='roleid') | list)
+  changed_when: true
+  run_once: true
+
+- name: Configure OpenTofu provisioning role privileges
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - modify
+      - OpenTofuProv
+      - --privs
+      - Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit SDN.Use Sys.Audit Sys.Modify VM.Allocate VM.Audit VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.PowerMgmt
+  changed_when: false
+  run_once: true
+
 - name: Assign VM administration permissions
   ansible.builtin.command:
     argv:
@@ -38,7 +76,21 @@
   changed_when: false
   run_once: true
 
-- name: Assign datastore administration permissions
+- name: Assign ISO datastore administration permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - /storage/local
+      - --users
+      - opentofu@pve
+      - --roles
+      - PVEDatastoreAdmin
+  changed_when: false
+  run_once: true
+
+- name: Assign VM disk datastore administration permissions
   ansible.builtin.command:
     argv:
       - pveum
@@ -52,17 +104,17 @@
   changed_when: false
   run_once: true
 
-- name: Assign node audit permissions
+- name: Assign provisioning permissions
   ansible.builtin.command:
     argv:
       - pveum
       - acl
       - modify
-      - /nodes
+      - /
       - --users
       - opentofu@pve
       - --roles
-      - PVEAuditor
+      - OpenTofuProv
   changed_when: false
   run_once: true
 
