@@ -69,28 +69,19 @@ locals {
         certSANs = local.talos_cert_sans
 
         network = {
+
           interfaces = [{
             interface = local.config.cluster.interface
-            dhcp      = false
-            addresses = [node.address]
+            dhcp      = true
 
             vip = {
               ip = local.config.cluster.vip
             }
-
-            routes = [{
-              network = "0.0.0.0/0"
-              gateway = local.config.cluster.gateway
-            }]
           }]
         }
       }
 
       cluster = {
-        proxy = {
-          mode = "iptables"
-        }
-
         apiServer = {
           certSANs = local.talos_cert_sans
         }

@@ -4,7 +4,6 @@ cluster:
   name: prod-k8s
   vip: 10.40.0.10
   interface: ens18
-  gateway: 10.40.0.1
   talos_version: v1.13.3
   kubernetes_version: v1.35.4
   bootstrap_node: cp1
