@@ -1,58 +1,38 @@
-# Kubernetes IP address management.
-# Talos provides each node's PodCIDR through Kubernetes.
 ipam:
   mode: kubernetes
 
-# IPv4-only cluster.
-ipv4:
-  enabled: true
-
-ipv6:
-  enabled: false
-
-# Direct routing between nodes instead of VXLAN/Geneve.
-routingMode: native
-
-# Install direct PodCIDR routes between nodes on the same L2 network.
-autoDirectNodeRoutes: true
-
-# Entire Kubernetes pod network.
-ipv4NativeRoutingCIDR: 10.244.0.0/16
-
-# Cilium replaces kube-proxy for ClusterIP, NodePort and LoadBalancer
-# service forwarding.
 kubeProxyReplacement: true
 
-# Talos local API server proxy.
 k8sServiceHost: localhost
 k8sServicePort: 7445
 
-# Perform IPv4 masquerading in eBPF rather than iptables.
-bpf:
-  masquerade: true
+routingMode: native
+ipv4NativeRoutingCIDR: 10.244.0.0/16
+autoDirectNodeRoutes: true
 
-# Allow Cilium to advertise LoadBalancer VIPs using ARP.
 l2announcements:
   enabled: true
 
-# Traefik is the only Gateway API controller.
-gatewayAPI:
-  enabled: false
+securityContext:
+  capabilities:
+    ciliumAgent:
+      - CHOWN
+      - KILL
+      - NET_ADMIN
+      - NET_RAW
+      - IPC_LOCK
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    cleanCiliumState:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
 
-# One replica while the cluster has only one control-plane node.
-# Increase this when additional nodes are deployed.
-operator:
-  replicas: 1
-
-# Talos already provides the cgroup v2 mount.
 cgroup:
   autoMount:
     enabled: false
   hostRoot: /sys/fs/cgroup
-
-# Keep disabled until you deliberately add Cilium flow observability.
-hubble:
-  enabled: false
-
-# Automatically restart the agent when Cilium's ConfigMap changes.
-rollOutCiliumPods: true
