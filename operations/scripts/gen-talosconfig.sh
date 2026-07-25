@@ -40,11 +40,4 @@ talosctl config endpoint "${controlplane_hosts[@]}" \
 talosctl config node "$bootstrap_hostname" \
   --talosconfig "$output_dir/talosconfig"
 
-talosctl kubeconfig "$output_dir/kubeconfig" \
-  --merge=false \
-  --force \
-  --talosconfig "$output_dir/talosconfig" \
-  --nodes "$bootstrap_hostname" \
-  --endpoints "$bootstrap_hostname"
-
-chmod 600 "$output_dir/talosconfig" "$output_dir/kubeconfig"
+chmod 600 "$output_dir/talosconfig"
