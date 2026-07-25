@@ -2,48 +2,53 @@ ingressClass:
   enabled: false
 
 providers:
+  kubernetesCRD:
+    enabled: false
+
   kubernetesIngress:
     enabled: false
+
   kubernetesGateway:
     enabled: true
 
 gateway:
-  enabled: true
   listeners:
     web:
-      port: 80
+      port: 8000
       protocol: HTTP
-      namespacePolicy: All
+      namespacePolicy:
+        from: All
+
     websecure:
-      port: 443
+      port: 8443
       protocol: HTTPS
-      namespacePolicy: All
+      namespacePolicy:
+        from: All
       mode: Terminate
       certificateRefs:
-        - kind: Secret
+        - group: ""
+          kind: Secret
           name: home-hovirix-dev-tls
           namespace: cert-manager
 
+api:
+  dashboard: false
+
+accessLog:
+  enabled: true
+  format: json
+
 ports:
   web:
-    port: 80
     http:
       redirections:
         entryPoint:
           to: websecure
           scheme: https
           permanent: true
-  websecure:
-    port: 443
 
 service:
-  enabled: true
-  type: LoadBalancer
-  spec:
-    loadBalancerIP: 10.40.0.200
-
-api:
-  dashboard: false
-
-log:
-  level: INFO
+  annotations:
+    lbipam.cilium.io/ips: 10.40.0.200
+  labels:
+    networking.hovirix.dev/address-pool: internal
