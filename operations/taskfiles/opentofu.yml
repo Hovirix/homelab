@@ -8,3 +8,51 @@ tasks:
     dir: "{{.stack_dir}}"
     cmds:
       - "{{.ROOT_DIR}}/operations/scripts/tofu.sh {{.ROOT_DIR}}/secrets/infrastructure.sops.yaml {{.CLI_ARGS}}"
+
+  infrastructure:plan:
+    desc: Plan the infrastructure cluster stacks in dependency order
+    cmds:
+      - task: tofu
+        vars:
+          stack: proxmox
+          CLI_ARGS: plan
+      - task: tofu
+        vars:
+          stack: adguardhome
+          CLI_ARGS: plan
+      - task: tofu
+        vars:
+          stack: talos
+          CLI_ARGS: plan
+
+  infrastructure:apply:
+    desc: Apply the infrastructure cluster stacks in dependency order
+    cmds:
+      - task: tofu
+        vars:
+          stack: proxmox
+          CLI_ARGS: apply
+      - task: tofu
+        vars:
+          stack: adguardhome
+          CLI_ARGS: apply
+      - task: tofu
+        vars:
+          stack: talos
+          CLI_ARGS: apply
+
+  infrastructure:destroy:
+    desc: Destroy the infrastructure cluster stacks in reverse dependency order
+    cmds:
+      - task: tofu
+        vars:
+          stack: talos
+          CLI_ARGS: destroy
+      - task: tofu
+        vars:
+          stack: adguardhome
+          CLI_ARGS: destroy
+      - task: tofu
+        vars:
+          stack: proxmox
+          CLI_ARGS: destroy
