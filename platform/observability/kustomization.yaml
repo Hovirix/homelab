@@ -3,6 +3,8 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
+  - metrics-server
+  - kube-prometheus-stack
   - alloy
   - grafana
   - loki

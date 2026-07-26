@@ -1,0 +1,17 @@
+alertmanager:
+  enabled: true
+  alertmanagerSpec:
+    retention: 24h
+    storage: {}
+
+grafana:
+  enabled: false
+  forceDeployDashboards: true
+  defaultDashboardsEnabled: true
+
+prometheus:
+  enabled: true
+  prometheusSpec:
+    retention: 24h
+    storageSpec:
+      emptyDir: {}

@@ -20,5 +20,19 @@ datasources:
         uid: loki
         access: proxy
         url: http://loki-gateway.observability.svc.cluster.local
-        isDefault: true
         editable: false
+
+      - name: Prometheus
+        type: prometheus
+        uid: prometheus
+        access: proxy
+        url: http://kube-prometheus-stack-kube-prometheus-prometheus.observability.svc.cluster.local:9090
+        editable: false
+
+sidecar:
+  dashboards:
+    enabled: true
+    searchNamespace:
+      - ALL
+    label: grafana_dashboard
+    labelValue: "1"
