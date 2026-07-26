@@ -4,10 +4,12 @@ scan:
     - .artifacts
     - .git
     - .opencode
-    - .talos
     - docs/.vitepress/cache
     - docs/.vitepress/dist
     - docs/node_modules
+  skip-files:
+    - infrastructure/opentofu/stacks/talos/talosconfig
+    - infrastructure/opentofu/stacks/talos/kubeconfig
 
 vulnerability:
   ignore-unfixed: true

@@ -1,47 +1,34 @@
 locals {
-  config        = yamldecode(file("${path.module}/config.yaml"))
-  talos_secrets = yamldecode(data.sops_file.infrastructure.raw).talos
-
-  machine_secrets = {
-    certs = {
-      etcd = {
-        cert = local.talos_secrets.machine_secrets.certs.etcd.crt
-        key  = local.talos_secrets.machine_secrets.certs.etcd.key
-      }
-      k8s = {
-        cert = local.talos_secrets.machine_secrets.certs.k8s.crt
-        key  = local.talos_secrets.machine_secrets.certs.k8s.key
-      }
-      k8s_aggregator = {
-        cert = local.talos_secrets.machine_secrets.certs.k8saggregator.crt
-        key  = local.talos_secrets.machine_secrets.certs.k8saggregator.key
-      }
-      k8s_serviceaccount = {
-        key = local.talos_secrets.machine_secrets.certs.k8sserviceaccount.key
-      }
-      os = {
-        cert = local.talos_secrets.machine_secrets.certs.os.crt
-        key  = local.talos_secrets.machine_secrets.certs.os.key
-      }
-    }
-    cluster = local.talos_secrets.machine_secrets.cluster
-    secrets = {
-      bootstrap_token             = local.talos_secrets.machine_secrets.secrets.bootstraptoken
-      secretbox_encryption_secret = local.talos_secrets.machine_secrets.secrets.secretboxencryptionsecret
-    }
-    trustdinfo = {
-      token = local.talos_secrets.machine_secrets.trustdinfo.token
-    }
+  cluster = {
+    name               = "prod-k8s"
+    domain             = "home.hovirix.dev"
+    vip                = "10.40.0.10"
+    interface          = "ens18"
+    talos_version      = "v1.13.3"
+    kubernetes_version = "v1.35.4"
+    bootstrap_node     = "cp1"
   }
 
   nodes = {
-    for key, node in local.config.nodes : key => merge(node, {
-      hostname = "${node.name}.${local.config.domain}"
+    cp1 = {
+      name    = "prod-k8s-cp-01"
+      role    = "controlplane"
+      address = "10.40.0.11/24"
+    }
+  }
+
+  cluster_hostname = "${local.cluster.name}.${local.cluster.domain}"
+  cluster_endpoint = "https://${local.cluster_hostname}:6443"
+
+  resolved_nodes = {
+    for key, node in local.nodes : key => merge(node, {
+      hostname = "${node.name}.${local.cluster.domain}"
+      ip       = split("/", node.address)[0]
     })
   }
 
   controlplane_nodes = {
-    for name, node in local.nodes : name => node
+    for key, node in local.resolved_nodes : key => node
     if node.role == "controlplane"
   }
 
@@ -50,32 +37,34 @@ locals {
   ]
 
   talos_nodes = [
-    for node in values(local.nodes) : node.hostname
+    for node in values(local.resolved_nodes) : node.hostname
   ]
 
-  bootstrap_node = local.controlplane_nodes[local.config.cluster.bootstrap_node].hostname
+  bootstrap_node = local.controlplane_nodes[
+    local.cluster.bootstrap_node
+  ]
 
-  cluster_hostname = "${local.config.cluster.name}.${local.config.domain}"
-  cluster_endpoint = "https://${local.cluster_hostname}:6443"
+  talos_api_sans = [
+    for node in values(local.controlplane_nodes) : node.hostname
+  ]
 
-  talos_cert_sans = concat(
-    [local.cluster_hostname],
-    [for node in values(local.controlplane_nodes) : node.hostname]
+  kubernetes_api_sans = concat(
+    [local.cluster_hostname, local.cluster.vip],
+    [for node in values(local.controlplane_nodes) : node.hostname],
   )
 
   controlplane_node_patches = {
-    for name, node in local.controlplane_nodes : name => yamlencode({
+    for key, node in local.controlplane_nodes : key => yamlencode({
       machine = {
-        certSANs = local.talos_cert_sans
+        certSANs = local.talos_api_sans
 
         network = {
-
           interfaces = [{
-            interface = local.config.cluster.interface
+            interface = local.cluster.interface
             dhcp      = true
 
             vip = {
-              ip = local.config.cluster.vip
+              ip = local.cluster.vip
             }
           }]
         }
@@ -83,7 +72,7 @@ locals {
 
       cluster = {
         apiServer = {
-          certSANs = local.talos_cert_sans
+          certSANs = local.kubernetes_api_sans
         }
       }
     })

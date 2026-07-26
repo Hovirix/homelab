@@ -1,11 +1,16 @@
 version: "3"
 
+vars:
+  CONFIG_DIR: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/talos"
+
+env:
+  TALOSCONFIG: "{{.CONFIG_DIR}}/talosconfig"
+  KUBECONFIG: "{{.CONFIG_DIR}}/kubeconfig"
+
 tasks:
   bootstrap:
     desc: Bootstrap the cluster
     cmds:
-      - task: talosconfig
-      - task: kubeconfig
       - task: cni
       - task: flux
       - task: sops-key
@@ -16,27 +21,6 @@ tasks:
     cmds:
       - flux reconcile source git flux-system
       - flux reconcile kustomization platform
-
-  talosconfig:
-    internal: true
-    silent: true
-    desc: Generate Talos client config
-    vars:
-      CONFIG_FILE: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/talos/config.yaml"
-      SOPS_FILE: "{{.ROOT_DIR}}/secrets/infrastructure.sops.yaml"
-      OUTPUT_DIR: "{{.ROOT_DIR}}/.talos"
-    cmds:
-      - "{{.ROOT_DIR}}/operations/scripts/gen-talosconfig.sh {{.CONFIG_FILE}} {{.SOPS_FILE}} {{.OUTPUT_DIR}}"
-
-  kubeconfig:
-    internal: true
-    silent: true
-    desc: Fetch Kubernetes kubeconfig from Talos
-    vars:
-      CONFIG_FILE: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/talos/config.yaml"
-      OUTPUT_DIR: "{{.ROOT_DIR}}/.talos"
-    cmds:
-      - "{{.ROOT_DIR}}/operations/scripts/get-kubeconfig.sh {{.CONFIG_FILE}} {{.OUTPUT_DIR}}"
 
   cni:
     internal: true

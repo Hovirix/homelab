@@ -13,7 +13,8 @@ override.tf.json
 *_override.tf.json
 talosconfig
 kubeconfig
-.talos/
+/infrastructure/opentofu/stacks/talos/talosconfig
+/infrastructure/opentofu/stacks/talos/kubeconfig
 
 # Butane / Ignition
 *.ign
