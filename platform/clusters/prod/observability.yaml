@@ -34,4 +34,4 @@ spec:
       namespace: flux-system
   sourceRef:
     kind: GitRepository
-    name: homelab
+    name: flux-system
