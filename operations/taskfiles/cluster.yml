@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  CONFIG_DIR: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/talos"
+  CONFIG_DIR: "{{.ROOT_DIR}}/.artifacts/talos/prod-k8s"
 
 env:
   TALOSCONFIG: "{{.CONFIG_DIR}}/talosconfig"

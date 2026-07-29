@@ -75,8 +75,8 @@
     ];
 
     shellHook = ''
-      export TALOSCONFIG="$PWD/infrastructure/opentofu/stacks/talos/talosconfig"
-      export KUBECONFIG="$PWD/infrastructure/opentofu/stacks/talos/kubeconfig"
+      export TALOSCONFIG="$PWD/.artifacts/talos/prod-k8s/talosconfig"
+      export KUBECONFIG="$PWD/.artifacts/talos/prod-k8s/kubeconfig"
     '';
   };
 

@@ -1,5 +1,5 @@
 resource "talos_machine_secrets" "cluster" {
-  talos_version = local.cluster.talos_version
+  talos_version = local.talos_version
 
   lifecycle {
     prevent_destroy = true
@@ -7,10 +7,10 @@ resource "talos_machine_secrets" "cluster" {
 }
 
 data "talos_client_configuration" "cluster" {
-  cluster_name         = local.cluster.name
+  cluster_name         = local.cluster_name
   client_configuration = talos_machine_secrets.cluster.client_configuration
-  endpoints            = local.talos_endpoints
-  nodes                = local.talos_nodes
+  endpoints            = [for node in values(local.nodes) : node.hostname]
+  nodes                = [for node in values(local.nodes) : node.ip]
 }
 
 resource "talos_cluster_kubeconfig" "cluster" {
@@ -19,6 +19,6 @@ resource "talos_cluster_kubeconfig" "cluster" {
   ]
 
   client_configuration = talos_machine_secrets.cluster.client_configuration
-  node                 = local.bootstrap_node.hostname
-  endpoint             = local.bootstrap_node.hostname
+  node                 = local.bootstrap_node.ip
+  endpoint             = local.bootstrap_node.ip
 }

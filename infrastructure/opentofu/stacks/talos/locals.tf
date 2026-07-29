@@ -1,80 +1,72 @@
 locals {
-  cluster = {
-    name               = "prod-k8s"
-    domain             = "home.hovirix.dev"
-    vip                = "10.40.0.10"
-    interface          = "ens18"
-    talos_version      = "v1.13.3"
-    kubernetes_version = "v1.35.4"
-    bootstrap_node     = "cp1"
-  }
+  cluster_name       = "prod-k8s"
+  cluster_domain     = "home.hovirix.dev"
+  cluster_hostname   = "${local.cluster_name}.${local.cluster_domain}"
+  cluster_endpoint   = "https://${local.cluster_hostname}:6443"
+  cluster_vip        = "10.40.0.10"
+  network_interface  = "ens18"
+  talos_version      = "v1.13.3"
+  kubernetes_version = "v1.35.4"
 
   nodes = {
     cp1 = {
-      name    = "prod-k8s-cp-01"
-      role    = "controlplane"
-      address = "10.40.0.11/24"
+      hostname = "prod-k8s-cp-01"
+      ip       = "10.40.0.11"
     }
   }
 
-  cluster_hostname = "${local.cluster.name}.${local.cluster.domain}"
-  cluster_endpoint = "https://${local.cluster_hostname}:6443"
+  bootstrap_node = local.nodes.cp1
 
-  resolved_nodes = {
-    for key, node in local.nodes : key => merge(node, {
-      hostname = "${node.name}.${local.cluster.domain}"
-      ip       = split("/", node.address)[0]
-    })
-  }
+  machine_patch = yamlencode({
+    machine = {
+      install = {
+        disk = "/dev/vda"
+      }
 
-  controlplane_nodes = {
-    for key, node in local.resolved_nodes : key => node
-    if node.role == "controlplane"
-  }
+      features = {
+        hostDNS = {
+          enabled              = true
+          forwardKubeDNSToHost = true
+        }
+      }
+    }
 
-  talos_endpoints = [
-    for node in values(local.controlplane_nodes) : node.hostname
-  ]
+    cluster = {
+      allowSchedulingOnControlPlanes = true
 
-  talos_nodes = [
-    for node in values(local.resolved_nodes) : node.hostname
-  ]
-
-  bootstrap_node = local.controlplane_nodes[
-    local.cluster.bootstrap_node
-  ]
-
-  talos_api_sans = [
-    for node in values(local.controlplane_nodes) : node.hostname
-  ]
-
-  kubernetes_api_sans = concat(
-    [local.cluster_hostname, local.cluster.vip],
-    [for node in values(local.controlplane_nodes) : node.hostname],
-  )
-
-  controlplane_node_patches = {
-    for key, node in local.controlplane_nodes : key => yamlencode({
-      machine = {
-        certSANs = local.talos_api_sans
-
-        network = {
-          interfaces = [{
-            interface = local.cluster.interface
-            dhcp      = true
-
-            vip = {
-              ip = local.cluster.vip
-            }
-          }]
+      network = {
+        cni = {
+          name = "none"
         }
       }
 
-      cluster = {
-        apiServer = {
-          certSANs = local.kubernetes_api_sans
-        }
+      proxy = {
+        disabled = true
       }
-    })
-  }
+
+      apiServer = {
+        certSANs = concat(
+          [
+            local.cluster_hostname,
+            local.cluster_vip,
+          ],
+          [for node in values(local.nodes) : node.hostname],
+          [for node in values(local.nodes) : node.ip],
+        )
+      }
+    }
+  })
+
+  dhcp_patch = yamlencode({
+    apiVersion = "v1alpha1"
+    kind       = "DHCPv4Config"
+    name       = local.network_interface
+  })
+
+  vip_patch = yamlencode({
+    apiVersion = "v1alpha1"
+    kind       = "Layer2VIPConfig"
+    name       = local.cluster_vip
+    link       = local.network_interface
+  })
 }
