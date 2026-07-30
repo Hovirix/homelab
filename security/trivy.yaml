@@ -8,8 +8,8 @@ scan:
     - docs/.vitepress/dist
     - docs/node_modules
   skip-files:
-    - infrastructure/opentofu/stacks/talos/talosconfig
-    - infrastructure/opentofu/stacks/talos/kubeconfig
+    - infrastructure/opentofu/stacks/clusters/prod-k8s/talosconfig
+    - infrastructure/opentofu/stacks/clusters/prod-k8s/kubeconfig
 
 vulnerability:
   ignore-unfixed: true

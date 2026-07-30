@@ -1,27 +1,41 @@
 locals {
   cluster_name       = "prod-k8s"
-  cluster_domain     = "home.hovirix.dev"
-  cluster_hostname   = "${local.cluster_name}.${local.cluster_domain}"
+  domain             = "home.hovirix.dev"
+  cluster_hostname   = "${local.cluster_name}.${local.domain}"
   cluster_endpoint   = "https://${local.cluster_hostname}:6443"
   cluster_vip        = "10.40.0.10"
   network_interface  = "ens18"
   talos_version      = "v1.13.3"
   kubernetes_version = "v1.35.4"
 
-  nodes = {
-    cp1 = {
-      hostname = "prod-k8s-cp-01"
-      ip       = "10.40.0.11"
-    }
-  }
+  active_nodes        = { for name, node in local.nodes : name => node if node.enabled }
+  controlplane_nodes  = { for name, node in local.active_nodes : name => node if node.machine_type == "controlplane" }
+  controlplane        = local.controlplane_nodes["cp1"]
+  bootstrap_node      = local.controlplane
+  talos_api_endpoints = [for node in values(local.controlplane_nodes) : node.fqdn]
 
-  bootstrap_node = local.nodes.cp1
+  cluster_dns_records = merge(
+    {
+      (local.cluster_name) = {
+        domain = local.cluster_hostname
+        answer = local.cluster_vip
+      }
+    },
+    {
+      for _, node in local.nodes : node.hostname => {
+        domain = node.fqdn
+        answer = node.ip
+      }
+    },
+  )
 
   machine_patch = yamlencode({
     machine = {
       install = {
         disk = "/dev/vda"
       }
+
+      certSANs = [for node in values(local.controlplane_nodes) : node.fqdn]
 
       features = {
         hostDNS = {
@@ -45,14 +59,10 @@ locals {
       }
 
       apiServer = {
-        certSANs = concat(
-          [
-            local.cluster_hostname,
-            local.cluster_vip,
-          ],
-          [for node in values(local.nodes) : node.hostname],
-          [for node in values(local.nodes) : node.ip],
-        )
+        certSANs = [
+          local.cluster_hostname,
+          local.cluster_vip,
+        ]
       }
     }
   })

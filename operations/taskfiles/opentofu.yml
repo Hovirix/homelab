@@ -14,15 +14,11 @@ tasks:
     cmds:
       - task: tofu
         vars:
-          stack: proxmox
-          CLI_ARGS: plan
-      - task: tofu
-        vars:
           stack: adguardhome
           CLI_ARGS: plan
       - task: tofu
         vars:
-          stack: talos
+          stack: clusters/prod-k8s
           CLI_ARGS: plan
 
   infrastructure:apply:
@@ -30,15 +26,11 @@ tasks:
     cmds:
       - task: tofu
         vars:
-          stack: proxmox
-          CLI_ARGS: apply
-      - task: tofu
-        vars:
           stack: adguardhome
           CLI_ARGS: apply
       - task: tofu
         vars:
-          stack: talos
+          stack: clusters/prod-k8s
           CLI_ARGS: apply
 
   infrastructure:destroy:
@@ -46,13 +38,9 @@ tasks:
     cmds:
       - task: tofu
         vars:
-          stack: talos
+          stack: clusters/prod-k8s
           CLI_ARGS: destroy
       - task: tofu
         vars:
           stack: adguardhome
-          CLI_ARGS: destroy
-      - task: tofu
-        vars:
-          stack: proxmox
           CLI_ARGS: destroy

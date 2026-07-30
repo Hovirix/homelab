@@ -8,7 +8,7 @@ resource "proxmox_download_file" "talos_nocloud" {
 }
 
 resource "proxmox_virtual_environment_vm" "controlplane" {
-  name        = local.controlplane.name
+  name        = local.controlplane.hostname
   node_name   = local.controlplane.proxmox_node
   vm_id       = local.controlplane.vm_id
   description = "Managed by OpenTofu"

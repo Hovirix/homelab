@@ -6,7 +6,7 @@ variable "opentofu_state_encryption_passphrase" {
 terraform {
   backend "s3" {
     bucket = "tf-state"
-    key    = "prod/proxmox/terraform.tfstate"
+    key    = "prod/clusters/prod-k8s/terraform.tfstate"
     region = "auto"
 
     endpoints = {
@@ -14,6 +14,7 @@ terraform {
     }
 
     use_path_style              = true
+    use_lockfile                = true
     skip_credentials_validation = true
     skip_region_validation      = true
     skip_requesting_account_id  = true

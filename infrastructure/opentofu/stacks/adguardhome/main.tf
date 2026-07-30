@@ -20,26 +20,6 @@ locals {
       answer = "10.30.0.106"
     }
 
-    prod-k8s-cp-01 = {
-      domain = "prod-k8s-cp-01.home.hovirix.dev"
-      answer = "10.40.0.11"
-    }
-
-    prod-k8s-cp-02 = {
-      domain = "prod-k8s-cp-02.home.hovirix.dev"
-      answer = "10.40.0.12"
-    }
-
-    prod-k8s-cp-03 = {
-      domain = "prod-k8s-cp-03.home.hovirix.dev"
-      answer = "10.40.0.13"
-    }
-
-    prod-k8s = {
-      domain = "prod-k8s.home.hovirix.dev"
-      answer = "10.40.0.10"
-    }
-
     grafana = {
       domain = "grafana.home.hovirix.dev"
       answer = "10.40.0.200"
