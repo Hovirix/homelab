@@ -3,7 +3,7 @@ resource "proxmox_download_file" "talos_nocloud" {
   datastore_id        = "local"
   file_name           = "talos-nocloud-amd64.iso"
   node_name           = local.controlplane.proxmox_node
-  url                 = "https://factory.talos.dev/image/ce4c980550dd2ab1b17bbf2b08801c7eb59418eafe8f279833297925d67c7515/v1.13.3/nocloud-amd64.iso"
+  url                 = "https://factory.talos.dev/image/${talos_image_factory_schematic.this.id}/${local.talos_version}/nocloud-amd64.iso"
   overwrite_unmanaged = true
 }
 

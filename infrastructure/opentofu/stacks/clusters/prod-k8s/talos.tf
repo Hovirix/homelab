@@ -1,3 +1,15 @@
+resource "talos_image_factory_schematic" "this" {
+  schematic = yamlencode({
+    customization = {
+      systemExtensions = {
+        officialExtensions = [
+          "siderolabs/qemu-guest-agent",
+        ]
+      }
+    }
+  })
+}
+
 resource "talos_machine_secrets" "cluster" {
   talos_version = local.talos_version
 
