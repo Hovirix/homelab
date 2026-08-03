@@ -1,8 +1,6 @@
 exclude:
   - ./.artifacts
   - ./.opencode
-  - ./infrastructure/opentofu/stacks/clusters/prod-k8s/talosconfig
-  - ./infrastructure/opentofu/stacks/clusters/prod-k8s/kubeconfig
   - ./docs/.vitepress/cache
   - ./docs/.vitepress/dist
   - ./docs/node_modules

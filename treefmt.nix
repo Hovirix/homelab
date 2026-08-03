@@ -18,7 +18,6 @@
 
   settings = {
     global.excludes = [
-      "platform/clusters/prod/flux-system/**"
       "secrets/**"
     ];
     formatter.opentofu = {

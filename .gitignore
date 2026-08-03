@@ -11,10 +11,6 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
-talosconfig
-kubeconfig
-/infrastructure/opentofu/stacks/clusters/prod-k8s/talosconfig
-/infrastructure/opentofu/stacks/clusters/prod-k8s/kubeconfig
 
 # Butane / Ignition
 *.ign

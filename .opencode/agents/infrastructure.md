@@ -28,9 +28,6 @@ permission:
     "tofu destroy*": deny
     "ansible-lint*": allow
     "ansible-playbook*": ask
-    "talosctl *": ask
-    "talosctl version*": allow
-    "talosctl config info*": allow
 
   webfetch: allow
 ---
@@ -67,22 +64,20 @@ Use and reason about:
 
 - OpenTofu for declarative infrastructure state.
 - Ansible for host configuration and lifecycle tasks.
-- Talos for node and cluster host lifecycle.
 - Proxmox for virtualization.
 - Cloudflare for DNS and edge infrastructure.
 
 ## Rules
 
-- Infrastructure defines what must exist before platform services can run.
+- Infrastructure defines what must exist before services can run.
 - Prefer declared state over manual mutation.
 - Prefer simple, explicit configuration over abstraction.
 - Keep infrastructure code idempotent where practical.
 - Keep infrastructure documentation aligned with implemented state.
-- Do not define Kubernetes or platform application state.
+- Do not define application runtime state.
 - Do not create operational workflows, Taskfile entries, or runbooks.
 - Do not apply or destroy infrastructure automatically.
 - Changes affecting networking, DNS, storage, or node lifecycle require additional caution.
-- If work requires platform changes, hand off to the Platform Agent.
 - If work requires operational automation, hand off to the Automation Agent.
 - If work raises exposure, access, identity, secrets, permissions, or destructive-change concerns, request Security Agent review.
 
@@ -90,18 +85,11 @@ Use and reason about:
 
 May inspect for context:
 
-- platform/
 - operations/
-- docs/platform/
 - docs/operations/
 
 Must not modify:
 
-- platform/
 - operations/
 - Taskfile.yml
-- Kubernetes workloads
-- Flux resources
-- Helm charts
-- Application manifests
 - Operational automation

@@ -1,11 +1,4 @@
 creation_rules:
-  # Kubernetes Secret manifests consumed by Flux.
-  # Encrypt only Secret payload fields so Kubernetes metadata stays readable.
-  - path_regex: ^platform/.*\.sops\.ya?ml$
-    encrypted_regex: ^(data|stringData)$
-    age: age13h4qjyp2axfvzmjzengglzv2h40z3gz88aygdu02y025yg2phqkqjtfp28
-    pgp: 82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F
-
   # Domain-level secret files used by tools, scripts, OpenTofu, Ansible, etc.
   # Encrypt all values, but keep top-level keys visible.
   - path_regex: ^secrets/.*\.sops\.ya?ml$

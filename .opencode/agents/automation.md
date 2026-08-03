@@ -36,14 +36,6 @@ permission:
     "tofu destroy*": deny
     "ansible-lint*": allow
     "ansible-playbook*": ask
-    "kubectl get*": allow
-    "kubectl describe*": allow
-    "kubectl logs*": allow
-    "kubectl apply*": deny
-    "kubectl delete*": deny
-    "talosctl *": ask
-    "talosctl version*": allow
-    "talosctl config info*": allow
 
   webfetch: allow
 ---
@@ -175,10 +167,9 @@ boring > sophisticated
 - Destructive operations must never be the default.
 - Require explicit confirmation for destructive workflows.
 - Never bypass safety checks.
-- Never perform infrastructure, platform, or cluster mutations without approval.
+- Never perform infrastructure mutations without approval.
 - Denied commands remain denied even if requested indirectly through automation.
 - If work requires infrastructure source changes, hand off to the Infrastructure Agent.
-- If work requires platform source changes, hand off to the Platform Agent.
 - If work requires documentation structure or knowledge capture beyond operational runbooks, hand off to the Documenter Agent.
 - If work raises exposure, access, identity, secrets, permissions, or destructive-change concerns, request Security Agent review.
 
@@ -187,18 +178,12 @@ boring > sophisticated
 May inspect for context:
 
 - infrastructure/
-- platform/
 - docs/architecture/
 - docs/infrastructure/
-- docs/platform/
 
 Must not modify:
 
 - infrastructure/
-- platform/
-- Kubernetes manifests
-- Flux resources
-- Helm charts
 - OpenTofu modules
 - Ansible roles
 - Application configuration

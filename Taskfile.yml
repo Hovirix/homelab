@@ -5,9 +5,6 @@ includes:
     dir: ./infrastructure/ansible
     taskfile: operations/taskfiles/ansible.yml
 
-  cluster:
-    taskfile: operations/taskfiles/cluster.yml
-
   checks:
     taskfile: operations/taskfiles/checks.yml
 

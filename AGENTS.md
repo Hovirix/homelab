@@ -2,7 +2,7 @@
 
 HX Lab is a personal self-hosted DevSecOps platform.
 
-This repository is the source of truth for infrastructure, platform, operations, and documentation.
+This repository is the source of truth for infrastructure, operations, and documentation.
 
 Keep changes simple, boring, readable, reviewable, and recoverable.
 
@@ -15,12 +15,6 @@ The repository is divided into three domains.
 Infrastructure defines the state required before the platform can run.
 
 Route infrastructure state, provisioning, networking, compute, storage, and node lifecycle work to the **Infrastructure Agent**.
-
-### Platform
-
-Platform defines Kubernetes and platform services running on top of infrastructure.
-
-Route platform state, cluster services, application delivery, and Kubernetes configuration work to the **Platform Agent**.
 
 ### Operations
 
@@ -44,8 +38,6 @@ Route security, exposure, access, secrets, identity, permissions, and safety rev
 
 Infrastructure defines infrastructure state.
 
-Platform defines platform state.
-
 Operations defines operational workflows.
 
 Documentation explains the system.
@@ -53,6 +45,12 @@ Documentation explains the system.
 Security reviews risk.
 
 If work crosses domains, keep changes separated and hand off to the correct agent.
+
+## Platform Migration
+
+The previous Talos, Kubernetes, and FluxCD implementation has been archived in the separate `kubelab` repository.
+
+The active application platform is being redesigned around Docker Swarm. Docker Swarm implementation is not yet part of this repository.
 
 ## Principles
 
@@ -100,7 +98,6 @@ Examples:
 
 ```plaintext
 infrastructure:*
-platform:*
 operations:*
 docs:*
 ```
@@ -116,8 +113,7 @@ Commit format:
 Examples:
 
 ```plaintext
-feat(infrastructure): add opentofu talos module
-fix(platform): correct ingress for monitoring
+feat(infrastructure): add opentofu stack
 chore(operations): update health check task
 docs(operations): document backup restore workflow
 ```

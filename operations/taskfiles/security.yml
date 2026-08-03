@@ -21,19 +21,11 @@ tasks:
     cmds:
       - trivy sbom --scanners vuln "{{.SBOM_DIR}}/infrastructure.cdx.json"
       - trivy sbom --scanners vuln "{{.SBOM_DIR}}/operations.cdx.json"
-      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/platform.cdx.json"
-      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/docs.cdx.json"
 
   iac:
-    desc: Scan infrastructure and platform configuration
+    desc: Scan infrastructure configuration
     cmds:
       - trivy config infrastructure
-      - trivy config platform
-
-  kubernetes:
-    desc: Validate rendered Kubernetes manifests
-    cmds:
-      - kustomize build platform/clusters/prod | kubeconform -strict -summary -ignore-missing-schemas
 
   sbom:
     desc: Generate local SBOMs with syft
@@ -41,8 +33,6 @@ tasks:
       - mkdir -p "{{.SBOM_DIR}}"
       - syft dir:infrastructure -o cyclonedx-json="{{.SBOM_DIR}}/infrastructure.cdx.json"
       - syft dir:operations -o cyclonedx-json="{{.SBOM_DIR}}/operations.cdx.json"
-      - syft dir:platform -o cyclonedx-json="{{.SBOM_DIR}}/platform.cdx.json"
-      - syft dir:docs -o cyclonedx-json="{{.SBOM_DIR}}/docs.cdx.json"
 
   all:
     desc: Run all local security checks
@@ -50,4 +40,3 @@ tasks:
       - task: secrets
       - task: vuln
       - task: iac
-      - task: kubernetes
