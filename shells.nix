@@ -12,8 +12,6 @@
       # Security validation
       ansible
       ansible-lint
-      kubeconform
-      kustomize
       shellcheck
       tflint
 
@@ -36,15 +34,6 @@
       shellcheck
       tflint
 
-      # Kubernetes & GitOps
-      fluxcd
-      helmfile
-      k9s
-      kubectl
-      kustomize
-      kubernetes-helm
-      talosctl
-
       # Secrets
       openssl
       sops
@@ -58,7 +47,6 @@
       pre-commit
 
       # Validation & Linting
-      kubeconform
       shfmt
       yamllint
 
@@ -68,16 +56,10 @@
 
       # Language Servers
       bash-language-server
-      helm-ls
       nil
       tofu-ls
       yaml-language-server
     ];
-
-    shellHook = ''
-      export TALOSCONFIG="$PWD/.artifacts/talos/prod-k8s/talosconfig"
-      export KUBECONFIG="$PWD/.artifacts/talos/prod-k8s/kubeconfig"
-    '';
   };
 
   docs = pkgs.mkShell {

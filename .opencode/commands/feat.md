@@ -27,20 +27,16 @@ Requirements:
    boundaries.
 8. Run the repository's relevant deterministic validation entrypoints.
 9. Inspect the complete final diff and preserve unrelated user changes.
-10. Do not commit, push, merge, reconcile, or mutate live cluster state.
+10. Do not commit, push, merge, apply infrastructure, or mutate live production state.
 
 Do not run:
 
 ```text
 git commit
 git push
-task cluster:reconcile
-flux reconcile
-kubectl apply
-kubectl create
-kubectl edit
-kubectl delete
-helm upgrade
+tofu apply
+tofu destroy
+ansible-playbook --limit production
 ```
 
 End with the implementation report defined by the skill and exactly one verdict:

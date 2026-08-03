@@ -26,7 +26,7 @@ Requirements:
    - functional correctness;
    - repository and domain consistency;
    - scope control;
-   - GitOps integrity;
+   - operational safety;
    - secret safety;
    - exposure, identity, RBAC, permissions, and trust boundaries;
    - dependency ordering;
@@ -44,7 +44,7 @@ git diff --check
 git diff
 ```
 
-8. Do not modify files, implement fixes, commit, push, merge, reconcile, or mutate live cluster state.
+8. Do not modify files, implement fixes, commit, push, merge, apply infrastructure, or mutate live production state.
 9. Do not accept implementation-agent claims without verifying them from repository evidence or command output.
 10. Do not report live completion before reconciliation and functional verification.
 
@@ -53,13 +53,9 @@ Do not run:
 ```text
 git commit
 git push
-task cluster:reconcile
-flux reconcile
-kubectl apply
-kubectl create
-kubectl edit
-kubectl delete
-helm upgrade
+tofu apply
+tofu destroy
+ansible-playbook --limit production
 ```
 
 Report findings first, ordered by severity:
