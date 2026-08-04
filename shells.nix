@@ -12,12 +12,12 @@
       # Security validation
       ansible
       ansible-lint
+      butane
       shellcheck
       tflint
 
       # Utilities used by task entrypoints
       jq
-      yq-go
     ];
   };
 
@@ -30,6 +30,7 @@
       # Infrastructure
       ansible
       ansible-lint
+      butane
       opentofu
       shellcheck
       tflint
@@ -52,7 +53,6 @@
 
       # General Utilities
       jq
-      yq-go
 
       # Language Servers
       bash-language-server

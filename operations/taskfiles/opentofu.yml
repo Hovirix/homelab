@@ -1,6 +1,11 @@
 version: "3"
 
 tasks:
+  infrastructure:fcos:render:
+    desc: Render Fedora CoreOS Ignition files outside OpenTofu
+    cmds:
+      - mkdir -p "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/build"
+      - butane --strict "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu" > "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/build/fcos.ign"
   tofu:
     desc: Run any OpenTofu command for a stack
     vars:
@@ -12,6 +17,11 @@ tasks:
   infrastructure:plan:
     desc: Plan infrastructure stacks in dependency order
     cmds:
+      - task: infrastructure:fcos:render
+      - task: tofu
+        vars:
+          stack: proxmox
+          CLI_ARGS: plan
       - task: tofu
         vars:
           stack: adguardhome
@@ -28,6 +38,11 @@ tasks:
   infrastructure:apply:
     desc: Apply infrastructure stacks in dependency order
     cmds:
+      - task: infrastructure:fcos:render
+      - task: tofu
+        vars:
+          stack: proxmox
+          CLI_ARGS: apply
       - task: tofu
         vars:
           stack: adguardhome
@@ -55,4 +70,8 @@ tasks:
       - task: tofu
         vars:
           stack: adguardhome
+          CLI_ARGS: destroy
+      - task: tofu
+        vars:
+          stack: proxmox
           CLI_ARGS: destroy

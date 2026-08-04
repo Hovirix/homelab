@@ -1,0 +1,24 @@
+network:
+  vlan_id: 40
+
+hosts:
+  prod-fcos-apps:
+    vm_id: 203
+    mac: "02:40:00:00:01:03"
+    cpu_cores: 2
+    memory_mb: 4096
+    boot_disk_gb: 64
+
+  prod-fcos-data:
+    vm_id: 201
+    mac: "02:40:00:00:01:04"
+    cpu_cores: 2
+    memory_mb: 4096
+    boot_disk_gb: 64
+
+  prod-fcos-obs:
+    vm_id: 202
+    mac: "02:40:00:00:01:05"
+    cpu_cores: 2
+    memory_mb: 4096
+    boot_disk_gb: 64

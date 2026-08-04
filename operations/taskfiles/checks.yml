@@ -47,4 +47,4 @@ tasks:
     desc: Lint OpenTofu stacks
     dir: infrastructure/opentofu/stacks
     cmds:
-      - for stack in adguardhome authentik cloudflare; do tflint --chdir="$stack"; done
+      - for stack in adguardhome authentik cloudflare proxmox; do tflint --chdir="$stack"; done
