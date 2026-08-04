@@ -24,6 +24,31 @@ locals {
       domain = "grafana.home.hovirix.dev"
       answer = "10.40.0.200"
     }
+
+    "prod-ingress-01" = {
+      domain = "prod-ingress-01.home.hovirix.dev"
+      answer = "10.40.0.101"
+    }
+
+    "prod-idp-01" = {
+      domain = "prod-idp-01.home.hovirix.dev"
+      answer = "10.40.0.102"
+    }
+
+    "prod-apps-01" = {
+      domain = "prod-apps-01.home.hovirix.dev"
+      answer = "10.40.0.103"
+    }
+
+    "prod-data-01" = {
+      domain = "prod-data-01.home.hovirix.dev"
+      answer = "10.40.0.104"
+    }
+
+    "prod-obs-01" = {
+      domain = "prod-obs-01.home.hovirix.dev"
+      answer = "10.40.0.105"
+    }
   }
 }
 
