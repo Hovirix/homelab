@@ -36,7 +36,7 @@ jobs:
             security-${{ runner.os }}-
 
       - name: Run security checks
-        run: nix develop .#ci --command task security:all
+        run: nix develop .#ci --command task security
 
       - name: Upload SBOM artifacts
         if: always()
