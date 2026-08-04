@@ -1,0 +1,14 @@
+version: "3"
+
+tasks:
+  preview:
+    desc: Preview machine configuration changes
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - ansible-playbook playbooks/site.yml --check --diff
+
+  apply:
+    desc: Apply machine configuration changes
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - ansible-playbook playbooks/site.yml

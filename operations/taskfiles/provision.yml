@@ -1,0 +1,47 @@
+version: "3"
+
+tasks:
+  plan:
+    desc: Preview infrastructure provisioning changes
+    cmds:
+      - task: fcos-render
+      - for: [proxmox, adguardhome, cloudflare, authentik]
+        task: stack
+        vars:
+          STACK: "{{.ITEM}}"
+          ARGS: plan
+
+  apply:
+    desc: Apply infrastructure provisioning changes
+    deps: [fcos-render]
+    cmds:
+      - for: [proxmox, adguardhome, cloudflare, authentik]
+        task: stack
+        vars:
+          STACK: "{{.ITEM}}"
+          ARGS: apply
+
+  destroy:
+    desc: Destroy provisioned infrastructure
+    cmds:
+      - for: [authentik, cloudflare, adguardhome, proxmox]
+        task: stack
+        vars:
+          STACK: "{{.ITEM}}"
+          ARGS: destroy
+
+  fcos-render:
+    internal: true
+    cmds:
+      - mkdir -p "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/build"
+      - butane --strict "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu" > "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/build/fcos.ign"
+
+  stack:
+    internal: true
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/{{.STACK}}"
+    requires:
+      vars:
+        - STACK
+        - ARGS
+    cmds:
+      - "{{.ROOT_DIR}}/operations/scripts/tofu.sh {{.ROOT_DIR}}/secrets/infrastructure.sops.yaml {{.ARGS}}"

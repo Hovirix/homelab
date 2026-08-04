@@ -1,19 +1,23 @@
 version: "3"
 
-includes:
-  ansible:
-    dir: ./infrastructure/ansible
-    taskfile: operations/taskfiles/ansible.yml
+silent: true
 
-  checks:
-    taskfile: operations/taskfiles/checks.yml
+includes:
+  lint:
+    flatten: true
+    taskfile: operations/taskfiles/lint.yml
+
+  configure:
+    taskfile: operations/taskfiles/configure.yml
 
   security:
     taskfile: operations/taskfiles/security.yml
 
-  tofu:
-    flatten: true
-    taskfile: operations/taskfiles/opentofu.yml
+  provision:
+    taskfile: operations/taskfiles/provision.yml
 
-  update:
-    taskfile: operations/taskfiles/update.yml
+tasks:
+  security:
+    desc: Run all local security checks
+    cmds:
+      - task: security:check

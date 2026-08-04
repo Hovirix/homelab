@@ -1,0 +1,39 @@
+version: "3"
+
+tasks:
+  lint:
+    desc: Run all local lint checks
+    cmds:
+      - task: nix
+      - task: shellcheck
+      - task: ansible-lint
+      - task: ansible-playbook
+      - task: tflint
+
+  nix:
+    desc: Validate Nix flake
+    cmds:
+      - nix flake check
+
+  shellcheck:
+    desc: Lint shell scripts
+    cmds:
+      - shellcheck operations/scripts/*.sh
+
+  ansible-lint:
+    desc: Lint Ansible code
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - ansible-lint
+
+  ansible-playbook:
+    desc: Syntax check Ansible playbooks
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - for playbook in playbooks/*.yml; do ansible-playbook "$playbook" --syntax-check; done
+
+  tflint:
+    desc: Lint OpenTofu configuration
+    cmds:
+      - for: [proxmox, adguardhome, cloudflare, authentik]
+        cmd: tflint --chdir "infrastructure/opentofu/stacks/{{.ITEM}}"
