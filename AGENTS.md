@@ -1,179 +1,61 @@
-## Repository
+# HX Lab
 
-HX Lab is a personal self-hosted DevSecOps platform.
+HX Lab is a personal homelab managed as code. Repository code is desired state; runtime command output is observed state and is evidence only for the command that produced it.
 
-This repository is the source of truth for infrastructure, operations, and documentation.
+## Active Architecture
 
-Keep changes simple, boring, readable, reviewable, and recoverable.
-
-## Work Routing
-
-The repository is divided into three domains.
-
-### Infrastructure
-
-Infrastructure defines the state required before the platform can run.
-
-Route infrastructure state, provisioning, networking, compute, storage, and node lifecycle work to the **Infrastructure Agent**.
-
-### Operations
-
-Operations defines how the lab is run.
-
-Route automation, checks, maintenance, backup, restore, troubleshooting, runbooks, and human entrypoints to the **Automation Agent**.
-
-### Tools
-
-Tools defines repository-level developer tooling and validation.
-
-Route root flake wiring, dev shells, formatters, linters, checks, and helper script plumbing to the **Automation Agent**.
-
-### Security
-
-Security is a review function.
-
-Route security, exposure, access, secrets, identity, permissions, and safety review to the **Security Agent**.
-
-## Boundary Model
-
-Infrastructure defines infrastructure state.
-
-Operations defines operational workflows.
-
-Documentation explains the system.
-
-Security reviews risk.
-
-If work crosses domains, keep changes separated and hand off to the correct agent.
-
-## Platform Migration
-
-The previous Talos, Kubernetes, and FluxCD implementation has been archived in the separate `kubelab` repository.
-
-The active application platform is being redesigned around Docker Swarm. Docker Swarm implementation is not yet part of this repository.
-
-## Principles
-
-- Git is the source of truth.
-- Configuration is declared as code.
-- Secrets are encrypted.
-- Changes are small and reviewable.
-- Prefer explicit state over implicit behavior.
-- Prefer readable code over clever code.
-- Prefer local reproducibility.
-- Prefer safe defaults.
-- Prefer documentation close to the thing it explains.
-
-## Code Style
-
-Code should be boring.
-
-Prefer:
-
-- Small files
-- Clear names
-- Explicit inputs
-- Explicit outputs
-- Minimal abstraction
-- Comments only for non-obvious decisions
-
-Avoid:
-
-- Clever abstractions
-- Hidden side effects
-- Large inline logic
-- Broad generic helpers without a real need
-- Duplicated configuration
-- Undocumented behavior
-
-## Naming
-
-- Use lowercase names where practical.
-- Use hyphens for human-facing names and documentation paths.
-- Use underscores where the tool ecosystem expects them.
-- Use clear domain prefixes for commands and workflows.
-- Use lowercase Taskfile variables.
-
-Examples:
-
-```plaintext
-infrastructure:*
-operations:*
-docs:*
+```text
+Internet
+  |
+Cloudflare
+  |
+Cloudflared and ingress
+  |
+Docker Swarm services
+  |
+Docker Engine
+  |
+Fedora CoreOS virtual machines
+  |
+Proxmox VE
+  |
+Physical compute and storage
 ```
 
-## Commits
-
-Commit format:
-
-```plaintext
-<type>(<domain>): <change>
+```text
+Clients
+  |
+OpenWrt
+  |
+VLAN routing, DHCP, AdGuard Home DNS and WireGuard
+  |
+Proxmox and internal services
 ```
 
-Examples:
+The physical environment includes one Minisforum UM790 Pro systems running Proxmox VE, a separately managed GL.iNet Flint 2 running OpenWrt, and a separate TrueNAS system used primarily as the backup destination. Internal services use `*.home.hovirix.dev`.
 
-```plaintext
-feat(infrastructure): add opentofu stack
-chore(operations): update health check task
-docs(operations): document backup restore workflow
-```
+The active software direction is Proxmox VE, Fedora CoreOS, Docker Engine, Docker Swarm, OpenTofu, Ansible for Proxmox hosts only, Butane and Ignition for Fedora CoreOS provisioning, Taskfile, SOPS, Cloudflare, Cloudflared, and TrueNAS backups.
 
-- Commit subjects are lowercase, concise, imperative, and do not end with a period.
-- Unrelated changes should be separate commits.
+## Repository Domains
 
-Examples for repo tooling:
+Infrastructure is rooted at `infrastructure/`. It contains Proxmox Ansible configuration under `infrastructure/ansible/`, OpenTofu modules under `infrastructure/opentofu/modules/`, and OpenTofu stacks under `infrastructure/opentofu/stacks/`.
 
-```plaintext
-chore(tools): add flake checks
-chore(tools): refactor dev shells
-```
+Current Ansible paths are `infrastructure/ansible/ansible.cfg`, `infrastructure/ansible/inventory.yml`, `infrastructure/ansible/requirements.yml`, `infrastructure/ansible/playbooks/datacenter.yml`, `infrastructure/ansible/playbooks/hosts.yml`, `infrastructure/ansible/playbooks/pve.yml`, `infrastructure/ansible/playbooks/site.yml`, `infrastructure/ansible/roles/datacenter/`, `infrastructure/ansible/roles/host/`, and `infrastructure/ansible/roles/pve/`.
 
-## Pull Requests
+Current OpenTofu module paths are `infrastructure/opentofu/modules/authentik/oauth2_application/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access_application/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access_identity_provider/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access_policy/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_exposed_application/`, and `infrastructure/opentofu/modules/cloudflare/zero_trust_tunnel_cloudflared/`.
 
-PR title format:
+Current OpenTofu stack paths are `infrastructure/opentofu/stacks/adguardhome/`, `infrastructure/opentofu/stacks/authentik/`, `infrastructure/opentofu/stacks/cloudflare/`, and `infrastructure/opentofu/stacks/proxmox/`. Fedora CoreOS Butane source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; node input data is `infrastructure/opentofu/stacks/proxmox/fcos/nodes.yaml`; Ignition output under `infrastructure/opentofu/stacks/proxmox/build/` is generated provisioning data.
 
-```plaintext
-<domain>: <summary>
-```
+`platform/` is the intended domain for Docker Swarm runtime definitions, but no tracked platform desired-state files are implemented yet.
 
-Preferred PR body:
+Operations is rooted at `Taskfile.yml` and `operations/`. Current operation paths are `operations/taskfiles/configure.yml`, `operations/taskfiles/lint.yml`, `operations/taskfiles/provision.yml`, `operations/taskfiles/security.yml`, `operations/taskfiles/swarm.yml`, `operations/scripts/swarm-init.sh`, `operations/scripts/tofu.sh`, `.github/workflows/checks.yml`, `.github/workflows/security.yml`, and `.pre-commit-config.yaml`.
 
-```md
-## Summary
+Security tooling is rooted at `security/` with `security/syft.yaml` and `security/trivy.yaml`. Encrypted secret material is rooted at `secrets/` with `secrets/identity.sops.yaml` and `secrets/infrastructure.sops.yaml`; repository SOPS policy is `.sops.yaml`.
 
-- What changed
-- Why it changed
+OpenCode project context is rooted at `.opencode/opencode.jsonc` and `.opencode/`. Agents live in `.opencode/agents/`, reusable skills live in `.opencode/skills/`, and user commands live in `.opencode/commands/`.
 
-## Risk
+## Domain Relationships
 
-- Low / Medium / High
-- Rollback or recovery notes if relevant
-```
+Infrastructure creates the substrate required before platform services can run. Platform consumes infrastructure and defines desired Docker Swarm runtime state. Operations provides controlled local and CI entrypoints around desired state. Security reviews exposure, privilege, identity, secrets, state confidentiality, and destructive-operation risk across all domains. Secrets are inputs to infrastructure, platform, or operational workflows; they are not an implementation domain by themselves.
 
-- PRs should be scoped and reviewable.
-- Documentation-only PRs should say so explicitly.
-- Safety-sensitive PRs should request Security Agent review.
-
-## Issues
-
-Issues should be actionable.
-
-Prefer including:
-
-- Problem or goal
-- Affected domain
-- Relevant paths
-- Expected outcome
-- Risk or safety notes when relevant
-
-## Safety
-
-For security, exposure, access, secrets, identity, permissions, or destructive workflow concerns, route review to the **Security Agent**.
-
-High-risk changes should be explicit, documented, and reviewed before execution.
-
-## Final Principle
-
-Optimize for the future maintainer who has not touched the lab in three months.
-
-The best change is obvious, safe, boring, documented where needed, and easy to recover from.
+There is no documentation domain in this repository. Do not introduce `docs/`, runbooks, ADRs, architecture reports, operational guides, generated documentation, a Documentation Agent, or documentation-specific commands.

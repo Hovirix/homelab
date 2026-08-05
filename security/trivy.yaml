@@ -4,9 +4,6 @@ scan:
     - .artifacts
     - .git
     - .opencode
-    - docs/.vitepress/cache
-    - docs/.vitepress/dist
-    - docs/node_modules
 
 vulnerability:
   ignore-unfixed: true

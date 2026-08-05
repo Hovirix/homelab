@@ -1,17 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
-  "permission": {
+  "share": "disabled",
 
-    "edit": {
-      "*": "allow",
-      "secrets/**": "deny",
-    },
-
-    "bash": {
-      "age *": "deny",
-      "ssh *": "deny",
-      "sops *": "deny",
-    },
+  "mcp": {
+    "docker-docs": {
+      "type": "remote",
+      "url": "https://mcp-docs.docker.com/mcp",
+      "enabled": true
+    }
   }
 }
