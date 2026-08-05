@@ -25,29 +25,19 @@ locals {
       answer = "10.40.0.200"
     }
 
-    "prod-ingress-01" = {
-      domain = "prod-ingress-01.home.hovirix.dev"
+    "swarm-01" = {
+      domain = "swarm-01.home.hovirix.dev"
       answer = "10.40.0.101"
     }
 
-    "prod-idp-01" = {
-      domain = "prod-idp-01.home.hovirix.dev"
+    "swarm-02" = {
+      domain = "swarm-02.home.hovirix.dev"
       answer = "10.40.0.102"
     }
 
-    "prod-apps-01" = {
-      domain = "prod-apps-01.home.hovirix.dev"
+    "swarm-03" = {
+      domain = "swarm-03.home.hovirix.dev"
       answer = "10.40.0.103"
-    }
-
-    "prod-data-01" = {
-      domain = "prod-data-01.home.hovirix.dev"
-      answer = "10.40.0.104"
-    }
-
-    "prod-obs-01" = {
-      domain = "prod-obs-01.home.hovirix.dev"
-      answer = "10.40.0.105"
     }
   }
 }
