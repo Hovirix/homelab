@@ -16,6 +16,9 @@ includes:
   provision:
     taskfile: operations/taskfiles/provision.yml
 
+  swarm:
+    taskfile: operations/taskfiles/swarm.yml
+
 tasks:
   security:
     desc: Run all local security checks
