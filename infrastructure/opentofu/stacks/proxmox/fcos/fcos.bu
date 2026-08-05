@@ -4,5 +4,19 @@ version: 1.7.0
 passwd:
   users:
     - name: admin
+      groups:
+        - wheel
       ssh_authorized_keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
+
+storage:
+  files:
+    - path: /etc/sudoers.d/90-admin
+      mode: 0440
+      user:
+        name: root
+      group:
+        name: root
+      contents:
+        inline: |
+          admin ALL=(ALL) NOPASSWD: ALL
