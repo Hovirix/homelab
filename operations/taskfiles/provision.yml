@@ -5,7 +5,7 @@ tasks:
     desc: Preview infrastructure provisioning changes
     cmds:
       - task: fcos-render
-      - for: [proxmox, adguardhome, cloudflare, authentik]
+      - for: [adguardhome, proxmox]
         task: stack
         vars:
           STACK: "{{.ITEM}}"
@@ -15,7 +15,7 @@ tasks:
     desc: Apply infrastructure provisioning changes
     deps: [fcos-render]
     cmds:
-      - for: [proxmox, adguardhome, cloudflare, authentik]
+      - for: [adguardhome, proxmox]
         task: stack
         vars:
           STACK: "{{.ITEM}}"
@@ -24,7 +24,7 @@ tasks:
   destroy:
     desc: Destroy provisioned infrastructure
     cmds:
-      - for: [authentik, cloudflare, adguardhome, proxmox]
+      - for: [proxmox, adguardhome]
         task: stack
         vars:
           STACK: "{{.ITEM}}"
