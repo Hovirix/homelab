@@ -8,9 +8,25 @@ passwd:
         - wheel
       ssh_authorized_keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
+    - name: deploy
+      groups:
+        - docker
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
 
 storage:
   files:
+    - path: /etc/selinux/local/traefik-docker-socket.cil
+      mode: 0644
+      user:
+        name: root
+      group:
+        name: root
+      contents:
+        inline: |
+          (allow container_t container_var_run_t (sock_file (getattr open read write ioctl lock append)))
+          (allow container_t container_runtime_t (unix_stream_socket (connectto)))
+
     - path: /etc/sudoers.d/90-admin
       mode: 0440
       user:
@@ -20,3 +36,20 @@ storage:
       contents:
         inline: |
           admin ALL=(ALL) NOPASSWD: ALL
+
+systemd:
+  units:
+    - name: traefik-docker-socket-selinux.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Allow Traefik containers to access the Docker socket
+        Before=docker.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/sbin/semodule -i /etc/selinux/local/traefik-docker-socket.cil
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
