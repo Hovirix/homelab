@@ -16,6 +16,7 @@ tasks:
       - "{{.ROOT_DIR}}/operations/scripts/swarm-init.sh"
 
   secrets:
+    internal: true
     desc: Create missing platform Swarm secrets
     cmds:
       - "{{.ROOT_DIR}}/operations/scripts/swarm-secrets.sh"
@@ -30,6 +31,7 @@ tasks:
 
   deploy:
     desc: Deploy a platform domain stack
+    deps: [secrets]
     requires:
       vars:
         - DOMAIN

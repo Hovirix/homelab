@@ -1,0 +1,183 @@
+services:
+  grafana:
+    image: grafana/grafana:11.3.1
+
+    environment:
+      GF_SERVER_DOMAIN: grafana.home.hovirix.dev
+      GF_SERVER_ROOT_URL: https://grafana.home.hovirix.dev
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/observability_grafana_admin_password
+
+    secrets:
+      - observability_grafana_admin_password
+
+    configs:
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/datasources.yml
+
+    networks:
+      - observability
+      - traefik-public
+
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q --spider http://localhost:3000/api/health || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.grafana.rule=Host(`grafana.home.hovirix.dev`)
+        - traefik.http.routers.grafana.entrypoints=websecure
+        - traefik.http.routers.grafana.tls=true
+        - traefik.http.routers.grafana.tls.certresolver=cloudflare
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
+
+      update_config:
+        order: start-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+      - --web.enable-remote-write-receiver
+
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+
+    networks:
+      - observability
+
+    volumes:
+      - prometheus-data:/prometheus
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+  loki:
+    image: grafana/loki:3.3.2
+
+    command:
+      - -config.file=/etc/loki/loki.yml
+
+    configs:
+      - source: loki_config
+        target: /etc/loki/loki.yml
+
+    networks:
+      - observability
+
+    volumes:
+      - loki-data:/loki
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+  alloy:
+    image: grafana/alloy:v1.5.1
+
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+
+    user: "0:0"
+
+    configs:
+      - source: alloy_config
+        target: /etc/alloy/config.alloy
+
+    networks:
+      - observability
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/host/root:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+
+    deploy:
+      mode: global
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+networks:
+  observability:
+    driver: overlay
+
+  traefik-public:
+    external: true
+    name: ingress_traefik-public
+
+configs:
+  grafana_datasources:
+    file: ./configs/grafana-datasources.yml
+
+  prometheus_config:
+    file: ./configs/prometheus.yml
+
+  loki_config:
+    file: ./configs/loki.yml
+
+  alloy_config:
+    file: ./configs/alloy.river
+
+secrets:
+  observability_grafana_admin_password:
+    external: true
+
+volumes:
+  grafana-data:
+
+  prometheus-data:
+
+  loki-data:
