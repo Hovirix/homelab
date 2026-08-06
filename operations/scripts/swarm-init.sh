@@ -1,61 +1,39 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
-: "${SWARM_PRIMARY:?SWARM_PRIMARY is required}"
-: "${SWARM_JOIN_HOSTS:?SWARM_JOIN_HOSTS is required}"
-: "${SWARM_ADVERTISE_ADDR:?SWARM_ADVERTISE_ADDR is required}"
-: "${SWARM_MANAGER_ENDPOINT:?SWARM_MANAGER_ENDPOINT is required}"
+: "${DOCKER_HOST:?required}"
+: "${SWARM_JOIN_DOCKER_HOSTS:?required}"
+: "${SWARM_ADVERTISE_ADDR:?required}"
+: "${SWARM_MANAGER_ENDPOINT:?required}"
 
-printf '+ ssh %s sudo docker swarm init\n' \
-  "${SWARM_PRIMARY}"
+printf 'Checking primary node: %s\n' "$DOCKER_HOST"
 
-primary_state="$(
-  ssh "${SWARM_PRIMARY}" \
-    sudo docker info --format '{{.Swarm.LocalNodeState}}'
-)"
+primary_state="$(docker --host "$DOCKER_HOST" info --format '{{.Swarm.LocalNodeState}}')"
 
-if [[ ${primary_state} == "active" ]]; then
-  printf 'swarm already active on %s, skipping init\n' \
-    "${SWARM_PRIMARY}"
+if [[ $primary_state == "active" ]]; then
+  printf 'Swarm is already initialized.\n'
 else
-  ssh "${SWARM_PRIMARY}" \
-    sudo docker swarm init \
-    --advertise-addr "${SWARM_ADVERTISE_ADDR}"
+  printf 'Initializing swarm...\n'
+  docker --host "$DOCKER_HOST" swarm init --advertise-addr "$SWARM_ADVERTISE_ADDR"
 fi
 
-printf '\n+ ssh %s sudo docker swarm join-token -q manager\n' \
-  "${SWARM_PRIMARY}"
+printf 'Retrieving manager join token...\n'
 
-manager_token="$(
-  ssh "${SWARM_PRIMARY}" \
-    sudo docker swarm join-token -q manager
-)"
+SWARM_TOKEN="$(docker --host "$DOCKER_HOST" swarm join-token --quiet manager)"
 
-for host in ${SWARM_JOIN_HOSTS}; do
-  host_state="$(
-    ssh "${host}" \
-      sudo docker info --format '{{.Swarm.LocalNodeState}}'
-  )"
+for host in $SWARM_JOIN_DOCKER_HOSTS; do
+  printf '\nChecking node: %s\n' "$host"
 
-  if [[ ${host_state} == "active" ]]; then
-    printf '\nswarm already active on %s, skipping join\n' \
-      "${host}"
-    continue
+  node_state="$(docker --host "$host" info --format '{{.Swarm.LocalNodeState}}')"
+
+  if [[ $node_state == "active" ]]; then
+    printf 'Node is already part of a swarm; skipping.\n'
+  else
+    printf 'Joining node as a manager...\n'
+    docker --host "$host" swarm join --token "$SWARM_TOKEN" "$SWARM_MANAGER_ENDPOINT"
   fi
-
-  printf '\n+ ssh %s sudo docker swarm join --token <redacted> %s\n' \
-    "${host}" \
-    "${SWARM_MANAGER_ENDPOINT}"
-
-  ssh "${host}" \
-    sudo docker swarm join \
-    --token "${manager_token}" \
-    "${SWARM_MANAGER_ENDPOINT}"
 done
 
-printf '\n+ ssh %s sudo docker node ls\n' \
-  "${SWARM_PRIMARY}"
+printf '\nCurrent swarm nodes:\n'
 
-ssh "${SWARM_PRIMARY}" \
-  sudo docker node ls
+docker --host "$DOCKER_HOST" node ls

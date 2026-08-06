@@ -16,8 +16,8 @@ includes:
   provision:
     taskfile: operations/taskfiles/provision.yml
 
-  swarm:
-    taskfile: operations/taskfiles/swarm.yml
+  platform:
+    taskfile: operations/taskfiles/platform.yml
 
 tasks:
   security:
