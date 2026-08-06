@@ -11,28 +11,33 @@ tasks:
       - task: tflint
 
   nix:
+    internal: true
     desc: Validate Nix flake
     cmds:
       - nix flake check
 
   shellcheck:
+    internal: true
     desc: Lint shell scripts
     cmds:
       - shellcheck operations/scripts/*.sh
 
   ansible-lint:
+    internal: true
     desc: Lint Ansible code
     dir: "{{.ROOT_DIR}}/infrastructure/ansible"
     cmds:
       - ansible-lint
 
   ansible-playbook:
+    internal: true
     desc: Syntax check Ansible playbooks
     dir: "{{.ROOT_DIR}}/infrastructure/ansible"
     cmds:
       - for playbook in playbooks/*.yml; do ansible-playbook "$playbook" --syntax-check; done
 
   tflint:
+    internal: true
     desc: Lint OpenTofu configuration
     cmds:
       - for: [proxmox, adguardhome, cloudflare, authentik]
