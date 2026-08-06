@@ -6,19 +6,19 @@ hosts:
     vm_id: 101
     mac: "02:40:00:00:01:01"
     cpu_cores: 2
-    memory_mb: 4096
+    memory_mb: 8192
     boot_disk_gb: 64
 
   swarm-02:
     vm_id: 102
     mac: "02:40:00:00:01:02"
     cpu_cores: 2
-    memory_mb: 4096
+    memory_mb: 8192
     boot_disk_gb: 64
 
   swarm-03:
     vm_id: 103
     mac: "02:40:00:00:01:03"
     cpu_cores: 2
-    memory_mb: 4096
+    memory_mb: 8192
     boot_disk_gb: 64
