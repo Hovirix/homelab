@@ -13,11 +13,13 @@
       ansible
       ansible-lint
       butane
+      docker-client
       shellcheck
       tflint
 
       # Utilities used by task entrypoints
       jq
+      yq-go
     ];
   };
 
@@ -31,6 +33,7 @@
       ansible
       ansible-lint
       butane
+      docker-client
       opentofu
       shellcheck
       tflint
@@ -53,6 +56,7 @@
 
       # General Utilities
       jq
+      yq-go
 
       # Language Servers
       bash-language-server
@@ -60,6 +64,10 @@
       tofu-ls
       yaml-language-server
     ];
+
+    shellHook = ''
+      export DOCKER_HOST=''${DOCKER_HOST:-ssh://deploy@swarm-01.home.hovirix.dev}
+    '';
   };
 
   docs = pkgs.mkShell {
