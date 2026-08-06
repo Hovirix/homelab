@@ -20,9 +20,9 @@ locals {
       answer = "10.30.0.106"
     }
 
-    grafana = {
-      domain = "grafana.home.hovirix.dev"
-      answer = "10.40.0.200"
+    home_wildcard = {
+      domain = "*.home.hovirix.dev"
+      answer = "10.40.0.101"
     }
 
     "swarm-01" = {
