@@ -40,5 +40,5 @@ tasks:
     internal: true
     desc: Lint OpenTofu configuration
     cmds:
-      - for: [proxmox, adguardhome, cloudflare, authentik]
+      - for: [proxmox, adguardhome, access]
         cmd: tflint --chdir "infrastructure/opentofu/stacks/{{.ITEM}}"
