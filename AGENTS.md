@@ -38,17 +38,17 @@ The active software direction is Proxmox VE, Fedora CoreOS, Docker Engine, Docke
 
 ## Repository Domains
 
-Infrastructure is rooted at `infrastructure/`. It contains Proxmox Ansible configuration under `infrastructure/ansible/`, OpenTofu modules under `infrastructure/opentofu/modules/`, and OpenTofu stacks under `infrastructure/opentofu/stacks/`.
+Infrastructure is rooted at `infrastructure/`. It contains Proxmox Ansible configuration under `infrastructure/ansible/` and OpenTofu stacks under `infrastructure/opentofu/stacks/`.
 
 Current Ansible paths are `infrastructure/ansible/ansible.cfg`, `infrastructure/ansible/inventory.yml`, `infrastructure/ansible/requirements.yml`, `infrastructure/ansible/playbooks/datacenter.yml`, `infrastructure/ansible/playbooks/hosts.yml`, `infrastructure/ansible/playbooks/pve.yml`, `infrastructure/ansible/playbooks/site.yml`, `infrastructure/ansible/roles/datacenter/`, `infrastructure/ansible/roles/host/`, and `infrastructure/ansible/roles/pve/`.
 
-Current OpenTofu module paths are `infrastructure/opentofu/modules/authentik/oauth2_application/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access_application/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access_identity_provider/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_access_policy/`, `infrastructure/opentofu/modules/cloudflare/zero_trust_exposed_application/`, and `infrastructure/opentofu/modules/cloudflare/zero_trust_tunnel_cloudflared/`.
+There are no current OpenTofu modules. Prefer direct provider resources in stacks unless a durable boundary is needed.
 
-Current OpenTofu stack paths are `infrastructure/opentofu/stacks/adguardhome/`, `infrastructure/opentofu/stacks/authentik/`, `infrastructure/opentofu/stacks/cloudflare/`, and `infrastructure/opentofu/stacks/proxmox/`. Fedora CoreOS Butane source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; node input data is `infrastructure/opentofu/stacks/proxmox/fcos/nodes.yaml`; Ignition output under `infrastructure/opentofu/stacks/proxmox/build/` is generated provisioning data.
+Current OpenTofu stack paths are `infrastructure/opentofu/stacks/access/`, `infrastructure/opentofu/stacks/adguardhome/`, and `infrastructure/opentofu/stacks/proxmox/`. Fedora CoreOS Butane source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; node input data is `infrastructure/opentofu/stacks/proxmox/fcos/nodes.yaml`; Ignition output under `infrastructure/opentofu/stacks/proxmox/build/` is generated provisioning data.
 
-`platform/` is the intended domain for Docker Swarm runtime definitions, but no tracked platform desired-state files are implemented yet.
+`platform/` contains Docker Swarm runtime definitions for deployed services.
 
-Operations is rooted at `Taskfile.yml` and `operations/`. Current operation paths are `operations/taskfiles/configure.yml`, `operations/taskfiles/lint.yml`, `operations/taskfiles/provision.yml`, `operations/taskfiles/security.yml`, `operations/taskfiles/swarm.yml`, `operations/scripts/swarm-init.sh`, `operations/scripts/tofu.sh`, `.github/workflows/checks.yml`, `.github/workflows/security.yml`, and `.pre-commit-config.yaml`.
+Operations is rooted at `Taskfile.yml` and `operations/`. Current operation paths are `operations/taskfiles/configure.yml`, `operations/taskfiles/lint.yml`, `operations/taskfiles/platform.yml`, `operations/taskfiles/provision.yml`, `operations/taskfiles/security.yml`, `operations/scripts/swarm-init.sh`, `operations/scripts/swarm-secrets.sh`, `operations/scripts/tofu.sh`, `.github/workflows/checks.yml`, `.github/workflows/security.yml`, and `.pre-commit-config.yaml`.
 
 Security tooling is rooted at `security/` with `security/syft.yaml` and `security/trivy.yaml`. Encrypted secret material is rooted at `secrets/` with `secrets/identity.sops.yaml` and `secrets/infrastructure.sops.yaml`; repository SOPS policy is `.sops.yaml`.
 
