@@ -1,0 +1,109 @@
+services:
+  server:
+    image: ghcr.io/goauthentik/server:2026.5.6
+
+    command:
+      - server
+
+    environment:
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/identity_authentik_secret_key
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__PORT: "5432"
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
+      AUTHENTIK_POSTGRESQL__SSLMODE: disable
+      AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+
+    secrets:
+      - identity_authentik_secret_key
+      - data_postgres_authentik_password
+
+    networks:
+      - data
+      - traefik-public
+
+    volumes:
+      - authentik-data:/data
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.authentik.rule=Host(`authentik.home.hovirix.dev`)
+        - traefik.http.routers.authentik.entrypoints=websecure
+        - traefik.http.routers.authentik.tls=true
+        - traefik.http.routers.authentik.tls.certresolver=cloudflare
+        - traefik.http.services.authentik.loadbalancer.server.port=9000
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+  worker:
+    image: ghcr.io/goauthentik/server:2026.5.6
+
+    command:
+      - worker
+
+    environment:
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/identity_authentik_secret_key
+      AUTHENTIK_POSTGRESQL__HOST: postgres
+      AUTHENTIK_POSTGRESQL__PORT: "5432"
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
+      AUTHENTIK_POSTGRESQL__SSLMODE: disable
+      AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+      AUTHENTIK_OUTPOSTS__DISCOVER: "false"
+
+    secrets:
+      - identity_authentik_secret_key
+      - data_postgres_authentik_password
+
+    networks:
+      - data
+
+    volumes:
+      - authentik-data:/data
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+networks:
+  data:
+    external: true
+    name: data_data
+
+  traefik-public:
+    external: true
+    name: ingress_traefik-public
+
+secrets:
+  identity_authentik_secret_key:
+    external: true
+
+  data_postgres_authentik_password:
+    external: true
+
+volumes:
+  authentik-data:
