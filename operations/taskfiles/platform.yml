@@ -1,9 +1,5 @@
 version: "3"
 
-vars:
-  PLATFORM_ROOT: "{{.ROOT_DIR}}/platform"
-  STACK_FILE: "{{.PLATFORM_ROOT}}/{{.DOMAIN}}/stack.yml"
-
 tasks:
   init:
     desc: Initialize the Swarm and join the remaining managers
@@ -13,30 +9,34 @@ tasks:
       SWARM_ADVERTISE_ADDR: 10.40.0.101
       SWARM_MANAGER_ENDPOINT: swarm-01.home.hovirix.dev:2377
     cmds:
-      - "{{.ROOT_DIR}}/operations/scripts/swarm-init.sh"
+      - operations/scripts/swarm-init.sh
 
   secrets:
     internal: true
     desc: Create missing platform Swarm secrets
     cmds:
-      - "{{.ROOT_DIR}}/operations/scripts/swarm-secrets.sh"
-
-  check:
-    desc: Validate all platform domain stack files
-    cmds:
-      - |
-        for stack_file in "{{.PLATFORM_ROOT}}"/*/stack.yml; do
-          docker stack config --compose-file "$stack_file" >/dev/null
-        done
+      - operations/scripts/swarm-secrets.sh
 
   deploy:
-    desc: Deploy a platform domain stack
-    deps: [secrets]
-    requires:
-      vars:
-        - DOMAIN
+    desc: Deploy platform stacks
+    # deps: [secrets]
+
+    sources:
+      - './platform/{{.DOMAIN | default "*"}}/stack.yml'
+
+    method: none
+
     cmds:
-      - docker stack deploy --compose-file "{{.STACK_FILE}}" {{.DOMAIN}}
+      - for: sources
+        cmd: |
+          stack="$(basename "$(dirname {{.ITEM | shellQuote}})")"
+
+          printf 'Deploying %s stack ...\n' "$stack"
+
+          docker stack deploy \
+            --resolve-image changed \
+            --compose-file {{.ITEM | shellQuote}} \
+            "$stack"
 
   logs:
     desc: Show platform domain service logs
