@@ -1,0 +1,73 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:1.37.1
+
+    environment:
+      DOMAIN: https://vaultwarden.home.hovirix.dev
+      SIGNUPS_ALLOWED: "false"
+      INVITATIONS_ALLOWED: "false"
+      SSO_ENABLED: "true"
+      SSO_ONLY: "true"
+      SSO_AUTH_ONLY_NOT_SESSION: "true"
+      SSO_AUTHORITY: https://authentik.home.hovirix.dev/application/o/vaultwarden/
+      SSO_CLIENT_ID_FILE: /run/secrets/oauth_vaultwarden_client_id
+      SSO_CLIENT_SECRET_FILE: /run/secrets/oauth_vaultwarden_client_secret
+
+    secrets:
+      - oauth_vaultwarden_client_id
+      - oauth_vaultwarden_client_secret
+
+    networks:
+      - applications
+      - traefik-public
+
+    volumes:
+      - vaultwarden-data:/data
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS http://localhost/alive >/dev/null || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.home.hovirix.dev`)
+        - traefik.http.routers.vaultwarden.entrypoints=websecure
+        - traefik.http.routers.vaultwarden.tls=true
+        - traefik.http.routers.vaultwarden.tls.certresolver=cloudflare
+        - traefik.http.services.vaultwarden.loadbalancer.server.port=80
+
+      update_config:
+        order: start-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+networks:
+  applications:
+    driver: overlay
+
+  traefik-public:
+    name: ingress_traefik-public
+    external: true
+
+secrets:
+  oauth_vaultwarden_client_id:
+    external: true
+
+  oauth_vaultwarden_client_secret:
+    external: true
+
+volumes:
+  vaultwarden-data:
