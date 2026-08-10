@@ -1,3 +1,10 @@
+locals {
+  authentik_oauth_apps = {
+    for slug, app in local.apps : slug => app
+    if can(app.redirect_uris)
+  }
+}
+
 data "authentik_flow" "authorization" {
   slug = "default-provider-authorization-implicit-consent"
 }
@@ -14,8 +21,22 @@ data "authentik_property_mapping_provider_scope" "profile" {
   name = "authentik default OAuth Mapping: OpenID 'profile'"
 }
 
-data "authentik_property_mapping_provider_scope" "email" {
-  name = "authentik default OAuth Mapping: OpenID 'email'"
+data "authentik_property_mapping_provider_scope" "offline_access" {
+  name = "authentik default OAuth Mapping: OpenID 'offline_access'"
+}
+
+data "authentik_property_mapping_provider_scope" "entitlements" {
+  name = "authentik default OAuth Mapping: Application Entitlements"
+}
+
+data "authentik_certificate_key_pair" "signing" {
+  name = "authentik Self-signed Certificate"
+}
+
+resource "authentik_property_mapping_provider_scope" "email" {
+  name       = "Vaultwarden Email Scope"
+  scope_name = "email"
+  expression = "return {\"email\": request.user.email, \"email_verified\": True}"
 }
 
 resource "authentik_provider_oauth2" "app" {
@@ -27,22 +48,30 @@ resource "authentik_provider_oauth2" "app" {
 
   grant_types = ["authorization_code", "refresh_token"]
 
-  authorization_flow = data.authentik_flow.authorization.id
-  invalidation_flow  = data.authentik_flow.invalidation.id
+  authorization_flow    = data.authentik_flow.authorization.id
+  invalidation_flow     = data.authentik_flow.invalidation.id
+  access_token_validity = each.key == "vaultwarden" ? "minutes=10" : null
+  signing_key           = each.key == "vaultwarden" ? data.authentik_certificate_key_pair.signing.id : null
+  logout_method         = try(each.value.logout_method, null)
+  logout_uri            = try(each.value.logout_uri, null)
 
   allowed_redirect_uris = [
-    for uri in each.value.authentik.oauth.redirect_uris : {
-      matching_mode     = "strict"
-      redirect_uri_type = "authorization"
-      url               = uri
+    for uri in each.value.redirect_uris : {
+      matching_mode = "strict"
+      url           = uri
     }
   ]
 
-  property_mappings = [
+  property_mappings = each.key == "vaultwarden" ? [
     data.authentik_property_mapping_provider_scope.openid.id,
     data.authentik_property_mapping_provider_scope.profile.id,
-    data.authentik_property_mapping_provider_scope.email.id,
-    authentik_property_mapping_provider_scope.groups.id,
+    data.authentik_property_mapping_provider_scope.offline_access.id,
+    authentik_property_mapping_provider_scope.email.id,
+    ] : [
+    data.authentik_property_mapping_provider_scope.openid.id,
+    data.authentik_property_mapping_provider_scope.profile.id,
+    data.authentik_property_mapping_provider_scope.entitlements.id,
+    authentik_property_mapping_provider_scope.email.id,
   ]
 }
 
@@ -52,20 +81,4 @@ resource "authentik_application" "app" {
   name              = each.value.name
   slug              = each.key
   protocol_provider = authentik_provider_oauth2.app[each.key].id
-}
-
-resource "authentik_property_mapping_provider_scope" "groups" {
-  name       = "authentik default OAuth Mapping: OpenID 'groups'"
-  scope_name = "groups"
-  expression = "{\"groups\": [group.name for group in ak_user.groups.all()]}"
-}
-
-resource "authentik_group" "admins" {
-  name         = "admins"
-  is_superuser = true
-  users        = [6]
-}
-
-resource "authentik_group" "users" {
-  name = "users"
 }

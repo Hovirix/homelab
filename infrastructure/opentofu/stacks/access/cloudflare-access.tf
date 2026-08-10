@@ -1,3 +1,25 @@
+locals {
+  access_policies = {
+    authenticated = {
+      allowed_countries = ["FR"]
+    }
+  }
+
+  cloudflare_access_policy = "authenticated"
+
+  cloudflare_apps = {
+    for slug, app in local.apps : slug => app
+    if can(app.hostname) && can(app.upstream)
+  }
+
+  invalid_cloudflare_application_policies = contains(keys(local.access_policies), local.cloudflare_access_policy) ? [] : [local.cloudflare_access_policy]
+
+  cloudflare_access_policy_ids = concat(
+    [cloudflare_zero_trust_access_policy.allow[local.cloudflare_access_policy].id],
+    contains(keys(cloudflare_zero_trust_access_policy.country_restriction), local.cloudflare_access_policy) ? [cloudflare_zero_trust_access_policy.country_restriction[local.cloudflare_access_policy].id] : []
+  )
+}
+
 resource "terraform_data" "validate_cloudflare_apps" {
   input = true
 
@@ -23,9 +45,6 @@ resource "cloudflare_zero_trust_access_identity_provider" "authentik" {
     certs_url = "https://authentik.${local.domain}/application/o/cloudflare/jwks/"
 
     scopes = ["openid", "profile", "email"]
-    claims = ["groups"]
-
-    pkce_enabled = true
   }
 }
 
@@ -43,18 +62,6 @@ resource "cloudflare_zero_trust_access_policy" "allow" {
       }
     }
   ]
-
-  require = [
-    {
-      oidc = {
-        claim_name           = "groups"
-        claim_value          = each.value.group
-        identity_provider_id = cloudflare_zero_trust_access_identity_provider.authentik.id
-      }
-    }
-  ]
-
-  exclude = []
 }
 
 resource "cloudflare_zero_trust_access_policy" "country_restriction" {
@@ -73,8 +80,6 @@ resource "cloudflare_zero_trust_access_policy" "country_restriction" {
     }
   ]
 
-  require = []
-
   exclude = [
     for country in each.value.allowed_countries : {
       geo = {
@@ -84,21 +89,6 @@ resource "cloudflare_zero_trust_access_policy" "country_restriction" {
   ]
 }
 
-resource "cloudflare_zero_trust_tunnel_cloudflared" "homelab" {
-  account_id = local.account_id
-  name       = local.tunnel.name
-  config_src = local.tunnel.config_src
-}
-
-resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
-  account_id = local.account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.homelab.id
-
-  config = {
-    ingress = local.cloudflare_tunnel_ingress
-  }
-}
-
 resource "cloudflare_zero_trust_access_application" "app" {
   for_each = local.cloudflare_apps
 
@@ -106,32 +96,20 @@ resource "cloudflare_zero_trust_access_application" "app" {
 
   account_id = local.account_id
 
-  name             = each.value.name
-  type             = "self_hosted"
-  session_duration = try(each.value.cloudflare.session_duration, "24h")
-  allowed_idps     = [cloudflare_zero_trust_access_identity_provider.authentik.id]
+  name         = each.value.name
+  type         = "self_hosted"
+  allowed_idps = [cloudflare_zero_trust_access_identity_provider.authentik.id]
 
   destinations = [
     {
       type = "public"
-      uri  = local.cloudflare_application_hostnames[each.key]
+      uri  = each.value.hostname
     }
   ]
 
   policies = [
-    for id in local.cloudflare_access_policy_ids[each.value.cloudflare.access_policy] : {
+    for id in local.cloudflare_access_policy_ids : {
       id = id
     }
   ]
-}
-
-resource "cloudflare_dns_record" "app" {
-  for_each = local.cloudflare_apps
-
-  zone_id = local.zone_id
-  name    = each.key
-  type    = "CNAME"
-  content = "${cloudflare_zero_trust_tunnel_cloudflared.homelab.id}.cfargotunnel.com"
-  proxied = true
-  ttl     = 1
 }
