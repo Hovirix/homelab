@@ -1,5 +1,5 @@
 services:
-  server:
+  authentik-server:
     image: ghcr.io/goauthentik/server:2026.5.6
 
     command:
@@ -13,12 +13,24 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
+      AUTHENTIK_EMAIL__HOST: file:///run/secrets/smtp_host
+      AUTHENTIK_EMAIL__PORT: file:///run/secrets/smtp_port
+      AUTHENTIK_EMAIL__USERNAME: file:///run/secrets/smtp_user
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/smtp_password
+      AUTHENTIK_EMAIL__FROM: file:///run/secrets/smtp_from
+      AUTHENTIK_EMAIL__USE_TLS: "true"
+      AUTHENTIK_EMAIL__USE_SSL: "false"
       AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
 
     secrets:
       - identity_authentik_secret_key
       - data_postgres_authentik_password
+      - smtp_host
+      - smtp_port
+      - smtp_user
+      - smtp_password
+      - smtp_from
 
     networks:
       - data
@@ -48,7 +60,7 @@ services:
       restart_policy:
         condition: on-failure
 
-  worker:
+  authentik-worker:
     image: ghcr.io/goauthentik/server:2026.5.6
 
     command:
@@ -62,6 +74,13 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
+      AUTHENTIK_EMAIL__HOST: file:///run/secrets/smtp_host
+      AUTHENTIK_EMAIL__PORT: file:///run/secrets/smtp_port
+      AUTHENTIK_EMAIL__USERNAME: file:///run/secrets/smtp_user
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/smtp_password
+      AUTHENTIK_EMAIL__FROM: file:///run/secrets/smtp_from
+      AUTHENTIK_EMAIL__USE_TLS: "true"
+      AUTHENTIK_EMAIL__USE_SSL: "false"
       AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_OUTPOSTS__DISCOVER: "false"
@@ -69,6 +88,11 @@ services:
     secrets:
       - identity_authentik_secret_key
       - data_postgres_authentik_password
+      - smtp_host
+      - smtp_port
+      - smtp_user
+      - smtp_password
+      - smtp_from
 
     networks:
       - data
@@ -91,18 +115,33 @@ services:
 
 networks:
   data:
-    external: true
     name: data_data
+    external: true
 
   traefik-public:
-    external: true
     name: ingress_traefik-public
+    external: true
 
 secrets:
   identity_authentik_secret_key:
     external: true
 
   data_postgres_authentik_password:
+    external: true
+
+  smtp_host:
+    external: true
+
+  smtp_port:
+    external: true
+
+  smtp_user:
+    external: true
+
+  smtp_password:
+    external: true
+
+  smtp_from:
     external: true
 
 volumes:
