@@ -71,6 +71,7 @@ services:
 
 networks:
   data:
+    name: data_data
     driver: overlay
     attachable: true
 

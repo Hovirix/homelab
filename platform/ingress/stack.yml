@@ -96,6 +96,7 @@ services:
 
 networks:
   traefik-public:
+    name: ingress_traefik-public
     driver: overlay
     attachable: true
 
