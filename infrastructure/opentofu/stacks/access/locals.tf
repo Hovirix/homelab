@@ -4,26 +4,14 @@ locals {
   domain     = "home.hovirix.dev"
 
   apps = {
-    authentik = {
-      name     = "Authentik"
-      hostname = "authentik.${local.domain}"
-      upstream = "http://identity_authentik-server:9000"
-    }
-
-    cloudflare = {
-      name = "Cloudflare"
-      redirect_uris = [
-        "https://hovirix.cloudflareaccess.com/cdn-cgi/access/callback",
-      ]
-    }
-
     grafana = {
       name     = "Grafana"
       hostname = "grafana.${local.domain}"
-      upstream = "http://observability_grafana:3000"
+
       redirect_uris = [
         "https://grafana.${local.domain}/login/generic_oauth",
       ]
+
       logout_method = "frontchannel"
       logout_uri    = "https://grafana.${local.domain}/logout"
     }
@@ -31,7 +19,7 @@ locals {
     immich = {
       name     = "Immich"
       hostname = "immich.${local.domain}"
-      upstream = "http://prod-apps-01.home.hovirix.dev:2283"
+
       redirect_uris = [
         "app.immich:///oauth-callback",
         "https://immich.${local.domain}/auth/login",
@@ -42,7 +30,7 @@ locals {
     paperless = {
       name     = "Paperless"
       hostname = "paperless.${local.domain}"
-      upstream = "http://prod-apps-01.home.hovirix.dev:8000"
+
       redirect_uris = [
         "https://paperless.${local.domain}/accounts/oidc/authentik/login/callback/",
       ]
@@ -51,10 +39,15 @@ locals {
     vaultwarden = {
       name     = "Vaultwarden"
       hostname = "vaultwarden.${local.domain}"
-      upstream = "http://applications_vaultwarden:80"
+
       redirect_uris = [
         "https://vaultwarden.${local.domain}/identity/connect/oidc-signin",
       ]
+
+      access_token_validity = "minutes=10"
+      offline_access        = true
+      signed_tokens         = true
     }
   }
+
 }

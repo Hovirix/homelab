@@ -1,5 +1,5 @@
 resource "cloudflare_dns_record" "app" {
-  for_each = local.cloudflare_apps
+  for_each = local.apps
 
   zone_id = local.zone_id
   name    = each.key

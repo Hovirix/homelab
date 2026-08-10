@@ -11,9 +11,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
   config = {
     ingress = concat(
       [
-        for slug, app in local.cloudflare_apps : {
+        for slug, app in local.apps : {
           hostname = app.hostname
-          service  = app.upstream
+          service  = "https://${app.hostname}"
         }
       ],
       [

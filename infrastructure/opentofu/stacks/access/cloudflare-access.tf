@@ -1,36 +1,3 @@
-locals {
-  access_policies = {
-    authenticated = {
-      allowed_countries = ["FR"]
-    }
-  }
-
-  cloudflare_access_policy = "authenticated"
-
-  cloudflare_apps = {
-    for slug, app in local.apps : slug => app
-    if can(app.hostname) && can(app.upstream)
-  }
-
-  invalid_cloudflare_application_policies = contains(keys(local.access_policies), local.cloudflare_access_policy) ? [] : [local.cloudflare_access_policy]
-
-  cloudflare_access_policy_ids = concat(
-    [cloudflare_zero_trust_access_policy.allow[local.cloudflare_access_policy].id],
-    contains(keys(cloudflare_zero_trust_access_policy.country_restriction), local.cloudflare_access_policy) ? [cloudflare_zero_trust_access_policy.country_restriction[local.cloudflare_access_policy].id] : []
-  )
-}
-
-resource "terraform_data" "validate_cloudflare_apps" {
-  input = true
-
-  lifecycle {
-    precondition {
-      condition     = length(local.invalid_cloudflare_application_policies) == 0
-      error_message = "Applications reference undefined access policies: ${join(", ", local.invalid_cloudflare_application_policies)}."
-    }
-  }
-}
-
 resource "cloudflare_zero_trust_access_identity_provider" "authentik" {
   account_id = local.account_id
   name       = "authentik"
@@ -48,11 +15,9 @@ resource "cloudflare_zero_trust_access_identity_provider" "authentik" {
   }
 }
 
-resource "cloudflare_zero_trust_access_policy" "allow" {
-  for_each = local.access_policies
-
+resource "cloudflare_zero_trust_access_policy" "authentik" {
   account_id = local.account_id
-  name       = "authentik-${each.key}"
+  name       = "authentik-authenticated"
   decision   = "allow"
 
   include = [
@@ -64,14 +29,9 @@ resource "cloudflare_zero_trust_access_policy" "allow" {
   ]
 }
 
-resource "cloudflare_zero_trust_access_policy" "country_restriction" {
-  for_each = {
-    for name, policy in local.access_policies : name => policy
-    if length(policy.allowed_countries) > 0
-  }
-
+resource "cloudflare_zero_trust_access_policy" "deny_outside_fr" {
   account_id = local.account_id
-  name       = "block-${each.key}-outside-${lower(join("-", each.value.allowed_countries))}"
+  name       = "block-authenticated-outside-fr"
   decision   = "deny"
 
   include = [
@@ -81,18 +41,16 @@ resource "cloudflare_zero_trust_access_policy" "country_restriction" {
   ]
 
   exclude = [
-    for country in each.value.allowed_countries : {
+    {
       geo = {
-        country_code = country
+        country_code = "FR"
       }
     }
   ]
 }
 
 resource "cloudflare_zero_trust_access_application" "app" {
-  for_each = local.cloudflare_apps
-
-  depends_on = [terraform_data.validate_cloudflare_apps]
+  for_each = local.apps
 
   account_id = local.account_id
 
@@ -108,8 +66,11 @@ resource "cloudflare_zero_trust_access_application" "app" {
   ]
 
   policies = [
-    for id in local.cloudflare_access_policy_ids : {
-      id = id
-    }
+    {
+      id = cloudflare_zero_trust_access_policy.authentik.id
+    },
+    {
+      id = cloudflare_zero_trust_access_policy.deny_outside_fr.id
+    },
   ]
 }
