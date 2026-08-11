@@ -29,6 +29,13 @@ resource "proxmox_virtual_environment_vm" "fcos" {
     file_format  = "raw"
   }
 
+  virtiofs {
+    mapping      = proxmox_hardware_mapping_dir.swarm.name
+    cache        = "always"
+    direct_io    = true
+    expose_xattr = true
+  }
+
   network_device {
     bridge      = local.network_bridge
     mac_address = each.value.mac

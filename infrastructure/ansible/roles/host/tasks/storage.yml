@@ -9,6 +9,7 @@
       - rpool
   register: host_storage_rpool_size
   changed_when: false
+  check_mode: false
 
 - name: Read ZFS pool health
   ansible.builtin.command:
@@ -21,6 +22,7 @@
       - rpool
   register: host_storage_rpool_health
   changed_when: false
+  check_mode: false
 
 - name: Validate ZFS pool
   ansible.builtin.assert:
@@ -41,6 +43,7 @@
       - rpool
   register: host_storage_rpool_autotrim
   changed_when: false
+  check_mode: false
 
 - name: Enable ZFS pool autotrim
   ansible.builtin.command:
@@ -52,71 +55,20 @@
   when: host_storage_rpool_autotrim.stdout | trim != "on"
   changed_when: true
 
-- name: Read ZFS dataset compression property
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - get
-      - -H
-      - -o
-      - value
-      - compression
-      - rpool/data
-  register: host_storage_data_compression
-  changed_when: false
+- name: Configure VM ZFS dataset
+  community.general.zfs:
+    name: rpool/data
+    state: present
+    extra_zfs_properties:
+      compression: lz4
+      atime: "off"
+      xattr: sa
 
-- name: Enable ZFS dataset compression
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - set
-      - compression=lz4
-      - rpool/data
-  when: host_storage_data_compression.stdout | trim != "lz4"
-  changed_when: true
-
-- name: Read ZFS dataset atime property
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - get
-      - -H
-      - -o
-      - value
-      - atime
-      - rpool/data
-  register: host_storage_data_atime
-  changed_when: false
-
-- name: Disable ZFS dataset atime updates
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - set
-      - atime=off
-      - rpool/data
-  when: host_storage_data_atime.stdout | trim != "off"
-  changed_when: true
-
-- name: Read ZFS dataset xattr property
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - get
-      - -H
-      - -o
-      - value
-      - xattr
-      - rpool/data
-  register: host_storage_data_xattr
-  changed_when: false
-
-- name: Enable ZFS dataset xattr=sa
-  ansible.builtin.command:
-    argv:
-      - zfs
-      - set
-      - xattr=sa
-      - rpool/data
-  when: host_storage_data_xattr.stdout | trim != "sa"
-  changed_when: true
+- name: Configure Swarm ZFS dataset
+  community.general.zfs:
+    name: rpool/swarm
+    state: present
+    extra_zfs_properties:
+      compression: lz4
+      atime: "off"
+      xattr: sa
