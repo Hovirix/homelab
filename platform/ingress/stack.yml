@@ -55,7 +55,9 @@ services:
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - traefik-letsencrypt:/letsencrypt
+      - type: bind
+        source: /var/mnt/swarm/traefik
+        target: /letsencrypt
 
     healthcheck:
       test:
@@ -103,6 +105,3 @@ networks:
 secrets:
   ingress_traefik_cf_dns_api_token:
     external: true
-
-volumes:
-  traefik-letsencrypt:

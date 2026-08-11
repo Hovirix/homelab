@@ -34,7 +34,9 @@ services:
       - traefik-public
 
     volumes:
-      - grafana-data:/var/lib/grafana
+      - type: bind
+        source: /var/mnt/swarm/grafana
+        target: /var/lib/grafana
 
     healthcheck:
       test:
@@ -84,7 +86,9 @@ services:
       - observability
 
     volumes:
-      - prometheus-data:/prometheus
+      - type: bind
+        source: /var/mnt/swarm/prometheus
+        target: /prometheus
 
     deploy:
       replicas: 1
@@ -113,7 +117,9 @@ services:
       - observability
 
     volumes:
-      - loki-data:/loki
+      - type: bind
+        source: /var/mnt/swarm/loki
+        target: /loki
 
     deploy:
       replicas: 1
@@ -194,10 +200,3 @@ secrets:
 
   oauth_grafana_client_secret:
     external: true
-
-volumes:
-  grafana-data:
-
-  prometheus-data:
-
-  loki-data:

@@ -22,7 +22,9 @@ services:
       - traefik-public
 
     volumes:
-      - vaultwarden-data:/data
+      - type: bind
+        source: /var/mnt/swarm/vaultwarden
+        target: /data
 
     healthcheck:
       test:
@@ -68,6 +70,3 @@ secrets:
 
   oauth_vaultwarden_client_secret:
     external: true
-
-volumes:
-  vaultwarden-data:

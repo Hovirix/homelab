@@ -36,9 +36,6 @@ services:
       - data
       - traefik-public
 
-    volumes:
-      - authentik-data:/data
-
     deploy:
       replicas: 1
 
@@ -97,9 +94,6 @@ services:
     networks:
       - data
 
-    volumes:
-      - authentik-data:/data
-
     deploy:
       replicas: 1
 
@@ -143,6 +137,3 @@ secrets:
 
   smtp_from:
     external: true
-
-volumes:
-  authentik-data:
