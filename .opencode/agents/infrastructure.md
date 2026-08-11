@@ -10,12 +10,23 @@ permission:
     "infrastructure/**": allow
 
   bash:
+    "task configure:apply*": deny
+    "task provision:apply*": deny
+    "task provision:destroy*": deny
+
+    "*operations/scripts/tofu.sh * apply*": deny
+    "*operations/scripts/tofu.sh * destroy*": deny
+    "*operations/scripts/tofu.sh * import*": deny
+    "*operations/scripts/tofu.sh * force-unlock*": deny
+    "*operations/scripts/tofu.sh * state rm*": deny
+    "*operations/scripts/tofu.sh * state mv*": deny
     "tofu apply*": deny
     "tofu destroy*": deny
     "tofu import*": deny
     "tofu force-unlock*": deny
     "tofu state rm*": deny
     "tofu state mv*": deny
+    "ansible-playbook playbooks/site.yml": deny
 
     "sops": deny
     "sops *": deny

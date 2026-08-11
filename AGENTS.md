@@ -50,7 +50,7 @@ Current OpenTofu stack paths are `infrastructure/opentofu/stacks/access/`, `infr
 
 Operations is rooted at `Taskfile.yml` and `operations/`. Current operation paths are `operations/taskfiles/configure.yml`, `operations/taskfiles/lint.yml`, `operations/taskfiles/platform.yml`, `operations/taskfiles/provision.yml`, `operations/taskfiles/security.yml`, `operations/scripts/swarm-init.sh`, `operations/scripts/swarm-secrets.sh`, `operations/scripts/tofu.sh`, `.github/workflows/checks.yml`, `.github/workflows/security.yml`, and `.pre-commit-config.yaml`.
 
-Security tooling is rooted at `security/` with `security/syft.yaml` and `security/trivy.yaml`. Encrypted secret material is rooted at `secrets/` with `secrets/identity.sops.yaml` and `secrets/infrastructure.sops.yaml`; repository SOPS policy is `.sops.yaml`.
+Security tooling is rooted at `security/` with `security/syft.yaml` and `security/trivy.yaml`. Encrypted secret material is rooted at `secrets/` with `secrets/identity.sops.yaml`, `secrets/infrastructure.sops.yaml`, and `secrets/platform.sops.yaml`; repository SOPS policy is `.sops.yaml`.
 
 OpenCode project context is rooted at `.opencode/opencode.jsonc` and `.opencode/`. Agents live in `.opencode/agents/`, reusable skills live in `.opencode/skills/`, and user commands live in `.opencode/commands/`.
 

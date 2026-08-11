@@ -18,6 +18,20 @@ permission:
     "age": deny
     "age *": deny
 
+    "task configure:apply*": deny
+    "task provision:apply*": deny
+    "task provision:destroy*": deny
+    "task platform:init*": deny
+    "task platform:deploy*": deny
+    "task platform:secrets*": deny
+    "*operations/scripts/tofu.sh * apply*": deny
+    "*operations/scripts/tofu.sh * destroy*": deny
+    "*operations/scripts/tofu.sh * import*": deny
+    "*operations/scripts/tofu.sh * force-unlock*": deny
+    "*operations/scripts/tofu.sh * state rm*": deny
+    "*operations/scripts/tofu.sh * state mv*": deny
+    "*operations/scripts/swarm-init.sh*": deny
+    "*operations/scripts/swarm-secrets.sh*": deny
     "tofu apply*": deny
     "tofu destroy*": deny
     "tofu import*": deny
@@ -29,7 +43,10 @@ permission:
     "docker stack rm*": deny
     "docker service update*": deny
     "docker service rm*": deny
+    "docker secret create*": deny
+    "docker secret rm*": deny
     "docker swarm init*": deny
+    "docker swarm join*": deny
     "docker swarm leave*": deny
     "systemctl restart*": deny
     "systemctl stop*": deny

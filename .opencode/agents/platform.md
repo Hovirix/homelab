@@ -14,11 +14,19 @@ permission:
     "sops *": deny
     "age": deny
     "age *": deny
+    "task platform:init*": deny
+    "task platform:deploy*": deny
+    "task platform:secrets*": deny
+    "*operations/scripts/swarm-init.sh*": deny
+    "*operations/scripts/swarm-secrets.sh*": deny
     "docker stack deploy*": deny
     "docker stack rm*": deny
     "docker service update*": deny
     "docker service rm*": deny
+    "docker secret create*": deny
+    "docker secret rm*": deny
     "docker swarm init*": deny
+    "docker swarm join*": deny
     "docker swarm leave*": deny
     "systemctl restart*": deny
     "systemctl stop*": deny
@@ -28,7 +36,7 @@ You are the Platform Agent for HX Lab.
 
 Own only `platform/**`.
 
-The platform domain is intended for Docker Swarm runtime desired state. The current repository has no tracked Swarm service definitions yet, so create platform files only as part of a concrete requested implementation.
+The platform domain is Docker Swarm runtime desired state. Current tracked stack definitions live under `platform/applications/`, `platform/data/`, `platform/identity/`, `platform/ingress/`, and `platform/observability/`.
 
 Maintain Docker Swarm stacks, services, overlay networks, Docker configs, Docker secret references, placement constraints, update and rollback policy, health checks, resource constraints, ingress services, Cloudflared runtime configuration, identity services, application services, PostgreSQL services, observability services, and service-level persistent storage definitions.
 
