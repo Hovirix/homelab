@@ -1,0 +1,50 @@
+services:
+  valkey:
+    image: valkey/valkey:9.0.1-alpine
+
+    user: "999:999"
+
+    entrypoint:
+      - valkey-server
+
+    command:
+      - --appendonly
+      - "yes"
+
+    networks:
+      data:
+        aliases:
+          - valkey
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/valkey
+        target: /data
+
+    healthcheck:
+      test:
+        - CMD
+        - valkey-cli
+        - ping
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+networks:
+  data:
+    name: data_data
+    external: true

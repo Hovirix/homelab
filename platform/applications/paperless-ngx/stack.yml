@@ -1,0 +1,106 @@
+services:
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.18.4
+
+    entrypoint:
+      - /usr/local/bin/paperless-start.sh
+
+    environment:
+      PAPERLESS_URL: https://paperless.home.hovirix.dev
+      PAPERLESS_SECRET_KEY_FILE: /run/secrets/applications_paperless_secret_key
+      PAPERLESS_REDIS: redis://valkey:6379
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: postgres
+      PAPERLESS_DBPASS_FILE: /run/secrets/data_postgres_paperless_password
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+      PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
+      PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
+
+    configs:
+      - source: paperless_start
+        target: /usr/local/bin/paperless-start.sh
+        mode: 0555
+
+    secrets:
+      - applications_paperless_secret_key
+      - data_postgres_paperless_password
+      - oauth_paperless_client_id
+      - oauth_paperless_client_secret
+
+    networks:
+      - data
+      - traefik-public
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/paperless/data
+        target: /usr/src/paperless/data
+
+      - type: bind
+        source: /var/mnt/swarm/paperless/media
+        target: /usr/src/paperless/media
+
+      - type: bind
+        source: /var/mnt/swarm/paperless/export
+        target: /usr/src/paperless/export
+
+      - type: bind
+        source: /var/mnt/swarm/paperless/consume
+        target: /usr/src/paperless/consume
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS http://localhost:8000/api/health/ >/dev/null || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.paperless.rule=Host(`paperless.home.hovirix.dev`)
+        - traefik.http.routers.paperless.entrypoints=websecure
+        - traefik.http.routers.paperless.tls=true
+        - traefik.http.routers.paperless.tls.certresolver=cloudflare
+        - traefik.http.services.paperless.loadbalancer.server.port=8000
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+networks:
+  data:
+    name: data_data
+    external: true
+
+  traefik-public:
+    name: ingress_traefik-public
+    external: true
+
+configs:
+  paperless_start:
+    file: ./configs/paperless-start.sh
+
+secrets:
+  applications_paperless_secret_key:
+    external: true
+
+  data_postgres_paperless_password:
+    external: true
+
+  oauth_paperless_client_id:
+    external: true
+
+  oauth_paperless_client_secret:
+    external: true
