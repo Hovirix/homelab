@@ -18,7 +18,6 @@ services:
       - oauth_vaultwarden_client_secret
 
     networks:
-      - applications
       - traefik-public
 
     volumes:
@@ -57,9 +56,6 @@ services:
         condition: on-failure
 
 networks:
-  applications:
-    driver: overlay
-
   traefik-public:
     name: ingress_traefik-public
     external: true

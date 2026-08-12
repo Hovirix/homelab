@@ -12,7 +12,9 @@ services:
       - data_postgres_superuser_password
 
     networks:
-      - data
+      data:
+        aliases:
+          - postgres
 
     volumes:
       - type: bind
@@ -75,6 +77,7 @@ networks:
 
 configs:
   postgres_reconcile:
+    name: data_postgres_reconcile_20260812
     file: ./configs/postgres-reconcile.sh
 
 secrets:
