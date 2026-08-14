@@ -30,10 +30,9 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   }
 
   virtiofs {
-    mapping      = proxmox_hardware_mapping_dir.swarm.name
-    cache        = "always"
-    direct_io    = true
-    expose_xattr = true
+    mapping   = proxmox_hardware_mapping_dir.swarm.name
+    cache     = "auto"
+    direct_io = true
   }
 
   network_device {

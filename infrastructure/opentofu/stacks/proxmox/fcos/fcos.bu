@@ -8,6 +8,7 @@ passwd:
         - wheel
       ssh_authorized_keys:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
+
     - name: deploy
       groups:
         - docker
@@ -24,6 +25,29 @@ storage:
         name: root
 
   files:
+    - path: /etc/swarm-storage.tmpfiles
+      mode: 0644
+      user:
+        name: root
+      group:
+        name: root
+      contents:
+        inline: |
+          # Type Path                                Mode   User   Group  Age
+          d /var/mnt/swarm/traefik                  0777 :root :root -
+          d /var/mnt/swarm/postgres                 0777 :root :root -
+          d /var/mnt/swarm/valkey                   0777 :root :root -
+          d /var/mnt/swarm/grafana                  0777 :root :root -
+          d /var/mnt/swarm/prometheus               0777 :root :root -
+          d /var/mnt/swarm/loki                     0777 :root :root -
+          d /var/mnt/swarm/vaultwarden              0777 :root :root -
+
+          d /var/mnt/swarm/paperless                0755 :root :root -
+          d /var/mnt/swarm/paperless/data           0777 :root :root -
+          d /var/mnt/swarm/paperless/media          0777 :root :root -
+          d /var/mnt/swarm/paperless/export         0777 :root :root -
+          d /var/mnt/swarm/paperless/consume        0777 :root :root -
+
     - path: /etc/selinux/local/traefik-docker-socket.cil
       mode: 0644
       user:
@@ -52,16 +76,28 @@ systemd:
       contents: |
         [Unit]
         Description=Mount Docker Swarm persistent data
-        Before=docker.service
 
         [Mount]
         What=swarm
         Where=/var/mnt/swarm
         Type=virtiofs
-        Options=rw
+        Options=rw,context=system_u:object_r:container_file_t:s0
 
         [Install]
         WantedBy=multi-user.target
+
+    - name: swarm-storage-prepare.service
+      contents: |
+        [Unit]
+        Description=Prepare Docker Swarm persistent data directories
+        Requires=var-mnt-swarm.mount
+        After=var-mnt-swarm.mount
+        Before=docker.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/systemd-tmpfiles --create /etc/swarm-storage.tmpfiles
+        RemainAfterExit=yes
 
     - name: docker.service
       dropins:
@@ -70,17 +106,18 @@ systemd:
             [Unit]
             RequiresMountsFor=/var/mnt/swarm
 
+            Requires=swarm-storage-prepare.service
+            After=swarm-storage-prepare.service
+
+            Wants=traefik-docker-socket-selinux.service
+            After=traefik-docker-socket-selinux.service
+
     - name: traefik-docker-socket-selinux.service
-      enabled: true
       contents: |
         [Unit]
-        Description=Allow Traefik containers to access the Docker socket
-        Before=docker.service
+        Description=Allow containers to access the Docker socket
 
         [Service]
         Type=oneshot
         ExecStart=/usr/sbin/semodule -i /etc/selinux/local/traefik-docker-socket.cil
         RemainAfterExit=yes
-
-        [Install]
-        WantedBy=multi-user.target
