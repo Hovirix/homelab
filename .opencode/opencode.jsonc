@@ -1,7 +1,12 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
-  "share": "disabled",
+  "permission": {
+    "bash": {
+      "sops": "deny",
+      "sops *": "deny",
+    }
+  },
 
   "mcp": {
     "docker-docs": {
