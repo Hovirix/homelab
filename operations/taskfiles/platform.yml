@@ -19,27 +19,63 @@ tasks:
 
   deploy:
     desc: Deploy platform stacks
-    # deps: [secrets]
-
-    sources:
-      - './platform/{{.DOMAIN | default "*"}}/stack.yml'
-
-    method: none
-
     cmds:
-      - for: sources
-        cmd: |
-          stack="$(basename "$(dirname {{.ITEM | shellQuote}})")"
+      - task: secrets
+      - task: deploy:ingress
+      - task: deploy:data
+      - task: deploy:identity
+      - task: deploy:observability
+      - task: deploy:applications
 
-          printf 'Deploying %s stack ...\n' "$stack"
+  deploy:ingress:
+    desc: Deploy ingress stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/ingress/stack.yml ingress #magic___^_^___line
+  deploy:data:
+    desc: Deploy data stacks
+    cmds:
+      - task: deploy:postgres
+      - task: deploy:valkey
 
-          docker stack deploy \
-            --resolve-image changed \
-            --compose-file {{.ITEM | shellQuote}} \
-            "$stack"
+  deploy:postgres:
+    desc: Deploy PostgreSQL stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/data/postgres/stack.yml postgres #magic___^_^___line
+  deploy:valkey:
+    desc: Deploy Valkey stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/data/valkey/stack.yml valkey #magic___^_^___line
+  deploy:identity:
+    desc: Deploy identity stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/identity/stack.yml identity #magic___^_^___line
+  deploy:observability:
+    desc: Deploy observability stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/observability/stack.yml observability #magic___^_^___line
+  deploy:applications:
+    desc: Deploy application stacks
+    cmds:
+      - task: deploy:vaultwarden
+      - task: deploy:paperless-ngx
 
+  deploy:vaultwarden:
+    desc: Deploy Vaultwarden stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/applications/vaultwarden/stack.yml vaultwarden #magic___^_^___line
+  deploy:paperless-ngx:
+    desc: Deploy Paperless-ngx stack
+    cmds:
+      - >-
+        docker stack deploy --resolve-image changed --compose-file platform/applications/paperless-ngx/stack.yml paperless-ngx #magic___^_^___line
   logs:
-    desc: Show platform domain service logs
+    desc: Show platform service logs
     requires:
       vars:
         - DOMAIN
