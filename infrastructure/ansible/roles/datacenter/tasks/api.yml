@@ -1,15 +1,3 @@
-- name: Read Proxmox API users
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - user
-      - list
-      - --output-format
-      - json
-  register: datacenter_api_users
-  changed_when: false
-  run_once: true
-
 - name: Create OpenTofu API user
   ansible.builtin.command:
     argv:
@@ -19,47 +7,11 @@
       - opentofu@pve
       - --comment
       - OpenTofu VM lifecycle
-  when: >-
-    'opentofu@pve' not in (datacenter_api_users.stdout | from_json | map(attribute='userid') | list)
-  changed_when: true
-  run_once: true
-
-- name: Read Proxmox API roles
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - role
-      - list
-      - --output-format
-      - json
-  register: datacenter_api_roles
-  changed_when: false
-  run_once: true
-
-- name: Create OpenTofu provisioning role
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - role
-      - add
-      - OpenTofuProv
-      - --privs
-      - Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit SDN.Use Sys.Audit Sys.Modify VM.Allocate VM.Audit VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.PowerMgmt
-  when: >-
-    'OpenTofuProv' not in (datacenter_api_roles.stdout | from_json | map(attribute='roleid') | list)
-  changed_when: true
-  run_once: true
-
-- name: Configure OpenTofu provisioning role privileges
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - role
-      - modify
-      - OpenTofuProv
-      - --privs
-      - Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit SDN.Use Sys.Audit Sys.Modify VM.Allocate VM.Audit VM.Config.CDROM VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.PowerMgmt
-  changed_when: false
+  register: datacenter_api_user
+  failed_when:
+    - datacenter_api_user.rc != 0
+    - "'already exists' not in datacenter_api_user.stderr"
+  changed_when: datacenter_api_user.rc == 0
   run_once: true
 
 - name: Assign VM administration permissions
@@ -104,34 +56,6 @@
   changed_when: false
   run_once: true
 
-- name: Assign provisioning permissions
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - acl
-      - modify
-      - /
-      - --users
-      - opentofu@pve
-      - --roles
-      - OpenTofuProv
-  changed_when: false
-  run_once: true
-
-- name: Read OpenTofu API tokens
-  ansible.builtin.command:
-    argv:
-      - pveum
-      - user
-      - token
-      - list
-      - opentofu@pve
-      - --output-format
-      - json
-  register: datacenter_api_tokens
-  changed_when: false
-  run_once: true
-
 - name: Create OpenTofu API token
   ansible.builtin.command:
     argv:
@@ -148,9 +72,10 @@
       - --output-format
       - json
   register: datacenter_api_token
-  when: >-
-    'opentofu' not in (datacenter_api_tokens.stdout | from_json | map(attribute='tokenid') | list)
-  changed_when: true
+  failed_when:
+    - datacenter_api_token.rc != 0
+    - "'already exists' not in datacenter_api_token.stderr"
+  changed_when: datacenter_api_token.rc == 0
   no_log: true
   run_once: true
 
@@ -159,5 +84,5 @@
     msg:
       token_id: opentofu@pve!opentofu
       token_secret: "{{ (datacenter_api_token.stdout | from_json).value }}"
-  when: datacenter_api_token is changed
+  when: datacenter_api_token.rc == 0
   run_once: true
