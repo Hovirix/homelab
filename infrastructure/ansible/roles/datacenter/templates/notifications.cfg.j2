@@ -1,9 +1,9 @@
 smtp: hxlab-smtp
         mailto homelab@hovirix.dev
         from-address proxmox@hovirix.dev
-        username {{ infrastructure_secrets.smtp.user }}
-        server {{ infrastructure_secrets.smtp.host }}
-        port {{ infrastructure_secrets.smtp.port }}
+        username resend
+        server smtp.resend.com
+        port 587
         mode starttls
         comment Managed by Ansible
 

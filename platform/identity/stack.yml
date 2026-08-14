@@ -13,11 +13,11 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
-      AUTHENTIK_EMAIL__HOST: file:///run/secrets/smtp_host
-      AUTHENTIK_EMAIL__PORT: file:///run/secrets/smtp_port
-      AUTHENTIK_EMAIL__USERNAME: file:///run/secrets/smtp_user
-      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/smtp_password
-      AUTHENTIK_EMAIL__FROM: file:///run/secrets/smtp_from
+      AUTHENTIK_EMAIL__HOST: smtp.resend.com
+      AUTHENTIK_EMAIL__PORT: "587"
+      AUTHENTIK_EMAIL__USERNAME: resend
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/identity_authentik_smtp_api_key
+      AUTHENTIK_EMAIL__FROM: authentik@hovirix.dev
       AUTHENTIK_EMAIL__USE_TLS: "true"
       AUTHENTIK_EMAIL__USE_SSL: "false"
       AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
@@ -26,11 +26,7 @@ services:
     secrets:
       - identity_authentik_secret_key
       - data_postgres_authentik_password
-      - smtp_host
-      - smtp_port
-      - smtp_user
-      - smtp_password
-      - smtp_from
+      - identity_authentik_smtp_api_key
 
     networks:
       - data
@@ -71,11 +67,11 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
-      AUTHENTIK_EMAIL__HOST: file:///run/secrets/smtp_host
-      AUTHENTIK_EMAIL__PORT: file:///run/secrets/smtp_port
-      AUTHENTIK_EMAIL__USERNAME: file:///run/secrets/smtp_user
-      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/smtp_password
-      AUTHENTIK_EMAIL__FROM: file:///run/secrets/smtp_from
+      AUTHENTIK_EMAIL__HOST: smtp.resend.com
+      AUTHENTIK_EMAIL__PORT: "587"
+      AUTHENTIK_EMAIL__USERNAME: resend
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/identity_authentik_smtp_api_key
+      AUTHENTIK_EMAIL__FROM: authentik@hovirix.dev
       AUTHENTIK_EMAIL__USE_TLS: "true"
       AUTHENTIK_EMAIL__USE_SSL: "false"
       AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
@@ -85,11 +81,7 @@ services:
     secrets:
       - identity_authentik_secret_key
       - data_postgres_authentik_password
-      - smtp_host
-      - smtp_port
-      - smtp_user
-      - smtp_password
-      - smtp_from
+      - identity_authentik_smtp_api_key
 
     networks:
       - data
@@ -123,17 +115,5 @@ secrets:
   data_postgres_authentik_password:
     external: true
 
-  smtp_host:
-    external: true
-
-  smtp_port:
-    external: true
-
-  smtp_user:
-    external: true
-
-  smtp_password:
-    external: true
-
-  smtp_from:
+  identity_authentik_smtp_api_key:
     external: true
