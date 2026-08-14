@@ -10,6 +10,7 @@
       trivy
 
       # Security validation
+      actionlint
       ansible
       ansible-lint
       butane
@@ -51,6 +52,7 @@
       pre-commit
 
       # Validation & Linting
+      actionlint
       shfmt
       yamllint
 
@@ -59,6 +61,7 @@
       yq-go
 
       # Language Servers
+      ansible-language-server
       bash-language-server
       nil
       tofu-ls

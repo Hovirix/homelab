@@ -5,10 +5,17 @@ tasks:
     desc: Run all local lint checks
     cmds:
       - task: nix
+      - task: actionlint
       - task: shellcheck
       - task: ansible-lint
       - task: ansible-playbook
       - task: tflint
+
+  actionlint:
+    internal: true
+    desc: Lint GitHub Actions workflows
+    cmds:
+      - actionlint .github/workflows/*.yml
 
   nix:
     internal: true
