@@ -25,6 +25,16 @@ locals {
       answer = "10.40.0.101"
     }
 
+    home_wildcard_2 = {
+      domain = "*.home.hovirix.dev"
+      answer = "10.40.0.102"
+    }
+
+    home_wildcard_3 = {
+      domain = "*.home.hovirix.dev"
+      answer = "10.40.0.103"
+    }
+
     "swarm-01" = {
       domain = "swarm-01.home.hovirix.dev"
       answer = "10.40.0.101"

@@ -1,5 +1,9 @@
 version: "3"
 
+env:
+  DOCKER_HOST:
+    sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+
 tasks:
   secrets:
     internal: true

@@ -69,7 +69,9 @@
     ];
 
     shellHook = ''
-      export DOCKER_HOST=''${DOCKER_HOST:-ssh://deploy@swarm-01.home.hovirix.dev}
+      if [[ -z ''${DOCKER_HOST:-} && -x "$PWD/operations/scripts/swarm-host.sh" ]]; then
+        eval "$("$PWD/operations/scripts/swarm-host.sh" --export)"
+      fi
     '';
   };
 
