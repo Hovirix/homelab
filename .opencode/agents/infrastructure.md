@@ -10,9 +10,9 @@ permission:
     "infrastructure/**": allow
 
   bash:
-    "task configure:apply*": deny
-    "task provision:apply*": deny
-    "task provision:destroy*": deny
+    "task pve:apply*": deny
+    "task infra:apply*": deny
+    "task infra:destroy*": deny
 
     "*operations/scripts/tofu.sh * apply*": deny
     "*operations/scripts/tofu.sh * destroy*": deny

@@ -3,24 +3,37 @@ version: "3"
 silent: true
 
 includes:
-  lint:
-    flatten: true
-    taskfile: operations/taskfiles/lint.yml
+  check:
+    taskfile: operations/taskfiles/check.yml
 
-  configure:
-    taskfile: operations/taskfiles/configure.yml
+  infra:
+    taskfile: operations/taskfiles/infra.yml
 
-  security:
-    taskfile: operations/taskfiles/security.yml
+  pve:
+    taskfile: operations/taskfiles/pve.yml
 
-  provision:
-    taskfile: operations/taskfiles/provision.yml
+  swarm:
+    taskfile: operations/taskfiles/swarm.yml
 
   platform:
     taskfile: operations/taskfiles/platform.yml
 
 tasks:
-  security:
-    desc: Run all local security checks
+  check:
+    desc: Run all local validation
     cmds:
-      - task: security:check
+      - task: check:lint
+      - task: check:security
+
+  deploy:
+    desc: Deploy/update all platform workloads
+    cmds:
+      - task: platform:deploy
+
+  bootstrap:
+    desc: Converge the complete homelab from infrastructure to platform
+    cmds:
+      - task: infra:apply
+      - task: pve:apply
+      - task: swarm:init
+      - task: platform:deploy

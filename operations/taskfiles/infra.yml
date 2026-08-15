@@ -2,7 +2,7 @@ version: "3"
 
 tasks:
   init:
-    desc: Init infrastructure
+    desc: Initialize infrastructure
     cmds:
       - for: [adguardhome, proxmox, access]
         task: stack
@@ -11,7 +11,7 @@ tasks:
           ARGS: init
 
   plan:
-    desc: Preview infrastructure provisioning changes
+    desc: Preview infrastructure changes
     cmds:
       - task: fcos-render
       - for: [adguardhome, proxmox, access]
@@ -21,7 +21,7 @@ tasks:
           ARGS: plan
 
   apply:
-    desc: Apply infrastructure provisioning changes
+    desc: Apply infrastructure changes
     deps: [fcos-render]
     cmds:
       - for: [adguardhome, proxmox, access]
@@ -31,7 +31,7 @@ tasks:
           ARGS: apply
 
   destroy:
-    desc: Destroy provisioned infrastructure
+    desc: Destroy infrastructure
     cmds:
       - for: [access, proxmox, adguardhome]
         task: stack

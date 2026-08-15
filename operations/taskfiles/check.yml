@@ -1,0 +1,95 @@
+version: "3"
+
+vars:
+  SBOM_DIR: "{{.ROOT_DIR}}/.artifacts/sbom"
+  SECURITY_DIR: "{{.ROOT_DIR}}/security"
+
+env:
+  TRIVY_CONFIG: "{{.SECURITY_DIR}}/trivy.yaml"
+  SYFT_CONFIG: "{{.SECURITY_DIR}}/syft.yaml"
+
+tasks:
+  lint:
+    desc: Run lint checks
+    cmds:
+      - task: lint:actionlint
+      - task: lint:nix
+      - task: lint:shellcheck
+      - task: lint:ansible-lint
+      - task: lint:ansible-playbook
+      - task: lint:tflint
+
+  lint:actionlint:
+    internal: true
+    desc: Lint GitHub Actions workflows
+    cmds:
+      - actionlint .github/workflows/*.yml
+
+  lint:nix:
+    internal: true
+    desc: Validate Nix flake
+    cmds:
+      - nix flake check
+
+  lint:shellcheck:
+    internal: true
+    desc: Lint shell scripts
+    cmds:
+      - shellcheck operations/scripts/*.sh
+
+  lint:ansible-lint:
+    internal: true
+    desc: Lint Ansible code
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - ansible-lint
+
+  lint:ansible-playbook:
+    internal: true
+    desc: Syntax check Ansible playbooks
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - for playbook in playbooks/*.yml; do ansible-playbook "$playbook" --syntax-check; done
+
+  lint:tflint:
+    internal: true
+    desc: Lint OpenTofu configuration
+    cmds:
+      - for: [proxmox, adguardhome, access]
+        cmd: tflint --chdir "infrastructure/opentofu/stacks/{{.ITEM}}"
+
+  security:
+    desc: Run security checks
+    cmds:
+      - task: security:secrets
+      - task: security:vuln
+      - task: security:iac
+
+  security:secrets:
+    internal: true
+    desc: Scan the repository for secrets
+    cmds:
+      - trivy fs --scanners secret .
+
+  security:vuln:
+    internal: true
+    desc: Scan the repository for vulnerabilities
+    deps:
+      - security:sbom
+    cmds:
+      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/infrastructure.cdx.json"
+      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/operations.cdx.json"
+
+  security:iac:
+    internal: true
+    desc: Scan infrastructure configuration
+    cmds:
+      - trivy config infrastructure
+
+  security:sbom:
+    internal: true
+    desc: Generate local SBOMs with syft
+    cmds:
+      - mkdir -p "{{.SBOM_DIR}}"
+      - syft dir:infrastructure -o cyclonedx-json="{{.SBOM_DIR}}/infrastructure.cdx.json"
+      - syft dir:operations -o cyclonedx-json="{{.SBOM_DIR}}/operations.cdx.json"

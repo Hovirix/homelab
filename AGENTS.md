@@ -48,7 +48,7 @@ Current OpenTofu stack paths are `infrastructure/opentofu/stacks/access/`, `infr
 
 `platform/` contains Docker Swarm runtime definitions for deployed services.
 
-Operations is rooted at `Taskfile.yml` and `operations/`. Current operation paths are `operations/taskfiles/configure.yml`, `operations/taskfiles/lint.yml`, `operations/taskfiles/platform.yml`, `operations/taskfiles/provision.yml`, `operations/taskfiles/security.yml`, `operations/scripts/swarm-init.sh`, `operations/scripts/swarm-secrets.sh`, `operations/scripts/tofu.sh`, `.github/workflows/checks.yml`, `.github/workflows/security.yml`, and `.pre-commit-config.yaml`.
+Operations is rooted at `Taskfile.yml` and `operations/`. Current operation paths are `operations/taskfiles/check.yml`, `operations/taskfiles/infra.yml`, `operations/taskfiles/platform.yml`, `operations/taskfiles/pve.yml`, `operations/taskfiles/swarm.yml`, `operations/scripts/swarm-init.sh`, `operations/scripts/swarm-secrets.sh`, `operations/scripts/tofu.sh`, `.github/workflows/checks.yml`, `.github/workflows/security.yml`, and `.pre-commit-config.yaml`.
 
 Security tooling is rooted at `security/` with `security/syft.yaml` and `security/trivy.yaml`. Encrypted secret material is rooted at `secrets/` with `secrets/identity.sops.yaml`, `secrets/infrastructure.sops.yaml`, and `secrets/platform.sops.yaml`; repository SOPS policy is `.sops.yaml`.
 

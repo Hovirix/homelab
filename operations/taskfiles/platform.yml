@@ -1,15 +1,6 @@
 version: "3"
 
 tasks:
-  init:
-    desc: Initialize the Swarm and join the remaining managers
-    env:
-      SWARM_JOIN_DOCKER_HOSTS: ssh://deploy@swarm-02.home.hovirix.dev ssh://deploy@swarm-03.home.hovirix.dev
-      SWARM_ADVERTISE_ADDR: 10.40.0.101
-      SWARM_MANAGER_ENDPOINT: swarm-01.home.hovirix.dev:2377
-    cmds:
-      - operations/scripts/swarm-init.sh
-
   secrets:
     internal: true
     desc: Create missing platform Swarm secrets
@@ -17,67 +8,53 @@ tasks:
       - operations/scripts/swarm-secrets.sh
 
   deploy:
-    desc: Deploy platform stacks
+    desc: Deploy all platform stacks
     cmds:
       - task: secrets
-      - task: deploy:ingress
-      - task: deploy:data
-      - task: deploy:authentik
-      - task: deploy:observability
-      - task: deploy:applications
+      - task: ingress:deploy
+      - task: data:deploy
+      - task: authentik:deploy
+      - task: observability:deploy
+      - task: vaultwarden:deploy
+      - task: paperless:deploy
 
-  deploy:ingress:
-    desc: Deploy ingress stack
+  ingress:deploy:
+    desc: Deploy ingress
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/ingress/stack.yml ingress
 
-  deploy:data:
-    desc: Deploy data stacks
+  data:deploy:
+    desc: Deploy data services
     cmds:
-      - task: deploy:postgres
-      - task: deploy:valkey
+      - task: postgres:deploy
+      - task: valkey:deploy
 
-  deploy:postgres:
-    desc: Deploy PostgreSQL stack
+  postgres:deploy:
+    desc: Deploy PostgreSQL
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/data/postgres/stack.yml postgres
 
-  deploy:valkey:
-    desc: Deploy Valkey stack
+  valkey:deploy:
+    desc: Deploy Valkey
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/data/valkey/stack.yml valkey
 
-  deploy:authentik:
-    desc: Deploy Authentik stack
+  authentik:deploy:
+    desc: Deploy Authentik
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/identity/stack.yml authentik
 
-  deploy:observability:
-    desc: Deploy observability stack
+  observability:deploy:
+    desc: Deploy observability
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/observability/stack.yml observability
 
-  deploy:applications:
-    desc: Deploy application stacks
-    cmds:
-      - task: deploy:vaultwarden
-      - task: deploy:paperless
-
-  deploy:vaultwarden:
-    desc: Deploy Vaultwarden stack
+  vaultwarden:deploy:
+    desc: Deploy Vaultwarden
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/applications/vaultwarden/stack.yml vaultwarden
 
-  deploy:paperless:
-    desc: Deploy Paperless stack
+  paperless:deploy:
+    desc: Deploy Paperless
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/applications/paperless-ngx/stack.yml paperless
-
-  logs:
-    desc: Show Swarm service logs
-    requires:
-      vars:
-        - STACK
-        - SERVICE
-    cmds:
-      - docker service logs {{.STACK}}_{{.SERVICE}}

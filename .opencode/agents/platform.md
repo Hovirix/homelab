@@ -14,8 +14,9 @@ permission:
     "sops *": deny
     "age": deny
     "age *": deny
-    "task platform:init*": deny
+    "task swarm:init*": deny
     "task platform:deploy*": deny
+    "task platform:*:deploy*": deny
     "task platform:secrets*": deny
     "*operations/scripts/swarm-init.sh*": deny
     "*operations/scripts/swarm-secrets.sh*": deny
