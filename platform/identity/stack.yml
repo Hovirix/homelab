@@ -1,22 +1,22 @@
 services:
-  authentik-server:
+  server:
     image: ghcr.io/goauthentik/server:2026.5.6
 
     command:
       - server
 
     environment:
-      AUTHENTIK_SECRET_KEY: file:///run/secrets/identity_authentik_secret_key
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
       AUTHENTIK_POSTGRESQL__HOST: postgres
       AUTHENTIK_POSTGRESQL__PORT: "5432"
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__USER: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
       AUTHENTIK_EMAIL__HOST: smtp.resend.com
       AUTHENTIK_EMAIL__PORT: "587"
       AUTHENTIK_EMAIL__USERNAME: resend
-      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/identity_authentik_smtp_api_key
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/authentik_smtp_api_key
       AUTHENTIK_EMAIL__FROM: authentik@hovirix.dev
       AUTHENTIK_EMAIL__USE_TLS: "true"
       AUTHENTIK_EMAIL__USE_SSL: "false"
@@ -24,9 +24,9 @@ services:
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
 
     secrets:
-      - identity_authentik_secret_key
-      - data_postgres_authentik_password
-      - identity_authentik_smtp_api_key
+      - authentik_secret_key
+      - postgres_authentik_password
+      - authentik_smtp_api_key
 
     networks:
       - data
@@ -53,24 +53,24 @@ services:
       restart_policy:
         condition: on-failure
 
-  authentik-worker:
+  worker:
     image: ghcr.io/goauthentik/server:2026.5.6
 
     command:
       - worker
 
     environment:
-      AUTHENTIK_SECRET_KEY: file:///run/secrets/identity_authentik_secret_key
+      AUTHENTIK_SECRET_KEY: file:///run/secrets/authentik_secret_key
       AUTHENTIK_POSTGRESQL__HOST: postgres
       AUTHENTIK_POSTGRESQL__PORT: "5432"
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_POSTGRESQL__USER: authentik
-      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/data_postgres_authentik_password
+      AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
       AUTHENTIK_EMAIL__HOST: smtp.resend.com
       AUTHENTIK_EMAIL__PORT: "587"
       AUTHENTIK_EMAIL__USERNAME: resend
-      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/identity_authentik_smtp_api_key
+      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/authentik_smtp_api_key
       AUTHENTIK_EMAIL__FROM: authentik@hovirix.dev
       AUTHENTIK_EMAIL__USE_TLS: "true"
       AUTHENTIK_EMAIL__USE_SSL: "false"
@@ -79,9 +79,9 @@ services:
       AUTHENTIK_OUTPOSTS__DISCOVER: "false"
 
     secrets:
-      - identity_authentik_secret_key
-      - data_postgres_authentik_password
-      - identity_authentik_smtp_api_key
+      - authentik_secret_key
+      - postgres_authentik_password
+      - authentik_smtp_api_key
 
     networks:
       - data
@@ -109,11 +109,11 @@ networks:
     external: true
 
 secrets:
-  identity_authentik_secret_key:
+  authentik_secret_key:
     external: true
 
-  data_postgres_authentik_password:
+  postgres_authentik_password:
     external: true
 
-  identity_authentik_smtp_api_key:
+  authentik_smtp_api_key:
     external: true

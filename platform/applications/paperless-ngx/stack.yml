@@ -1,5 +1,5 @@
 services:
-  paperless:
+  web:
     image: ghcr.io/paperless-ngx/paperless-ngx:2.18.4
 
     entrypoint:
@@ -7,11 +7,11 @@ services:
 
     environment:
       PAPERLESS_URL: https://paperless.home.hovirix.dev
-      PAPERLESS_SECRET_KEY_FILE: /run/secrets/applications_paperless_secret_key
+      PAPERLESS_SECRET_KEY_FILE: /run/secrets/paperless_secret_key
       PAPERLESS_REDIS: redis://valkey:6379
       PAPERLESS_DBENGINE: postgresql
       PAPERLESS_DBHOST: postgres
-      PAPERLESS_DBPASS_FILE: /run/secrets/data_postgres_paperless_password
+      PAPERLESS_DBPASS_FILE: /run/secrets/postgres_paperless_password
       PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
       PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
       PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
@@ -23,10 +23,10 @@ services:
         mode: 0555
 
     secrets:
-      - applications_paperless_secret_key
-      - data_postgres_paperless_password
-      - oauth_paperless_client_id
-      - oauth_paperless_client_secret
+      - paperless_secret_key
+      - postgres_paperless_password
+      - paperless_client_id
+      - paperless_client_secret
 
     networks:
       - data
@@ -93,14 +93,14 @@ configs:
     file: ./configs/paperless-start.sh
 
 secrets:
-  applications_paperless_secret_key:
+  paperless_secret_key:
     external: true
 
-  data_postgres_paperless_password:
+  postgres_paperless_password:
     external: true
 
-  oauth_paperless_client_id:
+  paperless_client_id:
     external: true
 
-  oauth_paperless_client_secret:
+  paperless_client_secret:
     external: true

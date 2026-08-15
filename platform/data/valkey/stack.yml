@@ -1,5 +1,5 @@
 services:
-  valkey:
+  server:
     image: valkey/valkey:9.0.1-alpine
 
     user: "999:999"

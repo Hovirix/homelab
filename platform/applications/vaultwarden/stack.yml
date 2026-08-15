@@ -1,5 +1,5 @@
 services:
-  vaultwarden:
+  server:
     image: vaultwarden/server:1.37.1
 
     environment:
@@ -10,12 +10,12 @@ services:
       SSO_ONLY: "true"
       SSO_AUTH_ONLY_NOT_SESSION: "true"
       SSO_AUTHORITY: https://authentik.home.hovirix.dev/application/o/vaultwarden/
-      SSO_CLIENT_ID_FILE: /run/secrets/oauth_vaultwarden_client_id
-      SSO_CLIENT_SECRET_FILE: /run/secrets/oauth_vaultwarden_client_secret
+      SSO_CLIENT_ID_FILE: /run/secrets/vaultwarden_client_id
+      SSO_CLIENT_SECRET_FILE: /run/secrets/vaultwarden_client_secret
 
     secrets:
-      - oauth_vaultwarden_client_id
-      - oauth_vaultwarden_client_secret
+      - vaultwarden_client_id
+      - vaultwarden_client_secret
 
     networks:
       - traefik-public
@@ -61,8 +61,8 @@ networks:
     external: true
 
 secrets:
-  oauth_vaultwarden_client_id:
+  vaultwarden_client_id:
     external: true
 
-  oauth_vaultwarden_client_secret:
+  vaultwarden_client_secret:
     external: true

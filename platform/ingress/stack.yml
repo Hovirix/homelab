@@ -32,12 +32,12 @@ services:
       - --certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
 
     environment:
-      CF_DNS_API_TOKEN_FILE: /run/secrets/ingress_traefik_cf_dns_api_token
+      CF_DNS_API_TOKEN_FILE: /run/secrets/traefik_cf_dns_api_token
 
     user: "0:984"
 
     secrets:
-      - ingress_traefik_cf_dns_api_token
+      - traefik_cf_dns_api_token
 
     networks:
       - traefik-public
@@ -103,5 +103,5 @@ networks:
     attachable: true
 
 secrets:
-  ingress_traefik_cf_dns_api_token:
+  traefik_cf_dns_api_token:
     external: true

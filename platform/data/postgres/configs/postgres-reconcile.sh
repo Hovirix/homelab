@@ -2,9 +2,9 @@
 
 set -euo pipefail
 
-postgres_password_file=/run/secrets/data_postgres_superuser_password
-authentik_password_file=/run/secrets/data_postgres_authentik_password
-paperless_password_file=/run/secrets/data_postgres_paperless_password
+postgres_password_file=/run/secrets/postgres_superuser_password
+authentik_password_file=/run/secrets/postgres_authentik_password
+paperless_password_file=/run/secrets/postgres_paperless_password
 
 export PGPASSWORD
 PGPASSWORD="$(<"$postgres_password_file")"
