@@ -15,9 +15,9 @@ permission:
     "age": deny
     "age *": deny
     "task swarm:init*": deny
-    "task platform:deploy*": deny
-    "task platform:*:deploy*": deny
-    "task platform:secrets*": deny
+    "task services:deploy*": deny
+    "task services:*:deploy*": deny
+    "task services:secrets*": deny
     "*operations/scripts/swarm-init.sh*": deny
     "*operations/scripts/swarm-secrets.sh*": deny
     "docker stack deploy*": deny

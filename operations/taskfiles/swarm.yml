@@ -1,9 +1,5 @@
 version: "3"
 
-env:
-  DOCKER_HOST:
-    sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
-
 tasks:
   init:
     desc: Initialize the Docker Swarm
@@ -14,11 +10,10 @@ tasks:
     cmds:
       - operations/scripts/swarm-init.sh
 
-  logs:
-    desc: Show Swarm service logs
-    requires:
-      vars:
-        - STACK
-        - SERVICE
+  status:
+    desc: Show cluster and node status
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
-      - docker service logs {{.STACK}}_{{.SERVICE}}
+      - docker node ls

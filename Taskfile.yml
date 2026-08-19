@@ -15,8 +15,8 @@ includes:
   swarm:
     taskfile: operations/taskfiles/swarm.yml
 
-  platform:
-    taskfile: operations/taskfiles/platform.yml
+  services:
+    taskfile: operations/taskfiles/services.yml
 
 tasks:
   check:
@@ -26,14 +26,60 @@ tasks:
       - task: check:security
 
   deploy:
-    desc: Deploy/update all platform workloads
+    desc: Deploy/update all services
     cmds:
-      - task: platform:deploy
+      - task: services:deploy
 
   bootstrap:
-    desc: Converge the complete homelab from infrastructure to platform
+    desc: Converge the complete homelab
     cmds:
       - task: infra:apply
       - task: pve:apply
       - task: swarm:init
-      - task: platform:deploy
+      - task: services:deploy
+
+  status:
+    desc: Show homelab status
+    cmds:
+      - task: swarm:status
+      - task: services:status
+
+  default:
+    cmds:
+      - |
+        tasks="$(task --list --sort alphanumeric --json)"
+
+        printf '\n'
+        printf '\033[1m  HX LAB\033[0m\n'
+        printf '\033[2m  Homelab Infrastructure & Operations\033[0m\n'
+
+        group() {
+          title="$1"
+          pattern="$2"
+
+          entries="$(
+            printf '%s\n' "$tasks" |
+              jq -r --arg pattern "$pattern" '
+                .tasks[]
+                | select(.name | test($pattern))
+                | [.name, (.desc // "")]
+                | @tsv
+              '
+          )"
+
+          [ -z "$entries" ] && return
+
+          printf '\n  \033[1;36m%s\033[0m\n' "$title"
+
+          printf '%s\n' "$entries" |
+            while IFS="$(printf '\t')" read -r name desc; do
+              printf '    \033[1m%-36s\033[0m \033[2m%s\033[0m\n' "$name" "$desc"
+            done
+        }
+
+        group "Core"           '^(bootstrap|deploy|check|status)$'
+        group "Infrastructure" '^infra:'
+        group "Proxmox VE"     '^pve:'
+        group "Docker Swarm"   '^swarm:'
+        group "Services"       '^services:'
+        group "Validation"     '^check:'

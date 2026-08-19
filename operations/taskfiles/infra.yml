@@ -1,10 +1,14 @@
 version: "3"
 
+vars:
+  STACKS: [adguardhome, proxmox, access]
+
 tasks:
   init:
-    desc: Initialize infrastructure
+    internal: true
     cmds:
-      - for: [adguardhome, proxmox, access]
+      - for:
+          var: STACKS
         task: stack
         vars:
           STACK: "{{.ITEM}}"
@@ -12,9 +16,10 @@ tasks:
 
   plan:
     desc: Preview infrastructure changes
+    deps: [fcos-render, init]
     cmds:
-      - task: fcos-render
-      - for: [adguardhome, proxmox, access]
+      - for:
+          var: STACKS
         task: stack
         vars:
           STACK: "{{.ITEM}}"
@@ -22,22 +27,26 @@ tasks:
 
   apply:
     desc: Apply infrastructure changes
-    deps: [fcos-render]
+    prompt: Apply infrastructure changes?
+    deps: [fcos-render, init]
     cmds:
-      - for: [adguardhome, proxmox, access]
+      - for:
+          var: STACKS
         task: stack
         vars:
           STACK: "{{.ITEM}}"
-          ARGS: apply
+          ARGS: apply -auto-approve
 
   destroy:
-    desc: Destroy infrastructure
+    desc: Destroy managed infrastructure
+    prompt: "Destroy managed infrastructure? This is destructive."
+    deps: [init]
     cmds:
       - for: [access, proxmox, adguardhome]
         task: stack
         vars:
           STACK: "{{.ITEM}}"
-          ARGS: destroy
+          ARGS: destroy -auto-approve
 
   fcos-render:
     internal: true
@@ -49,8 +58,6 @@ tasks:
     internal: true
     dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/{{.STACK}}"
     requires:
-      vars:
-        - STACK
-        - ARGS
+      vars: [STACK, ARGS]
     cmds:
       - "{{.ROOT_DIR}}/operations/scripts/tofu.sh {{.ROOT_DIR}}/secrets/infrastructure.sops.yaml {{.ARGS}}"

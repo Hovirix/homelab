@@ -12,7 +12,7 @@ tasks:
       - operations/scripts/swarm-secrets.sh
 
   deploy:
-    desc: Deploy all platform stacks
+    internal: true
     cmds:
       - task: secrets
       - task: ingress:deploy
@@ -21,6 +21,11 @@ tasks:
       - task: observability:deploy
       - task: vaultwarden:deploy
       - task: paperless:deploy
+
+  status:
+    internal: true
+    cmds:
+      - docker stack ls
 
   ingress:deploy:
     desc: Deploy ingress

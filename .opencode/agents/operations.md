@@ -22,9 +22,9 @@ permission:
     "task infra:apply*": deny
     "task infra:destroy*": deny
     "task swarm:init*": deny
-    "task platform:deploy*": deny
-    "task platform:*:deploy*": deny
-    "task platform:secrets*": deny
+    "task services:deploy*": deny
+    "task services:*:deploy*": deny
+    "task services:secrets*": deny
     "*operations/scripts/tofu.sh * apply*": deny
     "*operations/scripts/tofu.sh * destroy*": deny
     "*operations/scripts/tofu.sh * import*": deny

@@ -11,7 +11,7 @@ env:
 tasks:
   lint:
     desc: Run lint checks
-    cmds:
+    deps:
       - task: lint:actionlint
       - task: lint:nix
       - task: lint:shellcheck
