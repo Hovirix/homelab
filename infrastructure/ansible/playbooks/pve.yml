@@ -15,8 +15,8 @@
         tasks_from: storage
       tags: [storage]
 
-    - name: Configure Proxmox VE certificates
+    - name: Configure Proxmox VE acme
       ansible.builtin.import_role:
         name: pve
-        tasks_from: certificates
-      tags: [certificates]
+        tasks_from: acme
+      tags: [acme]

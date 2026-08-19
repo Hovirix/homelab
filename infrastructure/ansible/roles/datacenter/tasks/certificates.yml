@@ -40,6 +40,20 @@
   failed_when: false
   run_once: true
 
+- name: Deactivate non-production ACME account
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - account
+      - deactivate
+      - default
+  when:
+    - datacenter_certificates_account.rc == 0
+    - (datacenter_certificates_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
+  changed_when: true
+  run_once: true
+
 - name: Register ACME account
   ansible.builtin.command:
     argv:
@@ -53,7 +67,8 @@
       - https://acme-v02.api.letsencrypt.org/directory
     stdin: |
       y
-  when: datacenter_certificates_account.rc != 0
+  when: >-
+    datacenter_certificates_account.rc != 0 or (datacenter_certificates_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
   changed_when: true
   run_once: true
 
@@ -96,3 +111,17 @@
     path: "{{ datacenter_certificates_cloudflare_credentials.path }}"
     state: absent
   when: datacenter_certificates_cloudflare_credentials is defined
+
+- name: Order ACME certificates
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - cert
+      - order
+      - --force
+      - "1"
+  changed_when: true
+  delegate_to: "{{ item }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  run_once: true

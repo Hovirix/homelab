@@ -1,0 +1,11 @@
+- name: Configure ACME domain
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - set
+      - --acme
+      - account=default
+      - -acmedomain0
+      - "{{ inventory_hostname }}.{{ domain }},plugin=cloudflare"
+  changed_when: true
