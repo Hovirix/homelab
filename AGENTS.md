@@ -27,6 +27,14 @@ HX Lab is a desired-state homelab repo. Treat repository code as intent; runtime
 - `task deploy` first creates missing Docker secrets from `secrets/platform.sops.yaml` and `secrets/identity.sops.yaml`, then deploys ingress, data, identity, observability, Vaultwarden, and Paperless stacks.
 - `task bootstrap` order is infrastructure apply, Proxmox Ansible apply, Swarm init, then services deploy.
 
+## Commit Convention
+
+- Format is Conventional Commits: `type(scope): description`.
+- Types: `fix`, `refactor`, `chore`, `feat`.
+- Scopes: `infrastructure`, `platform`, `operations`, `deps`, `tools`, `secrets`.
+- Use lowercase in commit messages. Do not capitalize the description after the colon.
+- Do not run `git commit` without being asked.
+
 ## Secrets And Safety
 
 - Secret material lives in `secrets/*.sops.yaml`; do not decrypt or print it to inspect values. Repo-local OpenCode config denies direct `sops` bash commands.
