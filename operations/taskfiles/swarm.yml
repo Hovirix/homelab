@@ -4,6 +4,7 @@ tasks:
   init:
     desc: Initialize the Docker Swarm
     env:
+      DOCKER_HOST: ssh://deploy@swarm-01.home.hovirix.dev
       SWARM_JOIN_DOCKER_HOSTS: ssh://deploy@swarm-02.home.hovirix.dev ssh://deploy@swarm-03.home.hovirix.dev
       SWARM_ADVERTISE_ADDR: 10.40.0.101
       SWARM_MANAGER_ENDPOINT: swarm-01.home.hovirix.dev:2377
@@ -16,4 +17,12 @@ tasks:
       DOCKER_HOST:
         sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
-      - docker node ls
+      - operations/scripts/swarm-status.sh
+
+  nuke:
+    desc: Remove all stacks and secrets from the cluster
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+    cmds:
+      - operations/scripts/swarm-nuke.sh
