@@ -9,7 +9,8 @@ services:
       - --log.level=INFO
       - --accesslog=true
 
-      - --api.dashboard=true
+      - --api.dashboard=false
+      - --api.insecure=false
       - --ping=true
 
       - --entrypoints.web.address=:80
@@ -22,7 +23,7 @@ services:
       - --entrypoints.websecure.http.tls.domains[0].sans=*.home.hovirix.dev
 
       - --providers.swarm=true
-      - --providers.swarm.endpoint=unix:///var/run/docker.sock
+      - --providers.swarm.endpoint=tcp://socket-proxy:2375
       - --providers.swarm.exposedbydefault=false
       - --providers.swarm.network=ingress_traefik-public
 
@@ -41,6 +42,7 @@ services:
 
     networks:
       - traefik-public
+      - socket-proxy
 
     ports:
       - target: 80
@@ -54,7 +56,6 @@ services:
         mode: ingress
 
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - type: bind
         source: /var/mnt/swarm/traefik
         target: /letsencrypt
@@ -73,19 +74,6 @@ services:
     deploy:
       replicas: 1
 
-      placement:
-        constraints:
-          - node.role == manager
-
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.traefik.rule=Host(`traefik.home.hovirix.dev`)
-        - traefik.http.routers.traefik.entrypoints=websecure
-        - traefik.http.routers.traefik.tls=true
-        - traefik.http.routers.traefik.tls.certresolver=cloudflare
-        - traefik.http.routers.traefik.service=api@internal
-        - traefik.http.services.traefik.loadbalancer.server.port=8080
-
       update_config:
         order: start-first
         failure_action: rollback
@@ -96,11 +84,39 @@ services:
       restart_policy:
         condition: on-failure
 
+  socket-proxy:
+    image: tecnativa/docker-socket-proxy:v0.4.2
+
+    environment:
+      EVENTS: "1"
+      INFO: "1"
+      NETWORKS: "1"
+      NODES: "1"
+      SERVICES: "1"
+      SWARM: "1"
+      TASKS: "1"
+
+    networks:
+      - socket-proxy
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    deploy:
+      replicas: 1
+
+      restart_policy:
+        condition: on-failure
+
 networks:
   traefik-public:
     name: ingress_traefik-public
     driver: overlay
     attachable: true
+
+  socket-proxy:
+    driver: overlay
+    internal: true
 
 secrets:
   traefik_cf_dns_api_token:
