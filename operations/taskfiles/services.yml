@@ -18,7 +18,8 @@ tasks:
     internal: true
     cmds:
       - task: secrets
-      - task: ingress:deploy
+      - task: traefik:deploy
+      - task: cloudflared:deploy
       - task: data:deploy
       - task: authentik:deploy
       - task: observability:deploy
@@ -30,10 +31,15 @@ tasks:
     cmds:
       - docker stack ls
 
-  ingress:deploy:
-    desc: Deploy ingress
+  traefik:deploy:
+    desc: Deploy Traefik
     cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/ingress/stack.yml ingress
+      - docker stack deploy --resolve-image changed --compose-file platform/ingress/traefik/stack.yml traefik
+
+  cloudflared:deploy:
+    desc: Deploy Cloudflared
+    cmds:
+      - docker stack deploy --resolve-image changed --compose-file platform/ingress/cloudflared/stack.yml cloudflared
 
   data:deploy:
     desc: Deploy data services

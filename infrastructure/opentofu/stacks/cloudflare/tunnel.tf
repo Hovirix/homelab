@@ -8,10 +8,9 @@ resource "cloudflare_dns_record" "wildcard" {
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "homelab" {
-  account_id    = local.account_id
-  name          = "homelab"
-  config_src    = "cloudflare"
-  tunnel_secret = data.sops_file.platform.data["ingress.clouflared.tunnel_secret"]
+  account_id = local.account_id
+  name       = "homelab"
+  config_src = "cloudflare"
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
@@ -22,7 +21,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
     ingress = [
       {
         hostname = "*.${local.domain}"
-        service  = "https://traefik.${local.domain}"
+        service  = "http://ingress_traefik:80"
       },
       {
         service = "http_status:404"
