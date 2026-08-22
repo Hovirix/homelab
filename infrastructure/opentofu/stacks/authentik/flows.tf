@@ -6,10 +6,6 @@ data "authentik_flow" "invalidation" {
   slug = "default-provider-invalidation-flow"
 }
 
-data "authentik_flow" "authentication" {
-  slug = "default-authentication-flow"
-}
-
 data "authentik_stage" "authentication_mfa_validation" {
   name = "default-authentication-mfa-validation"
 }
