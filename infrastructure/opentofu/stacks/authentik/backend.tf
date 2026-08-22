@@ -6,7 +6,7 @@ variable "opentofu_state_encryption_passphrase" {
 terraform {
   backend "s3" {
     bucket = "tf-state"
-    key    = "prod/access/terraform.tfstate"
+    key    = "prod/authentik/terraform.tfstate"
     region = "auto"
 
     endpoints = {

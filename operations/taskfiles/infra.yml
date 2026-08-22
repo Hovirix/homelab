@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  STACKS: [adguardhome, proxmox, access]
+  STACKS: [adguardhome, proxmox, cloudflare, authentik]
 
 tasks:
   init:
@@ -42,7 +42,7 @@ tasks:
     prompt: "Destroy managed infrastructure? This is destructive."
     deps: [init]
     cmds:
-      - for: [access, proxmox, adguardhome]
+      - for: [authentik, cloudflare, proxmox, adguardhome]
         task: stack
         vars:
           STACK: "{{.ITEM}}"

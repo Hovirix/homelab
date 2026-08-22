@@ -7,11 +7,6 @@ terraform {
       version = "2026.5.1"
     }
 
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "5.23.0"
-    }
-
     sops = {
       source  = "carlpett/sops"
       version = "1.4.1"
