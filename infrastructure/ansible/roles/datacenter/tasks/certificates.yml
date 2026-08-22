@@ -67,8 +67,9 @@
       - https://acme-v02.api.letsencrypt.org/directory
     stdin: |
       y
-  when: >-
-    datacenter_certificates_account.rc != 0 or (datacenter_certificates_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
+  when:
+    - datacenter_certificates_account.rc == 0
+    - (datacenter_certificates_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
   changed_when: true
   run_once: true
 
