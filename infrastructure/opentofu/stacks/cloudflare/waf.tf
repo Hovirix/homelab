@@ -9,7 +9,7 @@ resource "cloudflare_ruleset" "homelab_country" {
     {
       action      = "block"
       description = "Block non-Italian homelab traffic"
-      expression  = "(http.host wildcard \"*.home.hovirix.dev\" and ip.src.country ne \"IT\")"
+      expression  = "(http.host wildcard \"*.hovirix.dev\" and ip.src.country ne \"IT\")"
       ref         = "block_non_italian_homelab_traffic"
     },
   ]

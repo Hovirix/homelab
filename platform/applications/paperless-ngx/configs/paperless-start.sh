@@ -17,7 +17,7 @@ print(json.dumps({
                 "client_id": Path("/run/secrets/paperless_client_id").read_text(),
                 "secret": Path("/run/secrets/paperless_client_secret").read_text(),
                 "settings": {
-                    "server_url": "https://authentik.home.hovirix.dev/application/o/paperless/.well-known/openid-configuration",
+                    "server_url": "https://authentik.hovirix.dev/application/o/paperless/.well-known/openid-configuration",
                 },
             },
         ],

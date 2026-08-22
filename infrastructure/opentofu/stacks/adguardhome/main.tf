@@ -21,17 +21,17 @@ locals {
     }
 
     home_wildcard = {
-      domain = "*.home.hovirix.dev"
+      domain = "*.hovirix.dev"
       answer = "10.40.0.101"
     }
 
     home_wildcard_2 = {
-      domain = "*.home.hovirix.dev"
+      domain = "*.hovirix.dev"
       answer = "10.40.0.102"
     }
 
     home_wildcard_3 = {
-      domain = "*.home.hovirix.dev"
+      domain = "*.hovirix.dev"
       answer = "10.40.0.103"
     }
 

@@ -37,7 +37,7 @@ services:
 
       labels:
         - traefik.enable=true
-        - traefik.http.routers.authentik.rule=Host(`authentik.home.hovirix.dev`)
+        - traefik.http.routers.authentik.rule=Host(`authentik.hovirix.dev`)
         - traefik.http.routers.authentik.entrypoints=websecure
         - traefik.http.routers.authentik.tls=true
         - traefik.http.routers.authentik.tls.certresolver=cloudflare

@@ -3,13 +3,13 @@ services:
     image: vaultwarden/server:1.37.1
 
     environment:
-      DOMAIN: https://vaultwarden.home.hovirix.dev
+      DOMAIN: https://vaultwarden.hovirix.dev
       SIGNUPS_ALLOWED: "false"
       INVITATIONS_ALLOWED: "false"
       SSO_ENABLED: "true"
       SSO_ONLY: "true"
       SSO_AUTH_ONLY_NOT_SESSION: "true"
-      SSO_AUTHORITY: https://authentik.home.hovirix.dev/application/o/vaultwarden/
+      SSO_AUTHORITY: https://authentik.hovirix.dev/application/o/vaultwarden/
       SSO_CLIENT_ID_FILE: /run/secrets/vaultwarden_client_id
       SSO_CLIENT_SECRET_FILE: /run/secrets/vaultwarden_client_secret
 
@@ -39,7 +39,7 @@ services:
 
       labels:
         - traefik.enable=true
-        - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.home.hovirix.dev`)
+        - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.hovirix.dev`)
         - traefik.http.routers.vaultwarden.entrypoints=websecure
         - traefik.http.routers.vaultwarden.tls=true
         - traefik.http.routers.vaultwarden.tls.certresolver=cloudflare

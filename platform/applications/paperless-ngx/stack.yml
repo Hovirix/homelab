@@ -6,7 +6,7 @@ services:
       - /usr/local/bin/paperless-start.sh
 
     environment:
-      PAPERLESS_URL: https://paperless.home.hovirix.dev
+      PAPERLESS_URL: https://paperless.hovirix.dev
       PAPERLESS_SECRET_KEY_FILE: /run/secrets/paperless_secret_key
       PAPERLESS_REDIS: redis://valkey:6379
       PAPERLESS_DBENGINE: postgresql
@@ -63,7 +63,7 @@ services:
 
       labels:
         - traefik.enable=true
-        - traefik.http.routers.paperless.rule=Host(`paperless.home.hovirix.dev`)
+        - traefik.http.routers.paperless.rule=Host(`paperless.hovirix.dev`)
         - traefik.http.routers.paperless.entrypoints=websecure
         - traefik.http.routers.paperless.tls=true
         - traefik.http.routers.paperless.tls.certresolver=cloudflare

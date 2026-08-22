@@ -11,6 +11,11 @@ resource "cloudflare_zero_trust_tunnel_cloudflared" "homelab" {
   account_id = local.account_id
   name       = "homelab"
   config_src = "cloudflare"
+
+  # The provider retains this optional field even though it is not configured.
+  lifecycle {
+    ignore_changes = [tunnel_secret]
+  }
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {

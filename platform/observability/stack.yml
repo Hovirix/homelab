@@ -3,19 +3,19 @@ services:
     image: grafana/grafana:11.3.1
 
     environment:
-      GF_SERVER_DOMAIN: grafana.home.hovirix.dev
-      GF_SERVER_ROOT_URL: https://grafana.home.hovirix.dev
+      GF_SERVER_DOMAIN: grafana.hovirix.dev
+      GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
       GF_AUTH_GENERIC_OAUTH_NAME: authentik
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID__FILE: /run/secrets/grafana_client_id
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET__FILE: /run/secrets/grafana_client_secret
-      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://authentik.home.hovirix.dev/application/o/authorize/
-      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://authentik.home.hovirix.dev/application/o/token/
-      GF_AUTH_GENERIC_OAUTH_API_URL: https://authentik.home.hovirix.dev/application/o/userinfo/
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://authentik.hovirix.dev/application/o/authorize/
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://authentik.hovirix.dev/application/o/token/
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://authentik.hovirix.dev/application/o/userinfo/
       GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email entitlements
-      GF_AUTH_SIGNOUT_REDIRECT_URL: https://authentik.home.hovirix.dev/application/o/grafana/end-session/
+      GF_AUTH_SIGNOUT_REDIRECT_URL: https://authentik.hovirix.dev/application/o/grafana/end-session/
       GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "'GrafanaAdmin'"
@@ -52,7 +52,7 @@ services:
 
       labels:
         - traefik.enable=true
-        - traefik.http.routers.grafana.rule=Host(`grafana.home.hovirix.dev`)
+        - traefik.http.routers.grafana.rule=Host(`grafana.hovirix.dev`)
         - traefik.http.routers.grafana.entrypoints=websecure
         - traefik.http.routers.grafana.tls=true
         - traefik.http.routers.grafana.tls.certresolver=cloudflare

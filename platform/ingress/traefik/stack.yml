@@ -19,8 +19,8 @@ services:
 
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.http.tls.certresolver=cloudflare
-      - --entrypoints.websecure.http.tls.domains[0].main=home.hovirix.dev
-      - --entrypoints.websecure.http.tls.domains[0].sans=*.home.hovirix.dev
+      - --entrypoints.websecure.http.tls.domains[0].main=hovirix.dev
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.hovirix.dev
 
       - --providers.swarm=true
       - --providers.swarm.endpoint=tcp://socket-proxy:2375

@@ -1,3 +1,3 @@
 locals {
-  domain = "home.hovirix.dev"
+  domain = "hovirix.dev"
 }
