@@ -8,10 +8,10 @@ resource "cloudflare_dns_record" "wildcard" {
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "homelab" {
-  account_id = local.account_id
-  name       = "homelab"
-  config_src = "cloudflare"
-  # tunnel_secret = "" # Must be at least 32 bytes and encoded as a base64 string.
+  account_id    = local.account_id
+  name          = "homelab"
+  config_src    = "cloudflare"
+  tunnel_secret = data.sops_file.platform.data["ingress.clouflared.tunnel_secret"]
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
