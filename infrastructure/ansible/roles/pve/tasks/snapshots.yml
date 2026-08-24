@@ -1,0 +1,46 @@
+- name: Check Docker Swarm ZFS dataset
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - list
+      - -H
+      - -o
+      - name
+      - rpool/swarm
+  register: pve_swarm_zfs_dataset
+  changed_when: false
+  failed_when: false
+
+- name: Verify Docker Swarm ZFS dataset exists
+  ansible.builtin.assert:
+    that:
+      - pve_swarm_zfs_dataset.rc == 0
+      - pve_swarm_zfs_dataset.stdout == "rpool/swarm"
+    fail_msg: >-
+      Expected ZFS dataset rpool/swarm is missing or could not be queried on {{ inventory_hostname }}; refusing to configure snapshots. #magic___^_^___line
+- name: Install Docker Swarm ZFS snapshot service
+  ansible.builtin.template:
+    src: swarm-zfs-snapshot.service.j2
+    dest: /etc/systemd/system/swarm-zfs-snapshot.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd manager
+
+- name: Install Docker Swarm ZFS snapshot timer
+  ansible.builtin.template:
+    src: swarm-zfs-snapshot.timer.j2
+    dest: /etc/systemd/system/swarm-zfs-snapshot.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload systemd manager
+
+- name: Reload systemd before enabling Docker Swarm ZFS snapshot timer
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start Docker Swarm ZFS snapshot timer
+  ansible.builtin.systemd_service:
+    name: swarm-zfs-snapshot.timer
+    enabled: true
+    state: started

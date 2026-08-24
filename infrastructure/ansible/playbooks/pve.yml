@@ -20,3 +20,9 @@
         name: pve
         tasks_from: acme
       tags: [acme]
+
+    - name: Configure Docker Swarm ZFS snapshots
+      ansible.builtin.import_role:
+        name: pve
+        tasks_from: snapshots
+      tags: [snapshots]

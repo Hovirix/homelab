@@ -1,0 +1,10 @@
+[Unit]
+Description=Create hourly ZFS snapshot of Docker Swarm data
+
+[Timer]
+OnCalendar=*-*-* *:00:00
+Persistent=true
+Unit=swarm-zfs-snapshot.service
+
+[Install]
+WantedBy=timers.target
