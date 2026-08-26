@@ -20,6 +20,7 @@ services:
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "'GrafanaAdmin'"
       GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: "true"
+
     secrets:
       - grafana_admin_password
       - grafana_client_id
@@ -28,6 +29,10 @@ services:
     configs:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
+      - source: grafana_dashboards
+        target: /etc/grafana/provisioning/dashboards/hx-lab.yml
+      - source: grafana_dashboard_overview
+        target: /etc/grafana/provisioning/dashboards/hx-lab-overview.json
 
     networks:
       - observability
@@ -81,6 +86,8 @@ services:
     configs:
       - source: prometheus_config
         target: /etc/prometheus/prometheus.yml
+      - source: prometheus_alert_rules
+        target: /etc/prometheus/alerts.yml
 
     networks:
       - observability
@@ -140,9 +147,13 @@ services:
     command:
       - run
       - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy
       - /etc/alloy/config.alloy
 
     user: "0:0"
+
+    environment:
+      ALLOY_NODE: "{{.Node.Hostname}}"
 
     configs:
       - source: alloy_config
@@ -152,10 +163,11 @@ services:
       - observability
 
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/mnt/swarm/alloy:/var/lib/alloy
       - /:/host/root:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
+      - /var/run:/var/run:ro
 
     deploy:
       mode: global
@@ -180,16 +192,25 @@ networks:
 
 configs:
   grafana_datasources:
-    file: ./configs/grafana-datasources.yml
+    file: ./configs/grafana/provisioning/datasources.yml
+
+  grafana_dashboards:
+    file: ./configs/grafana/provisioning/dashboards.yml
+
+  grafana_dashboard_overview:
+    file: ./configs/grafana/dashboards/hx-lab-overview.json
 
   prometheus_config:
-    file: ./configs/prometheus.yml
+    file: ./configs/prometheus/prometheus.yml
+
+  prometheus_alert_rules:
+    file: ./configs/prometheus/rules/alerts.yml
 
   loki_config:
-    file: ./configs/loki.yml
+    file: ./configs/loki/config.yml
 
   alloy_config:
-    file: ./configs/alloy.river
+    file: ./configs/alloy/config.alloy
 
 secrets:
   grafana_admin_password:

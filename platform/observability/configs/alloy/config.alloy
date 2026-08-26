@@ -1,0 +1,216 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+discovery.docker "local" {
+  host             = "unix:///var/run/docker.sock"
+  refresh_interval = "30s"
+}
+
+// --- Docker logs to Loki ---
+
+discovery.relabel "docker_logs" {
+  targets = discovery.docker.local.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_stack_namespace"]
+    target_label  = "stack"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+    target_label  = "service"
+  }
+
+  rule {
+    replacement  = sys.env("ALLOY_NODE")
+    target_label = "node"
+  }
+}
+
+loki.source.docker "local" {
+  host             = "unix:///var/run/docker.sock"
+  targets          = discovery.relabel.docker_logs.output
+  labels           = {source = "docker"}
+  forward_to       = [loki.write.default.receiver]
+  refresh_interval = "30s"
+}
+
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// --- Host metrics via prometheus.exporter.unix ---
+
+prometheus.exporter.unix "node" {
+  rootfs_path = "/host/root"
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
+
+  // These collectors cannot read host PID state or parse FCOS XFS statistics.
+  disable_collectors = ["processes", "xfs"]
+
+  filesystem {
+    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+  }
+
+  netdev {
+    device_exclude = "^(lo|veth.+|docker.+|br-.+)$"
+  }
+}
+
+prometheus.scrape "node" {
+  targets         = prometheus.exporter.unix.node.targets
+  forward_to      = [prometheus.relabel.host_metrics.receiver]
+  scrape_interval = "15s"
+}
+
+prometheus.relabel "host_metrics" {
+  forward_to = [prometheus.remote_write.default.receiver]
+
+  rule {
+    replacement  = sys.env("ALLOY_NODE")
+    target_label = "node"
+  }
+
+  rule {
+    action = "labeldrop"
+    regex  = "instance"
+  }
+}
+
+// --- Docker container metrics via service discovery ---
+
+discovery.relabel "container_metrics" {
+  targets = discovery.docker.local.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_stack_namespace"]
+    target_label  = "stack"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    replacement  = sys.env("ALLOY_NODE")
+    target_label = "node"
+  }
+
+  rule {
+    source_labels = ["__address__"]
+    target_label  = "__param_target"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+    target_label  = "__param_service"
+  }
+
+  rule {
+    replacement  = "container_metrics"
+    target_label = "job"
+  }
+}
+
+prometheus.scrape "container_metrics" {
+  targets         = discovery.relabel.container_metrics.output
+  forward_to      = [prometheus.remote_write.default.receiver]
+  scrape_interval = "30s"
+}
+
+// --- Scrape Traefik metrics ---
+
+discovery.relabel "traefik_metrics" {
+  targets = discovery.docker.local.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+    target_label  = "__param_service"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_stack_namespace"]
+    target_label  = "stack"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+    target_label  = "service"
+  }
+
+  rule {
+    replacement  = sys.env("ALLOY_NODE")
+    target_label = "node"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_service_portpublished_8080_port"]
+    regex         = "8080"
+    target_label  = "__address__"
+    replacement   = "${1}"
+  }
+}
+
+prometheus.scrape "traefik" {
+  targets         = discovery.relabel.traefik_metrics.output
+  forward_to      = [prometheus.relabel.traefik.receiver]
+  scrape_interval = "30s"
+}
+
+prometheus.relabel "traefik" {
+  forward_to = [prometheus.remote_write.default.receiver]
+
+  rule {
+    action       = "drop"
+    source_labels = ["__address__"]
+    regex         = ""
+  }
+
+  rule {
+    replacement  = sys.env("ALLOY_NODE")
+    target_label = "node"
+  }
+}
+
+// --- Alloy self-metrics ---
+
+prometheus.scrape "alloy" {
+  targets         = [{"__address__" = "localhost:12345"}]
+  forward_to      = [prometheus.relabel.alloy.receiver]
+  scrape_interval = "15s"
+}
+
+prometheus.relabel "alloy" {
+  forward_to = [prometheus.remote_write.default.receiver]
+
+  rule {
+    replacement  = sys.env("ALLOY_NODE")
+    target_label = "node"
+  }
+}
+
+// --- Remote write to Prometheus ---
+
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}

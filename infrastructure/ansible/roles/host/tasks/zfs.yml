@@ -78,6 +78,7 @@
     name: "rpool/swarm/{{ item }}"
     state: present
   loop:
+    - alloy
     - grafana
     - loki
     - paperless

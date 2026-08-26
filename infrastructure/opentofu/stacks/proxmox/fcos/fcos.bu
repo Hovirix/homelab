@@ -34,6 +34,7 @@ storage:
       contents:
         inline: |
           # Type Path                                Mode   User   Group  Age
+          d /var/mnt/swarm/alloy                    0777 :root :root -
           d /var/mnt/swarm/traefik                  0777 :root :root -
           d /var/mnt/swarm/postgres                 0777 :root :root -
           d /var/mnt/swarm/valkey                   0777 :root :root -
