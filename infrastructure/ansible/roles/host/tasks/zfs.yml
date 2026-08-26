@@ -1,4 +1,4 @@
-- name: Read ZFS pool size
+- name: Read rpool size
   ansible.builtin.command:
     argv:
       - zpool
@@ -7,11 +7,11 @@
       - -o
       - size
       - rpool
-  register: host_storage_rpool_size
+  register: host_zfs_rpool_size
   changed_when: false
   check_mode: false
 
-- name: Read ZFS pool health
+- name: Read rpool health
   ansible.builtin.command:
     argv:
       - zpool
@@ -20,18 +20,18 @@
       - -o
       - health
       - rpool
-  register: host_storage_rpool_health
+  register: host_zfs_rpool_health
   changed_when: false
   check_mode: false
 
-- name: Validate ZFS pool
+- name: Validate rpool
   ansible.builtin.assert:
     that:
-      - host_storage_rpool_health.stdout | trim == "ONLINE"
-      - host_storage_rpool_size.stdout | trim | int >= 1500 * 1024**3
+      - host_zfs_rpool_health.stdout | trim == "ONLINE"
+      - host_zfs_rpool_size.stdout | trim | int >= 1500 * 1024**3
     fail_msg: >-
-      ZFS pool rpool must be ONLINE and at least 1500 GiB.
-- name: Read ZFS pool autotrim property
+      ZFS pool rpool must be ONLINE and at least 1500 GiB. #magic___^_^___line
+- name: Read rpool autotrim
   ansible.builtin.command:
     argv:
       - zpool
@@ -41,18 +41,18 @@
       - value
       - autotrim
       - rpool
-  register: host_storage_rpool_autotrim
+  register: host_zfs_rpool_autotrim
   changed_when: false
   check_mode: false
 
-- name: Enable ZFS pool autotrim
+- name: Enable rpool autotrim
   ansible.builtin.command:
     argv:
       - zpool
       - set
       - autotrim=on
       - rpool
-  when: host_storage_rpool_autotrim.stdout | trim != "on"
+  when: host_zfs_rpool_autotrim.stdout | trim != "on"
   changed_when: true
 
 - name: Configure VM ZFS dataset
@@ -72,3 +72,17 @@
       compression: lz4
       atime: "off"
       xattr: sa
+
+- name: Configure Swarm service ZFS datasets
+  community.general.zfs:
+    name: "rpool/swarm/{{ item }}"
+    state: present
+  loop:
+    - grafana
+    - loki
+    - paperless
+    - postgres
+    - prometheus
+    - traefik
+    - valkey
+    - vaultwarden
