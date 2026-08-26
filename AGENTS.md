@@ -4,7 +4,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 
 ## Architecture
 
-- Active stack: Proxmox VE, Fedora CoreOS VMs, Docker Swarm, Traefik, Cloudflared, Authentik, AdGuard Home, PostgreSQL/Valkey, and observability/application stacks. Network infrastructure itself is managed separately.
+- Active stack: Proxmox VE, Fedora CoreOS VMs, Docker Swarm, Traefik, Cloudflared, Authentik, AdGuard Home, PostgreSQL/Valkey, Netdata, and application stacks. Network infrastructure itself is managed separately.
 - `infrastructure/ansible/` configures only Proxmox hosts/datacenter resources. The active inventory is `pve1.home.hovirix.dev` as `root`.
 - `infrastructure/opentofu/stacks/` has four direct stacks: `adguardhome`, `proxmox`, `cloudflare`, and `authentik`. There are no current modules; add one only for a durable boundary or real repetition.
 - Fedora CoreOS source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; `infrastructure/opentofu/stacks/proxmox/build/fcos.ign` is generated and ignored. Regenerate it instead of editing it.
@@ -27,7 +27,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 - Keep each stack's `.terraform.lock.hcl` tracked; never edit state or generated `.terraform/` content.
 - Proxmox Ansible preview/apply commands are `task pve:plan` and `task pve:apply`; `site.yml` imports host config, node-local Proxmox config, then datacenter config.
 - Swarm/service tasks use `operations/scripts/swarm-host.sh`, which picks the first reachable configured node reporting active Swarm membership; it does not verify manager status independently.
-- `task deploy` orders secrets, Traefik, Cloudflared, PostgreSQL, Valkey, Authentik, observability, Vaultwarden, then Paperless. Secret delivery creates missing secrets only; it does not rotate existing ones.
+- `task deploy` orders secrets, Traefik, Cloudflared, PostgreSQL, Valkey, Authentik, Netdata, Vaultwarden, then Paperless. Secret delivery creates missing secrets only; it does not rotate existing ones.
 - `task bootstrap` runs infrastructure apply, Proxmox Ansible apply, Swarm init, then service deployment. Treat it as convergence, not guaranteed zero-state bootstrap: provider credentials and the Authentik endpoint may need to exist first.
 - `task status` contacts the live Swarm. `task swarm:nuke` has no prompt and removes every stack and Swarm secret visible through the selected endpoint.
 

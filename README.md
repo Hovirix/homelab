@@ -42,7 +42,7 @@ flowchart TB
             authentik --> services[Platform Services]
 
             services --> data[Data]
-            services --> observability[Observability]
+            services --> netdata[Netdata]
         end
 
         storage[ZFS / VirtioFS]
@@ -50,7 +50,7 @@ flowchart TB
 
     services --> storage
     data --> storage
-    observability --> storage
+    netdata --> storage
 
     storage -. Backup .-> truenas[TrueNAS]
 ```
@@ -82,15 +82,15 @@ Network infrastructure is managed separately in [`hovirix/netlab`](https://githu
 
 ## Platform
 
-| Layer          | Technology                                                                                                                                                                    | Role                           |
-| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| Orchestration  | [Docker Swarm](https://docs.docker.com/engine/swarm/)                                                                                                                         | Runs platform services         |
-| Ingress        | [Traefik](https://traefik.io/traefik/)                                                                                                                                        | Routes application traffic     |
-| Edge Connector | [Cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)                                                                        | Connects Cloudflare to Traefik |
-| Identity       | [Authentik](https://goauthentik.io/)                                                                                                                                          | Authentication and SSO         |
-| Data           | [PostgreSQL](https://www.postgresql.org/), [Valkey](https://valkey.io/)                                                                                                       | Shared data services           |
-| Observability  | [Grafana](https://grafana.com/), [Prometheus](https://prometheus.io/), [Loki](https://grafana.com/oss/loki/), [Alloy](https://grafana.com/oss/alloy-opentelemetry-collector/) | Metrics and logs               |
-| Applications   | [`platform/applications`](platform/applications)                                                                                                                              | Application stacks             |
+| Layer          | Technology                                                                                             | Role                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------- |
+| Orchestration  | [Docker Swarm](https://docs.docker.com/engine/swarm/)                                                  | Runs platform services                 |
+| Ingress        | [Traefik](https://traefik.io/traefik/)                                                                 | Routes application traffic             |
+| Edge Connector | [Cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/) | Connects Cloudflare to Traefik         |
+| Identity       | [Authentik](https://goauthentik.io/)                                                                   | Authentication and SSO                 |
+| Data           | [PostgreSQL](https://www.postgresql.org/), [Valkey](https://valkey.io/)                                | Shared data services                   |
+| Observability  | [Netdata](https://www.netdata.cloud/)                                                                  | Centralized host and container metrics |
+| Applications   | [`platform/applications`](platform/applications)                                                       | Application stacks                     |
 
 ## Repository
 

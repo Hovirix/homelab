@@ -78,11 +78,9 @@
     name: "rpool/swarm/{{ item }}"
     state: present
   loop:
-    - grafana
-    - loki
+    - netdata
     - paperless
     - postgres
-    - prometheus
     - traefik
     - valkey
     - vaultwarden

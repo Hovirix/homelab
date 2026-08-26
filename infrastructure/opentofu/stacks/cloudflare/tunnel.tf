@@ -25,6 +25,10 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
   config = {
     ingress = [
       {
+        hostname = "netdata.${local.domain}"
+        service  = "http_status:404"
+      },
+      {
         hostname = "*.${local.domain}"
         service  = "http://traefik_proxy:80"
       },
