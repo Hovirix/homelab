@@ -13,15 +13,6 @@
       "type": "remote",
       "url": "https://mcp-docs.docker.com/mcp",
       "enabled": true
-    },
-
-    "netdata": {
-      "type": "remote",
-      "url": "https://netdata.hovirix.dev/mcp",
-      "headers": {
-        "Authorization": "Bearer {env:NETDATA_MCP_TOKEN}"
-      },
-      "enabled": true
     }
   }
 }

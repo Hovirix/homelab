@@ -37,9 +37,9 @@ storage:
           d /var/mnt/swarm/traefik                  0777 :root :root -
           d /var/mnt/swarm/postgres                 0777 :root :root -
           d /var/mnt/swarm/valkey                   0777 :root :root -
-          d /var/mnt/swarm/netdata                  0777 :root :root -
-          d /var/mnt/swarm/netdata/lib              0777 :root :root -
-          d /var/mnt/swarm/netdata/cache            0777 :root :root -
+          d /var/mnt/swarm/grafana                  0777 :root :root -
+          d /var/mnt/swarm/prometheus               0777 :root :root -
+          d /var/mnt/swarm/loki                     0777 :root :root -
           d /var/mnt/swarm/vaultwarden              0777 :root :root -
 
           d /var/mnt/swarm/paperless                0755 :root :root -

@@ -22,7 +22,7 @@ tasks:
       - task: cloudflared:deploy
       - task: data:deploy
       - task: authentik:deploy
-      - task: netdata:deploy
+      - task: observability:deploy
       - task: vaultwarden:deploy
       - task: paperless:deploy
 
@@ -62,8 +62,8 @@ tasks:
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/identity/stack.yml authentik
 
-  netdata:deploy:
-    desc: Deploy Netdata
+  observability:deploy:
+    desc: Deploy observability
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/observability/stack.yml observability
 

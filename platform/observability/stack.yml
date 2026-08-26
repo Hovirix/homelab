@@ -1,53 +1,97 @@
 services:
-  parent:
-    image: netdata/netdata:v2.11.0
-
-    entrypoint:
-      - /etc/netdata/netdata-start.sh
+  grafana:
+    image: grafana/grafana:11.3.1
 
     environment:
-      DISABLE_TELEMETRY: "1"
-      NETDATA_HEALTHCHECK_TARGET: http://localhost:19998/api/v1/info
-      NETDATA_STREAM_ROLE: parent
+      GF_SERVER_DOMAIN: grafana.hovirix.dev
+      GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+      GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
+      GF_AUTH_GENERIC_OAUTH_NAME: authentik
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID__FILE: /run/secrets/grafana_client_id
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET__FILE: /run/secrets/grafana_client_secret
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://authentik.hovirix.dev/application/o/authorize/
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://authentik.hovirix.dev/application/o/token/
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://authentik.hovirix.dev/application/o/userinfo/
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email entitlements
+      GF_AUTH_SIGNOUT_REDIRECT_URL: https://authentik.hovirix.dev/application/o/grafana/end-session/
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
+      GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "'GrafanaAdmin'"
+      GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: "true"
+    secrets:
+      - grafana_admin_password
+      - grafana_client_id
+      - grafana_client_secret
 
     configs:
-      - source: parent_config
-        target: /etc/netdata/netdata.conf
-      - source: netdata_start
-        target: /etc/netdata/netdata-start.sh
-        mode: 0555
-
-    secrets:
-      - netdata_streaming_api_key
+      - source: grafana_datasources
+        target: /etc/grafana/provisioning/datasources/datasources.yml
 
     networks:
-      - netdata
+      - observability
       - traefik-public
-
-    ports:
-      - target: 19999
-        published: 19999
-        protocol: tcp
-        mode: ingress
 
     volumes:
       - type: bind
-        source: /var/mnt/swarm/netdata/lib
-        target: /var/lib/netdata
-      - type: bind
-        source: /var/mnt/swarm/netdata/cache
-        target: /var/cache/netdata
+        source: /var/mnt/swarm/grafana
+        target: /var/lib/grafana
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q --spider http://localhost:3000/api/health || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
     deploy:
       replicas: 1
 
       labels:
         - traefik.enable=true
-        - traefik.http.routers.netdata.rule=Host(`netdata.hovirix.dev`)
-        - traefik.http.routers.netdata.entrypoints=websecure
-        - traefik.http.routers.netdata.tls=true
-        - traefik.http.routers.netdata.tls.certresolver=cloudflare
-        - traefik.http.services.netdata.loadbalancer.server.port=19998
+        - traefik.http.routers.grafana.rule=Host(`grafana.hovirix.dev`)
+        - traefik.http.routers.grafana.entrypoints=websecure
+        - traefik.http.routers.grafana.tls=true
+        - traefik.http.routers.grafana.tls.certresolver=cloudflare
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
+
+      update_config:
+        order: start-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+      - --web.enable-remote-write-receiver
+
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+
+    networks:
+      - observability
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/prometheus
+        target: /prometheus
+
+    deploy:
+      replicas: 1
 
       update_config:
         order: stop-first
@@ -59,80 +103,59 @@ services:
       restart_policy:
         condition: on-failure
 
-  child:
-    image: netdata/netdata:v2.11.0
+  loki:
+    image: grafana/loki:3.3.2
 
-    hostname: "{{.Node.Hostname}}"
-
-    entrypoint:
-      - /etc/netdata/netdata-start.sh
-
-    environment:
-      DISABLE_TELEMETRY: "1"
-      NETDATA_HEALTHCHECK_TARGET: cli
-      NETDATA_STREAM_ROLE: child
-      NETDATA_STREAM_DESTINATION: swarm-01.home.hovirix.dev:19999 swarm-02.home.hovirix.dev:19999 swarm-03.home.hovirix.dev:19999
-
-    cap_add:
-      - SYS_ADMIN
-      - SYS_PTRACE
+    command:
+      - -config.file=/etc/loki/loki.yml
 
     configs:
-      - source: child_config
-        target: /etc/netdata/netdata.conf
-      - source: netdata_start
-        target: /etc/netdata/netdata-start.sh
-        mode: 0555
-
-    secrets:
-      - netdata_streaming_api_key
+      - source: loki_config
+        target: /etc/loki/loki.yml
 
     networks:
-      - host
+      - observability
 
     volumes:
       - type: bind
-        source: /
-        target: /host/root
-        read_only: true
-        bind:
-          propagation: rslave
-      - type: bind
-        source: /etc/passwd
-        target: /host/etc/passwd
-        read_only: true
-      - type: bind
-        source: /etc/group
-        target: /host/etc/group
-        read_only: true
-      - type: bind
-        source: /etc/hostname
-        target: /host/etc/hostname
-        read_only: true
-      - type: bind
-        source: /proc
-        target: /host/proc
-        read_only: true
-      - type: bind
-        source: /sys
-        target: /host/sys
-        read_only: true
-      - type: bind
-        source: /etc/os-release
-        target: /host/etc/os-release
-        read_only: true
-      - type: bind
-        source: /var/log
-        target: /host/var/log
-        read_only: true
-      - type: bind
-        source: /var/run/docker.sock
-        target: /var/run/docker.sock
-        read_only: true
-      - type: bind
-        source: /run/dbus
-        target: /run/dbus
-        read_only: true
+        source: /var/mnt/swarm/loki
+        target: /loki
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+      rollback_config:
+        order: stop-first
+
+      restart_policy:
+        condition: on-failure
+
+  alloy:
+    image: grafana/alloy:v1.5.1
+
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/alloy/config.alloy
+
+    user: "0:0"
+
+    configs:
+      - source: alloy_config
+        target: /etc/alloy/config.alloy
+
+    networks:
+      - observability
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/host/root:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
 
     deploy:
       mode: global
@@ -148,27 +171,32 @@ services:
         condition: on-failure
 
 networks:
-  netdata:
+  observability:
     driver: overlay
 
   traefik-public:
     name: ingress_traefik-public
     external: true
 
-  host:
-    external: true
-    name: host
-
 configs:
-  parent_config:
-    file: ./configs/netdata-parent.conf
+  grafana_datasources:
+    file: ./configs/grafana-datasources.yml
 
-  child_config:
-    file: ./configs/netdata-child.conf
+  prometheus_config:
+    file: ./configs/prometheus.yml
 
-  netdata_start:
-    file: ./configs/netdata-start.sh
+  loki_config:
+    file: ./configs/loki.yml
+
+  alloy_config:
+    file: ./configs/alloy.river
 
 secrets:
-  netdata_streaming_api_key:
+  grafana_admin_password:
+    external: true
+
+  grafana_client_id:
+    external: true
+
+  grafana_client_secret:
     external: true
