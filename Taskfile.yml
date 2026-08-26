@@ -3,6 +3,10 @@ version: "3"
 silent: true
 
 includes:
+  backup-restore:
+    taskfile: operations/taskfiles/backup-restore.yml
+    flatten: true
+
   check:
     taskfile: operations/taskfiles/check.yml
 
@@ -77,9 +81,10 @@ tasks:
             done
         }
 
-        group "Core"           '^(bootstrap|deploy|check|status)$'
-        group "Infrastructure" '^infra:'
-        group "Proxmox VE"     '^pve:'
-        group "Docker Swarm"   '^swarm:'
-        group "Services"       '^services:'
-        group "Validation"     '^check:'
+        group "Core"             '^(bootstrap|deploy|check|status)$'
+        group "Infrastructure"   '^infra:'
+        group "Proxmox VE"       '^pve:'
+        group "Docker Swarm"     '^swarm:'
+        group "Services"         '^services:'
+        group "Backup & Restore" '^(backup|restore)$'
+        group "Validation"       '^check:'

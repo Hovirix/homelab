@@ -1,0 +1,12 @@
+version: "3"
+
+tasks:
+  backup:
+    desc: Create a local Swarm recovery snapshot
+    cmds:
+      - operations/scripts/backup.sh
+
+  restore:
+    desc: Restore one local Swarm ZFS dataset snapshot
+    cmds:
+      - bash operations/scripts/restore.sh
