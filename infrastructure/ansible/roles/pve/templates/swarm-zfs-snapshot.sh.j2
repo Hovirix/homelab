@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+{% raw %}
+dataset='rpool/swarm'
+keep=24
+snapshot="$dataset@auto-$(date +%Y-%m-%d_%H-%M)"
+
+if zfs list -H -t snapshot -o name "$snapshot" >/dev/null 2>&1; then
+  printf 'Snapshot already exists: %s\n' "$snapshot"
+else
+  zfs snapshot -r "$snapshot"
+  printf 'Snapshot created: %s\n' "$snapshot"
+fi
+
+mapfile -t old_snapshots < <(
+  zfs list -H -t snapshot -o name -s creation "$dataset" |
+    awk '/^rpool\/swarm@auto-/'
+)
+
+if (( ${#old_snapshots[@]} > keep )); then
+  for snapshot in "${old_snapshots[@]:0:${#old_snapshots[@]}-keep}"; do
+    zfs destroy -r "$snapshot"
+  done
+fi
+{% endraw %}

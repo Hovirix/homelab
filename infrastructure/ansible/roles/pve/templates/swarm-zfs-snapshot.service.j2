@@ -1,6 +1,12 @@
 [Unit]
 Description=Create recursive ZFS snapshot of Docker Swarm data
+After=zfs.target
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -o pipefail -c '/usr/sbin/zfs snapshot -r "rpool/swarm@auto-$(/usr/bin/date +%%Y-%%m-%%d_%%H-%%M)" && /usr/sbin/zfs list -H -t snapshot -o name -s creation rpool/swarm | /usr/bin/awk "/^rpool\\/swarm@auto-/" | /usr/bin/head -n -24 | /usr/bin/xargs -r -n 1 /usr/sbin/zfs destroy -r'
+TimeoutStartSec=15min
+TimeoutStartFailureMode=kill
+TimeoutStopSec=30s
+TimeoutStopFailureMode=kill
+SuccessExitStatus=75
+ExecStart=/usr/bin/flock -n -E 75 /run/swarm-zfs-snapshot.lock /usr/local/sbin/swarm-zfs-snapshot

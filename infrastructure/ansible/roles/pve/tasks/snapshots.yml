@@ -18,6 +18,14 @@
       - pve_swarm_zfs_dataset.stdout == "rpool/swarm"
     fail_msg: >-
       Expected ZFS dataset rpool/swarm is missing or could not be queried on {{ inventory_hostname }}; refusing to configure snapshots. #magic___^_^___line
+- name: Install Docker Swarm ZFS snapshot script
+  ansible.builtin.template:
+    src: swarm-zfs-snapshot.sh.j2
+    dest: /usr/local/sbin/swarm-zfs-snapshot
+    owner: root
+    group: root
+    mode: "0755"
+
 - name: Install Docker Swarm ZFS snapshot service
   ansible.builtin.template:
     src: swarm-zfs-snapshot.service.j2
