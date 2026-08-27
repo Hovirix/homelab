@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-: "${DOCKER_HOST:?required}"
+: "${SWARM_PRIMARY_DOCKER_HOST:?required}"
 : "${SWARM_JOIN_DOCKER_HOSTS:?required}"
 : "${SWARM_ADVERTISE_ADDR:?required}"
 : "${SWARM_MANAGER_ENDPOINT:?required}"
 
-printf 'Checking primary node: %s\n' "$DOCKER_HOST"
+printf 'Checking primary node: %s\n' "$SWARM_PRIMARY_DOCKER_HOST"
 
-primary_state="$(docker --host "$DOCKER_HOST" info --format '{{.Swarm.LocalNodeState}}')"
+primary_state="$(docker --host "$SWARM_PRIMARY_DOCKER_HOST" info --format '{{.Swarm.LocalNodeState}}')"
 
 if [[ $primary_state == "active" ]]; then
   printf 'Swarm is already initialized.\n'
 else
   printf 'Initializing swarm...\n'
-  docker --host "$DOCKER_HOST" swarm init --advertise-addr "$SWARM_ADVERTISE_ADDR"
+  docker --host "$SWARM_PRIMARY_DOCKER_HOST" swarm init --advertise-addr "$SWARM_ADVERTISE_ADDR"
 fi
 
 printf 'Retrieving manager join token...\n'
 
-SWARM_TOKEN="$(docker --host "$DOCKER_HOST" swarm join-token --quiet manager)"
+SWARM_TOKEN="$(docker --host "$SWARM_PRIMARY_DOCKER_HOST" swarm join-token --quiet manager)"
 
 for host in $SWARM_JOIN_DOCKER_HOSTS; do
   printf '\nChecking node: %s\n' "$host"
@@ -36,4 +36,4 @@ done
 
 printf '\nCurrent swarm nodes:\n'
 
-docker --host "$DOCKER_HOST" node ls
+docker --host "$SWARM_PRIMARY_DOCKER_HOST" node ls
