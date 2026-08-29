@@ -142,7 +142,7 @@ services:
         condition: on-failure
 
   alloy:
-    image: grafana/alloy:v1.5.1
+    image: grafana/alloy:v1.19.2
 
     command:
       - run
