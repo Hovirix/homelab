@@ -1,6 +1,6 @@
 services:
   tunnel:
-    image: cloudflare/cloudflared:2025.8.1
+    image: cloudflare/cloudflared:2025.11.1
 
     command:
       - tunnel
