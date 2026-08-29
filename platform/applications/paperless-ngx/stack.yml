@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/paperless-ngx/paperless-ngx:2.18.4
+    image: ghcr.io/paperless-ngx/paperless-ngx:2.20.15
 
     entrypoint:
       - /usr/local/bin/paperless-start.sh
