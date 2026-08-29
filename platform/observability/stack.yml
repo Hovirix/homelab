@@ -173,6 +173,7 @@ services:
       - /:/rootfs:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
+      - /run/containerd:/run/containerd:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro

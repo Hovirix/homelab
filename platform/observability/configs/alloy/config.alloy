@@ -97,6 +97,7 @@ prometheus.relabel "host" {
 }
 
 prometheus.exporter.cadvisor "containers" {
+  containerd_host        = "/run/containerd/containerd.sock"
   docker_host            = "unix:///var/run/docker.sock"
   docker_only            = true
   store_container_labels = false

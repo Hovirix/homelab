@@ -63,6 +63,9 @@ storage:
           (allow container_t syslogd_var_run_t (dir (getattr search open read watch watch_reads)))
           (allow container_t syslogd_var_run_t (file (getattr open read map)))
           (allow container_t cgroup_t (dir (getattr search open read watch watch_reads)))
+          (allow container_t proc_t (dir (getattr search open read)))
+          (allow container_t proc_t (file (getattr open read)))
+          (allow container_t proc_t (lnk_file (getattr read)))
 
     - path: /etc/sudoers.d/90-admin
       mode: 0440
