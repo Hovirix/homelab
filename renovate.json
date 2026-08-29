@@ -4,5 +4,9 @@
 
   "nix": {
     "enabled": true
+  },
+
+  "docker-compose": {
+    "managerFilePatterns": ["/(^|/)stack\\.ya?ml$/"]
   }
 }
