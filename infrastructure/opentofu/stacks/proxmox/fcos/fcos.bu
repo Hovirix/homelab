@@ -34,12 +34,11 @@ storage:
       contents:
         inline: |
           # Type Path                                Mode   User   Group  Age
-          d /var/mnt/swarm/alloy                    0777 :root :root -
           d /var/mnt/swarm/traefik                  0777 :root :root -
           d /var/mnt/swarm/postgres                 0777 :root :root -
           d /var/mnt/swarm/valkey                   0777 :root :root -
           d /var/mnt/swarm/grafana                  0777 :root :root -
-          d /var/mnt/swarm/prometheus               0777 :root :root -
+          d /var/mnt/swarm/victoriametrics          0777 :root :root -
           d /var/mnt/swarm/loki                     0777 :root :root -
           d /var/mnt/swarm/vaultwarden              0777 :root :root -
 
@@ -49,7 +48,7 @@ storage:
           d /var/mnt/swarm/paperless/export         0777 :root :root -
           d /var/mnt/swarm/paperless/consume        0777 :root :root -
 
-    - path: /etc/selinux/local/traefik-docker-socket.cil
+    - path: /etc/selinux/local/container-host-access.cil
       mode: 0644
       user:
         name: root
@@ -59,6 +58,11 @@ storage:
         inline: |
           (allow container_t container_var_run_t (sock_file (getattr open read write ioctl lock append)))
           (allow container_t container_runtime_t (unix_stream_socket (connectto)))
+          (allow container_t var_log_t (dir (getattr search open read watch watch_reads)))
+          (allow container_t var_log_t (file (getattr open read map)))
+          (allow container_t syslogd_var_run_t (dir (getattr search open read watch watch_reads)))
+          (allow container_t syslogd_var_run_t (file (getattr open read map)))
+          (allow container_t cgroup_t (dir (getattr search open read watch watch_reads)))
 
     - path: /etc/sudoers.d/90-admin
       mode: 0440
@@ -110,15 +114,15 @@ systemd:
             Requires=swarm-storage-prepare.service
             After=swarm-storage-prepare.service
 
-            Wants=traefik-docker-socket-selinux.service
-            After=traefik-docker-socket-selinux.service
+            Wants=container-host-access-selinux.service
+            After=container-host-access-selinux.service
 
-    - name: traefik-docker-socket-selinux.service
+    - name: container-host-access-selinux.service
       contents: |
         [Unit]
-        Description=Allow containers to access the Docker socket
+        Description=Allow containers to access required host interfaces
 
         [Service]
         Type=oneshot
-        ExecStart=/usr/sbin/semodule -i /etc/selinux/local/traefik-docker-socket.cil
+        ExecStart=/usr/sbin/semodule -i /etc/selinux/local/container-host-access.cil
         RemainAfterExit=yes

@@ -29,10 +29,6 @@ services:
     configs:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
-      - source: grafana_dashboards
-        target: /etc/grafana/provisioning/dashboards/hx-lab.yml
-      - source: grafana_dashboard_overview
-        target: /etc/grafana/provisioning/dashboards/hx-lab-overview.json
 
     networks:
       - observability
@@ -73,32 +69,27 @@ services:
       restart_policy:
         condition: on-failure
 
-  prometheus:
-    image: prom/prometheus:v3.1.0
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.115.0
 
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.path=/prometheus
-      - --storage.tsdb.retention.time=15d
-      - --web.enable-lifecycle
-      - --web.enable-remote-write-receiver
-
-    configs:
-      - source: prometheus_config
-        target: /etc/prometheus/prometheus.yml
-      - source: prometheus_alert_rules
-        target: /etc/prometheus/alerts.yml
+      - -storageDataPath=/victoria-metrics-data
+      - -retentionPeriod=90d
 
     networks:
       - observability
 
     volumes:
       - type: bind
-        source: /var/mnt/swarm/prometheus
-        target: /prometheus
+        source: /var/mnt/swarm/victoriametrics
+        target: /victoria-metrics-data
 
     deploy:
       replicas: 1
+
+      placement:
+        constraints:
+          - node.hostname == swarm-03
 
       update_config:
         order: stop-first
@@ -128,6 +119,15 @@ services:
         source: /var/mnt/swarm/loki
         target: /loki
 
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://localhost:3100/ready || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
     deploy:
       replicas: 1
 
@@ -152,6 +152,9 @@ services:
 
     user: "0:0"
 
+    cap_add:
+      - SYS_ADMIN
+
     environment:
       ALLOY_NODE: "{{.Node.Hostname}}"
 
@@ -161,13 +164,18 @@ services:
 
     networks:
       - observability
+      - traefik-public
 
     volumes:
-      - /var/mnt/swarm/alloy:/var/lib/alloy
       - /:/host/root:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
-      - /var/run:/var/run:ro
+      - /:/rootfs:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log/journal:/var/log/journal:ro
+      - /run/log/journal:/run/log/journal:ro
 
     deploy:
       mode: global
@@ -192,24 +200,15 @@ networks:
 
 configs:
   grafana_datasources:
+    name: observability_grafana_datasources_v2
     file: ./configs/grafana/provisioning/datasources.yml
 
-  grafana_dashboards:
-    file: ./configs/grafana/provisioning/dashboards.yml
-
-  grafana_dashboard_overview:
-    file: ./configs/grafana/dashboards/hx-lab-overview.json
-
-  prometheus_config:
-    file: ./configs/prometheus/prometheus.yml
-
-  prometheus_alert_rules:
-    file: ./configs/prometheus/rules/alerts.yml
-
   loki_config:
+    name: observability_loki_config_v2
     file: ./configs/loki/config.yml
 
   alloy_config:
+    name: observability_alloy_config_v3
     file: ./configs/alloy/config.alloy
 
 secrets:

@@ -12,6 +12,8 @@ services:
       - --api.dashboard=false
       - --api.insecure=false
       - --ping=true
+      - --metrics.prometheus=true
+      - --metrics.prometheus.entrypoint=metrics
 
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
@@ -21,6 +23,7 @@ services:
       - --entrypoints.websecure.http.tls.certresolver=cloudflare
       - --entrypoints.websecure.http.tls.domains[0].main=hovirix.dev
       - --entrypoints.websecure.http.tls.domains[0].sans=*.hovirix.dev
+      - --entrypoints.metrics.address=:8082
 
       - --providers.swarm=true
       - --providers.swarm.endpoint=tcp://socket-proxy:2375

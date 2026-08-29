@@ -3,9 +3,9 @@ version: "3"
 # Settings this here set the env and execute the script for any tasks called this conflict with swarm:init
 # - [] Check Upstream if it's the intended way of go-task
 
-env:
-  DOCKER_HOST:
-    sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+# env:
+#   DOCKER_HOST:
+#     sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
 
 tasks:
   secrets:

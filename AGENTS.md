@@ -28,6 +28,11 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 - Proxmox Ansible preview/apply commands are `task pve:plan` and `task pve:apply`; `site.yml` imports host config, node-local Proxmox config, then datacenter config.
 - Swarm/service tasks use `operations/scripts/swarm-host.sh`, which picks the first reachable configured node reporting active Swarm membership; it does not verify manager status independently.
 - `task deploy` orders secrets, Traefik, Cloudflared, PostgreSQL, Valkey, Authentik, observability, Vaultwarden, then Paperless. Secret delivery creates missing secrets only; it does not rotate existing ones.
+
+## Observability
+
+Observability architecture is frozen: Alloy -> VictoriaMetrics/Loki -> Grafana -> mcp-grafana -> OpenCode. Do not redesign or replace components unless explicitly requested.
+
 - `task bootstrap` runs infrastructure apply, Proxmox Ansible apply, Swarm init, then service deployment. Treat it as convergence, not guaranteed zero-state bootstrap: provider credentials and the Authentik endpoint may need to exist first.
 - `task status` contacts the live Swarm. `task swarm:nuke` has no prompt and removes every stack and Swarm secret visible through the selected endpoint.
 

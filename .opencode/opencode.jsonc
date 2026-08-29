@@ -13,6 +13,27 @@
       "type": "remote",
       "url": "https://mcp-docs.docker.com/mcp",
       "enabled": true
+    },
+    "grafana": {
+      "enabled": true,
+      "type": "local",
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "-i",
+        "-e",
+        "GRAFANA_URL",
+        "-e",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN",
+        "grafana/mcp-grafana:1.2.0",
+        "-t",
+        "stdio"
+      ],
+      "environment": {
+        "GRAFANA_URL": "https://grafana.hovirix.dev",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+      }
     }
   }
 }
