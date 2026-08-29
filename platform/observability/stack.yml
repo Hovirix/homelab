@@ -70,7 +70,7 @@ services:
         condition: on-failure
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.115.0
+    image: victoriametrics/victoria-metrics:v1.150.0
 
     command:
       - -storageDataPath=/victoria-metrics-data
