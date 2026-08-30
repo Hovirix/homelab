@@ -209,7 +209,7 @@ configs:
     file: ./configs/loki/config.yml
 
   alloy_config:
-    name: observability_alloy_config_v3
+    name: observability_alloy_config_v4
     file: ./configs/alloy/config.alloy
 
 secrets:

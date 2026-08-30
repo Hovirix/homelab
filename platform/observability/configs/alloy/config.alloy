@@ -1,229 +1,341 @@
 logging {
-  level  = "info"
-  format = "logfmt"
+	level  = "info"
+	format = "logfmt"
 }
 
 discovery.docker "local" {
-  host             = "unix:///var/run/docker.sock"
-  refresh_interval = "30s"
+	refresh_interval = "30s"
+
+	match_first_network = true
 }
 
-// Docker logs retain their original content; only stable Swarm identity is indexed.
 discovery.relabel "docker_logs" {
-  targets = discovery.docker.local.targets
+	targets = discovery.docker.local.targets
 
-  rule {
-    source_labels = ["__meta_docker_container_label_com_docker_stack_namespace"]
-    target_label  = "stack"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_stack_namespace",
+		]
+		target_label = "stack"
+	}
 
-  rule {
-    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
-    target_label  = "service"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_service_name",
+		]
+		target_label = "service"
+	}
 
-  rule {
-    replacement  = sys.env("ALLOY_NODE")
-    target_label = "node"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_task_name",
+		]
+		regex        = ".*[.]([0-9]+)[.][^.]+$"
+		replacement  = "${1}"
+		target_label = "replica"
+	}
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "docker"
+		target_label = "source"
+	}
 }
 
 loki.source.docker "local" {
-  host             = "unix:///var/run/docker.sock"
-  targets          = discovery.relabel.docker_logs.output
-  forward_to       = [loki.write.default.receiver]
-  refresh_interval = "30s"
+	targets          = discovery.relabel.docker_logs.output
+	forward_to       = [loki.write.default.receiver]
+	refresh_interval = "30s"
 }
 
 discovery.relabel "journal" {
-  targets = [{}]
+	targets = [{}]
 
-  rule {
-    source_labels = ["__journal__systemd_unit"]
-    target_label  = "unit"
-  }
+	rule {
+		source_labels = ["__journal__systemd_unit"]
+		target_label  = "unit"
+	}
 
-  rule {
-    replacement  = sys.env("ALLOY_NODE")
-    target_label = "node"
-  }
+	rule {
+		source_labels = ["__journal_priority_keyword"]
+		target_label  = "level"
+	}
+
+	rule {
+		source_labels = ["__journal__transport"]
+		target_label  = "transport"
+	}
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "journal"
+		target_label = "source"
+	}
 }
 
 loki.source.journal "system" {
-  path          = "/var/log/journal"
-  max_age       = "24h"
-  relabel_rules = discovery.relabel.journal.rules
-  forward_to    = [loki.write.default.receiver]
+	path          = "/var/log/journal"
+	max_age       = "24h"
+	relabel_rules = discovery.relabel.journal.rules
+	forward_to    = [loki.write.default.receiver]
 }
 
 loki.write "default" {
-  endpoint {
-    url = "http://loki:3100/loki/api/v1/push"
-  }
+	endpoint { }
 }
 
 prometheus.exporter.unix "host" {
-  rootfs_path = "/host/root"
-  procfs_path = "/host/proc"
-  sysfs_path  = "/host/sys"
+	rootfs_path = "/host/root"
+	procfs_path = "/host/proc"
+	sysfs_path  = "/host/sys"
 
-  filesystem {
-    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
-  }
+	filesystem {
+		mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+	}
 
-  netdev {
-    device_exclude = "^(lo|veth.+|docker.+|br-.+)$"
-  }
+	netdev {
+		device_exclude = "^(lo|veth.+|docker.+|br-.+)$"
+	}
 }
 
 prometheus.scrape "host" {
-  targets         = prometheus.exporter.unix.host.targets
-  forward_to      = [prometheus.relabel.host.receiver]
-  scrape_interval = "15s"
+	targets         = prometheus.exporter.unix.host.targets
+	forward_to      = [prometheus.relabel.host.receiver]
+	scrape_interval = "15s"
 }
 
 prometheus.relabel "host" {
-  forward_to = [prometheus.remote_write.default.receiver]
+	forward_to = [prometheus.remote_write.default.receiver]
 
-  rule {
-    replacement  = sys.env("ALLOY_NODE")
-    target_label = "node"
-  }
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
 
-  rule {
-    action = "labeldrop"
-    regex  = "instance"
-  }
+	rule {
+		replacement  = "node"
+		target_label = "job"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
 }
 
 prometheus.exporter.cadvisor "containers" {
-  containerd_host        = "/run/containerd/containerd.sock"
-  docker_host            = "unix:///var/run/docker.sock"
-  docker_only            = true
-  store_container_labels = false
+	containerd_host              = "/run/containerd/containerd.sock"
+	docker_only                  = true
+	store_container_labels       = false
+	allowlisted_container_labels = [
+		"com.docker.stack.namespace",
+		"com.docker.swarm.service.name",
+		"com.docker.swarm.task.name",
+	]
 }
 
 prometheus.scrape "containers" {
-  targets         = prometheus.exporter.cadvisor.containers.targets
-  forward_to      = [prometheus.relabel.containers.receiver]
-  scrape_interval = "15s"
+	targets         = prometheus.exporter.cadvisor.containers.targets
+	forward_to      = [prometheus.relabel.containers.receiver]
+	scrape_interval = "15s"
 }
 
 prometheus.relabel "containers" {
-  forward_to = [prometheus.remote_write.default.receiver]
+	forward_to = [prometheus.remote_write.default.receiver]
 
-  rule {
-    replacement  = sys.env("ALLOY_NODE")
-    target_label = "node"
-  }
+	rule {
+		source_labels = [
+			"container_label_com_docker_stack_namespace",
+		]
+		target_label = "stack"
+	}
 
-  rule {
-    action = "labeldrop"
-    regex  = "(id|image|instance|name)"
-  }
+	rule {
+		source_labels = [
+			"container_label_com_docker_swarm_service_name",
+		]
+		target_label = "service"
+	}
+
+	rule {
+		source_labels = [
+			"container_label_com_docker_swarm_task_name",
+		]
+		regex        = ".*[.]([0-9]+)[.][^.]+$"
+		replacement  = "${1}"
+		target_label = "replica"
+	}
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "cadvisor"
+		target_label = "job"
+	}
+
+	rule {
+		source_labels = ["service", "name"]
+		separator     = ";"
+		regex         = "^;(.*)$"
+		replacement   = "${1}"
+		target_label  = "container"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "(container_label_.+|id|image|instance|name)"
+	}
 }
 
-// The Docker discovery target is local, so each Traefik replica is scraped once.
 discovery.relabel "traefik" {
-  targets = discovery.docker.local.targets
+	targets = discovery.docker.local.targets
 
-  rule {
-    action        = "keep"
-    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
-    regex         = "traefik_proxy"
-  }
+	rule {
+		action        = "keep"
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_service_name",
+		]
+		regex = "traefik_proxy"
+	}
 
-  rule {
-    source_labels = ["__meta_docker_network_ip"]
-    regex         = "(.+)"
-    replacement   = "${1}:8082"
-    target_label  = "__address__"
-  }
+	rule {
+		source_labels = ["__meta_docker_network_ip"]
+		regex         = "(.+)"
+		replacement   = "${1}:8082"
+		target_label  = "__address__"
+	}
 
-  rule {
-    replacement  = "traefik"
-    target_label = "stack"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_stack_namespace",
+		]
+		target_label = "stack"
+	}
 
-  rule {
-    replacement  = "proxy"
-    target_label = "service"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_service_name",
+		]
+		target_label = "service"
+	}
 
-  rule {
-    replacement  = sys.env("ALLOY_NODE")
-    target_label = "node"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_task_name",
+		]
+		regex        = ".*[.]([0-9]+)[.][^.]+$"
+		replacement  = "${1}"
+		target_label = "replica"
+	}
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
 }
 
 prometheus.scrape "traefik" {
-  targets         = discovery.relabel.traefik.output
-  forward_to      = [prometheus.relabel.traefik.receiver]
-  scrape_interval = "15s"
+	targets         = discovery.relabel.traefik.output
+	forward_to      = [prometheus.relabel.traefik.receiver]
+	scrape_interval = "15s"
 }
 
 prometheus.relabel "traefik" {
-  forward_to = [prometheus.remote_write.default.receiver]
+	forward_to = [prometheus.remote_write.default.receiver]
 
-  rule {
-    action = "labeldrop"
-    regex  = "instance"
-  }
+	rule {
+		replacement  = "traefik"
+		target_label = "job"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
 }
 
-// Scrape backend services from the node on which each replica runs.
 discovery.relabel "observability" {
-  targets = discovery.docker.local.targets
+	targets = discovery.docker.local.targets
 
-  rule {
-    action        = "keep"
-    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
-    regex         = "observability_(alloy|victoriametrics|loki|grafana)"
-  }
+	rule {
+		action        = "keep"
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_service_name",
+		]
+		regex = "observability_(alloy|victoriametrics|loki|grafana)"
+	}
 
-  rule {
-    source_labels = ["__meta_docker_network_ip", "__meta_docker_port_private"]
-    separator     = ":"
-    regex         = "(.+):(12345|3000|3100|8428)"
-    replacement   = "${1}:${2}"
-    target_label  = "__address__"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_network_ip",
+			"__meta_docker_port_private",
+		]
+		separator    = ":"
+		regex        = "(.+):(12345|3000|3100|8428)"
+		replacement  = "${1}:${2}"
+		target_label = "__address__"
+	}
 
-  rule {
-    source_labels = ["__meta_docker_container_label_com_docker_stack_namespace"]
-    target_label  = "stack"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_stack_namespace",
+		]
+		target_label = "stack"
+	}
 
-  rule {
-    source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
-    regex         = "observability_(.+)"
-    replacement   = "${1}"
-    target_label  = "service"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_service_name",
+		]
+		target_label = "service"
+	}
 
-  rule {
-    replacement  = sys.env("ALLOY_NODE")
-    target_label = "node"
-  }
+	rule {
+		source_labels = [
+			"__meta_docker_container_label_com_docker_swarm_task_name",
+		]
+		regex        = ".*[.]([0-9]+)[.][^.]+$"
+		replacement  = "${1}"
+		target_label = "replica"
+	}
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
 }
 
 prometheus.scrape "observability" {
-  targets         = discovery.relabel.observability.output
-  forward_to      = [prometheus.relabel.observability.receiver]
-  scrape_interval = "15s"
+	targets         = discovery.relabel.observability.output
+	forward_to      = [prometheus.relabel.observability.receiver]
+	scrape_interval = "15s"
 }
 
 prometheus.relabel "observability" {
-  forward_to = [prometheus.remote_write.default.receiver]
+	forward_to = [prometheus.remote_write.default.receiver]
 
-  rule {
-    action = "labeldrop"
-    regex  = "instance"
-  }
+	rule {
+		replacement  = "observability"
+		target_label = "job"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
 }
 
 prometheus.remote_write "default" {
-  endpoint {
-    url = "http://victoriametrics:8428/api/v1/write"
-  }
+	endpoint { }
 }
