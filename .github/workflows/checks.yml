@@ -23,5 +23,8 @@ jobs:
       - name: Cache Nix
         uses: DeterminateSystems/magic-nix-cache-action@v14
 
-      - name: Run checks
+      - name: Run lint checks
         run: nix develop .#ci --command task check:lint
+
+      - name: Run formatter check
+        run: nix develop .#ci --command treefmt --ci

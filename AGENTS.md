@@ -14,7 +14,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 
 ## Development And Validation
 
-- Format with `nix fmt`; Treefmt excludes `secrets/**`.
+- Format with `treefmt` via `task fmt`; Treefmt excludes `secrets/**`.
 - Full local validation is `task check`, which runs `task check:lint` then `task check:security`.
 - `task check` does not run formatting, `tofu validate`, Butane rendering, or Docker stack rendering; add focused validation when changed paths require it.
 - Security checks generate ignored SBOM output under `.artifacts/sbom` with Syft, then scan it with Trivy.
@@ -46,5 +46,5 @@ Observability architecture is frozen: Alloy -> VictoriaMetrics/Loki -> Grafana -
 
 - Secret material lives in `secrets/*.sops.yaml`; do not decrypt or print it to inspect values. Repo-local OpenCode config denies direct `sops` bash commands.
 - Remote mutation, backup/restore execution, and destructive commands require explicit user authorization. Some mutating Task entrypoints do not prompt; infra apply/destroy prompt but pass `-auto-approve` to OpenTofu.
-- When invoked, pre-commit runs full-repository `nix fmt` and `trivy --config security/trivy.yaml fs --scanners secret .`, regardless of staged paths.
+- When invoked, pre-commit runs full-repository `treefmt` and `trivy --config security/trivy.yaml fs --scanners secret .`, regardless of staged paths.
 - Keep traditional documentation minimal. Executable workflows are the operational source of truth; reserve `AGENTS.md` and skills for constraints and procedures code cannot express.

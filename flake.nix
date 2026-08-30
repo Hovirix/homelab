@@ -4,7 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
   outputs =
@@ -12,20 +11,71 @@
       self,
       nixpkgs,
       flake-utils,
-      treefmt-nix,
     }:
     flake-utils.lib.eachDefaultSystem (
       system:
       let
         pkgs = import nixpkgs { inherit system; };
-        treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+
+        validation = with pkgs; [
+          actionlint
+          ansible
+          ansible-lint
+          butane
+          docker-client
+          shellcheck
+          tflint
+        ];
+
+        security = with pkgs; [
+          syft
+          trivy
+        ];
+
+        formatters = with pkgs; [
+          nixfmt
+          opentofu
+          prettier
+          shfmt
+          treefmt
+          yamlfmt
+        ];
+
+        utilities = with pkgs; [
+          go-task
+          jq
+          yq-go
+        ];
       in
       {
-        formatter = treefmtEval.config.build.wrapper;
+        devShells = {
+          ci = pkgs.mkShell {
+            packages = validation ++ security ++ formatters ++ utilities;
+          };
 
-        checks = { };
+          default = pkgs.mkShell {
+            packages =
+              validation
+              ++ security
+              ++ formatters
+              ++ utilities
+              ++ (with pkgs; [
+                ansible-language-server
+                bash-language-server
+                nil
+                pre-commit
+                sops
+                tofu-ls
+                yaml-language-server
+              ]);
 
-        devShells = import ./shells.nix { inherit pkgs; };
+            shellHook = ''
+              if [[ -z ''${DOCKER_HOST:-} && -x "$PWD/operations/scripts/swarm-host.sh" ]]; then
+                eval "$("$PWD/operations/scripts/swarm-host.sh" --export)"
+              fi
+            '';
+          };
+        };
       }
     );
 }

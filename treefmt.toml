@@ -1,0 +1,24 @@
+[global]
+excludes = ["secrets/**"]
+
+[formatter.nixfmt]
+command = "nixfmt"
+includes = ["**/*.nix"]
+
+[formatter.prettier]
+command = "prettier"
+includes = ["**/*.{css,graphql,html,js,json,json5,jsonc,jsx,less,md,mdx,scss,ts,tsx,vue}"]
+
+[formatter.shfmt]
+command = "shfmt"
+includes = ["operations/scripts/*.sh"]
+
+[formatter.yamlfmt]
+command = "yamlfmt"
+options = ["-formatter", "type=basic", "-formatter", "retain_line_breaks_single=true"]
+includes = ["**/*.{yaml,yml}"]
+
+[formatter.opentofu]
+command = "tofu"
+options = ["fmt"]
+includes = ["**/*.tf", "**/*.tfvars"]

@@ -1,9 +1,9 @@
 repos:
   - repo: local
     hooks:
-      - id: nix-fmt
-        name: nix fmt
-        entry: nix fmt
+      - id: fmt
+        name: treefmt
+        entry: nix develop .#ci --command treefmt
         language: system
         pass_filenames: false
         always_run: true
