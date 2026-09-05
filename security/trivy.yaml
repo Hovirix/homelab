@@ -1,6 +1,10 @@
+quiet: true
+exit-code: 1
+
 scan:
+  skip-version-check: true
   skip-dirs:
-    - .direnv
     - .artifacts
+    - .direnv
     - .git
     - .opencode

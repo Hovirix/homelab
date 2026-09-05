@@ -1,13 +1,7 @@
 version: "3"
 
 vars:
-  SBOM_DIR: "{{.ROOT_DIR}}/.artifacts/sbom"
   POLICY_DIR: "{{.ROOT_DIR}}/security/policy"
-  SECURITY_DIR: "{{.ROOT_DIR}}/security"
-
-env:
-  TRIVY_CONFIG: "{{.SECURITY_DIR}}/trivy.yaml"
-  SYFT_CONFIG: "{{.SECURITY_DIR}}/syft.yaml"
 
 tasks:
   lint:
@@ -67,55 +61,55 @@ tasks:
   security:
     desc: Run security checks
     cmds:
+      - mkdir -p .artifacts/security
+      - printf '\nSecurity\n'
+      - printf '────────────────────────────────────────────────────────────\n'
       - task: security:secrets
       - task: security:iac
       - task: security:policy
       - task: security:actions
+
+      - printf '\nSBOM\n'
+      - printf '────────────────────────────────────────────────────────────\n'
+      - task: security:sbom
+
+      - printf '\nVulnerabilities\n'
+      - printf '────────────────────────────────────────────────────────────\n'
       - task: security:vuln
 
   security:secrets:
     internal: true
-    desc: Scan the repository for secrets
     cmds:
-      - trivy fs --scanners secret .
-
-  security:vuln:
-    internal: true
-    desc: Scan image SBOMs for High and Critical vulnerabilities
-    deps:
-      - security:sbom
-    cmds:
-      - for sbom in "{{.SBOM_DIR}}"/*.cdx.json; do grype "sbom:$sbom" --fail-on high; done
+      - trivy fs --config security/trivy.yaml --scanners secret --format json --output .artifacts/security/trivy-secrets.json .
+      - printf '✓ Secrets\n'
 
   security:iac:
     internal: true
-    desc: Scan repository configuration for generic misconfiguration
+    env:
+      TF_VAR_opentofu_state_encryption_passphrase: trivy-placeholder
     cmds:
-      - trivy config .
+      - trivy config --config security/trivy.yaml --format json --output .artifacts/security/trivy-iac.json .
+      - printf '✓ IaC\n'
 
   security:policy:
     internal: true
-    desc: Enforce HX Lab platform policy
     cmds:
-      - conftest verify --policy "{{.POLICY_DIR}}" "{{.POLICY_DIR}}"
-      - conftest test --policy "{{.POLICY_DIR}}" platform/**/stack.yml
+      - conftest verify --policy "{{.POLICY_DIR}}" > .artifacts/security/conftest-verify.txt
+      - conftest test --policy "{{.POLICY_DIR}}" --output json platform/*/stack.yml platform/*/*/stack.yml > .artifacts/security/conftest-policy.json
+      - printf '✓ Policy\n'
 
   security:actions:
     internal: true
-    desc: Analyze GitHub Actions security
     cmds:
-      - zizmor .github/workflows
+      - zizmor --quiet --format=json-v1 .github/workflows > .artifacts/security/zizmor.json
+      - printf '✓ Actions\n'
 
   security:sbom:
     internal: true
-    desc: Generate image SBOMs from unique stack image references
     cmds:
-      - mkdir -p "{{.SBOM_DIR}}"
-      - rm -f "{{.SBOM_DIR}}"/*.cdx.json
-      - |
-        yq -N -r '.. | select(has("image")) | .image' platform/**/stack.yml |
-          sort -u |
-          while IFS= read -r image; do
-            digest="$(printf '%s' "$image" | sha256sum | cut -d ' ' -f 1)"
-            syft "$image" -o cyclonedx-json="{{.SBOM_DIR}}/${digest}.cdx.json"
-          done
+      - operations/scripts/security-sbom.sh
+
+  security:vuln:
+    internal: true
+    cmds:
+      - operations/scripts/security-vuln.sh
