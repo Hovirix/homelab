@@ -4,6 +4,3 @@ scan:
     - .artifacts
     - .git
     - .opencode
-
-vulnerability:
-  ignore-unfixed: true

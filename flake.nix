@@ -28,8 +28,11 @@
         ];
 
         security = with pkgs; [
+          conftest
+          grype
           syft
           trivy
+          zizmor
         ];
 
         formatters = with pkgs; [
@@ -68,12 +71,6 @@
                 tofu-ls
                 yaml-language-server
               ]);
-
-            shellHook = ''
-              if [[ -z ''${DOCKER_HOST:-} && -x "$PWD/operations/scripts/swarm-host.sh" ]]; then
-                eval "$("$PWD/operations/scripts/swarm-host.sh" --export)"
-              fi
-            '';
           };
         };
       }

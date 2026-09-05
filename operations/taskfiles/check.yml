@@ -2,6 +2,7 @@ version: "3"
 
 vars:
   SBOM_DIR: "{{.ROOT_DIR}}/.artifacts/sbom"
+  POLICY_DIR: "{{.ROOT_DIR}}/security/policy"
   SECURITY_DIR: "{{.ROOT_DIR}}/security"
 
 env:
@@ -58,12 +59,19 @@ tasks:
       - for: [adguardhome, proxmox, cloudflare, authentik]
         cmd: tflint --chdir "infrastructure/opentofu/stacks/{{.ITEM}}"
 
+  lint:treefmt:
+    internal: true
+    desc: Check Formatting
+    cmd: treefmt --ci
+
   security:
     desc: Run security checks
     cmds:
       - task: security:secrets
-      - task: security:vuln
       - task: security:iac
+      - task: security:policy
+      - task: security:actions
+      - task: security:vuln
 
   security:secrets:
     internal: true
@@ -73,23 +81,41 @@ tasks:
 
   security:vuln:
     internal: true
-    desc: Scan the repository for vulnerabilities
+    desc: Scan image SBOMs for High and Critical vulnerabilities
     deps:
       - security:sbom
     cmds:
-      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/infrastructure.cdx.json"
-      - trivy sbom --scanners vuln "{{.SBOM_DIR}}/operations.cdx.json"
+      - for sbom in "{{.SBOM_DIR}}"/*.cdx.json; do grype "sbom:$sbom" --fail-on high; done
 
   security:iac:
     internal: true
-    desc: Scan infrastructure configuration
+    desc: Scan repository configuration for generic misconfiguration
     cmds:
-      - trivy config infrastructure
+      - trivy config .
+
+  security:policy:
+    internal: true
+    desc: Enforce HX Lab platform policy
+    cmds:
+      - conftest verify --policy "{{.POLICY_DIR}}" "{{.POLICY_DIR}}"
+      - conftest test --policy "{{.POLICY_DIR}}" platform/**/stack.yml
+
+  security:actions:
+    internal: true
+    desc: Analyze GitHub Actions security
+    cmds:
+      - zizmor .github/workflows
 
   security:sbom:
     internal: true
-    desc: Generate local SBOMs with syft
+    desc: Generate image SBOMs from unique stack image references
     cmds:
       - mkdir -p "{{.SBOM_DIR}}"
-      - syft dir:infrastructure -o cyclonedx-json="{{.SBOM_DIR}}/infrastructure.cdx.json"
-      - syft dir:operations -o cyclonedx-json="{{.SBOM_DIR}}/operations.cdx.json"
+      - rm -f "{{.SBOM_DIR}}"/*.cdx.json
+      - |
+        yq -N -r '.. | select(has("image")) | .image' platform/**/stack.yml |
+          sort -u |
+          while IFS= read -r image; do
+            digest="$(printf '%s' "$image" | sha256sum | cut -d ' ' -f 1)"
+            syft "$image" -o cyclonedx-json="{{.SBOM_DIR}}/${digest}.cdx.json"
+          done
