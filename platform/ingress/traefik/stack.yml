@@ -1,6 +1,6 @@
 services:
   proxy:
-    image: traefik:v3.7
+    image: traefik:v3.7@sha256:9c2a54d87f76f5c2f5f2682c68394af92fb12c0a2686798d6462a3f84bd78eaf
 
     command:
       - --global.checknewversion=false
@@ -88,7 +88,7 @@ services:
         condition: on-failure
 
   socket-proxy:
-    image: tecnativa/docker-socket-proxy:v0.4.2
+    image: tecnativa/docker-socket-proxy:v0.4.2@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476
 
     environment:
       EVENTS: "1"

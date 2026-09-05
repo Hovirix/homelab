@@ -1,6 +1,6 @@
 services:
   server:
-    image: vaultwarden/server:1.37.2
+    image: vaultwarden/server:1.37.2@sha256:094b5689ed81549bd293418395c7cf495ae9d960fc2d4928cef2083ef913d912
 
     environment:
       DOMAIN: https://vaultwarden.hovirix.dev
