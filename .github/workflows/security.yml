@@ -35,19 +35,22 @@ jobs:
         with:
           path: |
             /home/runner/.cache/grype
+            /home/runner/.cache/syft
             /home/runner/.cache/trivy
-          key: security-${{ runner.os }}-${{ hashFiles('security/trivy.yaml', 'flake.lock') }}
+          key: security-${{ runner.os }}-${{ hashFiles('.grype.yaml', '.syft.yaml', 'security/trivy.yaml', 'flake.lock') }}
           restore-keys: |
             security-${{ runner.os }}-
 
       - name: Run security checks
         run: nix develop .#ci --command task check:security
 
-      - name: Upload SBOM artifacts
+      - name: Upload security artifacts
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: sbom
-          path: .artifacts/sbom
+          name: security-reports
+          path: |
+            .artifacts/sbom
+            .artifacts/security
           if-no-files-found: warn
           retention-days: 14
