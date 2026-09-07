@@ -13,6 +13,7 @@ tasks:
       - task: lint:ansible-lint
       - task: lint:ansible-playbook
       - task: lint:tflint
+      - task: lint:treefmt
 
   lint:actionlint:
     internal: true
