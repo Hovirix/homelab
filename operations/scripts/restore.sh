@@ -11,6 +11,8 @@ ssh_opts=(
 )
 
 # Select stack
+# The selected dataset is deliberately quoted into the remote command.
+# shellcheck disable=SC2029
 dataset_output=$(
   ssh "${ssh_opts[@]}" "$host" \
     "zfs list -H -o name -d 1 '$parent' | sed -n 's#^$parent/##p' | sort"
@@ -34,6 +36,8 @@ done
 dataset="$parent/$stack"
 
 # Select snapshot
+# The selected dataset is deliberately quoted into the remote command.
+# shellcheck disable=SC2029
 snapshot_output=$(
   ssh "${ssh_opts[@]}" "$host" \
     "zfs list -H -t snapshot -o name -S creation '$dataset' |
@@ -85,6 +89,8 @@ read -r -p 'Type "restore" to continue: ' confirmation
 }
 
 # Restore
+# The selected snapshot is deliberately quoted into the remote command.
+# shellcheck disable=SC2029
 ssh "${ssh_opts[@]}" "$host" \
   "flock -n '$lock' zfs rollback -r '$snapshot'"
 
