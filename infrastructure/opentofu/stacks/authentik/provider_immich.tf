@@ -39,3 +39,13 @@ resource "authentik_application" "immich" {
   slug              = "immich"
   protocol_provider = authentik_provider_oauth2.immich.id
 }
+
+resource "authentik_group" "immich_users" {
+  name = "immich-users"
+}
+
+resource "authentik_policy_binding" "immich_users" {
+  target = authentik_application.immich.uuid
+  group  = authentik_group.immich_users.id
+  order  = 0
+}

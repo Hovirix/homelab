@@ -29,3 +29,13 @@ resource "authentik_application" "paperless" {
   slug              = "paperless"
   protocol_provider = authentik_provider_oauth2.paperless.id
 }
+
+resource "authentik_group" "paperless_users" {
+  name = "paperless-users"
+}
+
+resource "authentik_policy_binding" "paperless_users" {
+  target = authentik_application.paperless.uuid
+  group  = authentik_group.paperless_users.id
+  order  = 0
+}

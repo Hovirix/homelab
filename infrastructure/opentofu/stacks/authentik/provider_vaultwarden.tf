@@ -30,3 +30,13 @@ resource "authentik_application" "vaultwarden" {
   slug              = "vaultwarden"
   protocol_provider = authentik_provider_oauth2.vaultwarden.id
 }
+
+resource "authentik_group" "vaultwarden_users" {
+  name = "vaultwarden-users"
+}
+
+resource "authentik_policy_binding" "vaultwarden_users" {
+  target = authentik_application.vaultwarden.uuid
+  group  = authentik_group.vaultwarden_users.id
+  order  = 0
+}
