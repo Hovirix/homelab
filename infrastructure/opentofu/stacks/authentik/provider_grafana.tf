@@ -31,3 +31,13 @@ resource "authentik_application" "grafana" {
   slug              = "grafana"
   protocol_provider = authentik_provider_oauth2.grafana.id
 }
+
+resource "authentik_group" "grafana_admins" {
+  name = "grafana-admins"
+}
+
+resource "authentik_policy_binding" "grafana_admins" {
+  target = authentik_application.grafana.uuid
+  group  = authentik_group.grafana_admins.id
+  order  = 0
+}
