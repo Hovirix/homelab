@@ -46,7 +46,7 @@ services:
         - traefik.http.services.vaultwarden.loadbalancer.server.port=80
 
       update_config:
-        order: start-first
+        order: stop-first
         failure_action: rollback
 
       rollback_config:
