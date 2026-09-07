@@ -1,16 +1,12 @@
 version: "3"
 
-# Settings this here set the env and execute the script for any tasks called this conflict with swarm:init
-# - [] Check Upstream if it's the intended way of go-task
-
-# env:
-#   DOCKER_HOST:
-#     sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
-
 tasks:
   secrets:
     internal: true
     desc: Create missing platform Swarm secrets
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - operations/scripts/swarm-secrets.sh
 
@@ -28,16 +24,25 @@ tasks:
 
   status:
     internal: true
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack ls
 
   traefik:deploy:
     desc: Deploy Traefik
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/ingress/traefik/stack.yml traefik
 
   cloudflared:deploy:
     desc: Deploy Cloudflared
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/ingress/cloudflared/stack.yml cloudflared
 
@@ -49,30 +54,48 @@ tasks:
 
   postgres:deploy:
     desc: Deploy PostgreSQL
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/data/postgres/stack.yml postgres
 
   valkey:deploy:
     desc: Deploy Valkey
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/data/valkey/stack.yml valkey
 
   authentik:deploy:
     desc: Deploy Authentik
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/identity/stack.yml authentik
 
   observability:deploy:
     desc: Deploy observability
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/observability/stack.yml observability
 
   vaultwarden:deploy:
     desc: Deploy Vaultwarden
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/applications/vaultwarden/stack.yml vaultwarden
 
   paperless:deploy:
     desc: Deploy Paperless
+    env:
+      DOCKER_HOST:
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/applications/paperless-ngx/stack.yml paperless

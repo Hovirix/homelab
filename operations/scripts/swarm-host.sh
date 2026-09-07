@@ -8,7 +8,7 @@ hosts=(
 )
 
 for host in "${hosts[@]}"; do
-  if [[ $(docker --host "$host" info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null) == "active" ]]; then
+  if [[ $(docker --host "$host" info --format '{{.Swarm.LocalNodeState}}|{{.Swarm.ControlAvailable}}' 2>/dev/null) == "active|true" ]]; then
     if [[ ${1:-} == "--export" ]]; then
       printf 'export DOCKER_HOST=%q\n' "$host"
     else
