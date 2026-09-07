@@ -16,6 +16,7 @@
     validate: "sshd -t -f %s"
   notify: Reload sshd
 
+# yamllint disable rule:line-length
 - name: Configure root authorized keys
   ansible.posix.authorized_key:
     user: root
