@@ -16,7 +16,7 @@ includes = ["operations/scripts/*.sh"]
 [formatter.yamlfmt]
 command = "yamlfmt"
 options = ["-formatter", "type=basic", "-formatter", "retain_line_breaks_single=true"]
-includes = ["**/*.{yaml,yml}"]
+includes = ["**/*.{bu,yaml,yml}"]
 
 [formatter.opentofu]
 command = "tofu"
