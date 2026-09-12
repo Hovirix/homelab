@@ -16,44 +16,27 @@ passwd:
         - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
 
 storage:
-  directories:
-    - path: /var/mnt/swarm
-      mode: 0755
-      user:
-        name: root
-      group:
-        name: root
-
   files:
-    - path: /etc/swarm-storage.tmpfiles
+    - path: /etc/tmpfiles.d/swarm.conf
       mode: 0644
-      user:
-        name: root
-      group:
-        name: root
       contents:
         inline: |
-          # Type Path                                Mode   User   Group  Age
-          d /var/mnt/swarm/traefik                  0777 :root :root -
-          d /var/mnt/swarm/postgres                 0777 :root :root -
-          d /var/mnt/swarm/valkey                   0777 :root :root -
-          d /var/mnt/swarm/grafana                  0777 :root :root -
-          d /var/mnt/swarm/victoriametrics          0777 :root :root -
-          d /var/mnt/swarm/loki                     0777 :root :root -
-          d /var/mnt/swarm/vaultwarden              0777 :root :root -
+          d /var/mnt/swarm/traefik           0777 :root :root -
+          d /var/mnt/swarm/postgres          0777 :root :root -
+          d /var/mnt/swarm/valkey            0777 :root :root -
+          d /var/mnt/swarm/grafana           0777 :root :root -
+          d /var/mnt/swarm/victoriametrics   0777 :root :root -
+          d /var/mnt/swarm/loki              0777 :root :root -
+          d /var/mnt/swarm/vaultwarden       0777 :root :root -
 
-          d /var/mnt/swarm/paperless                0755 :root :root -
-          d /var/mnt/swarm/paperless/data           0777 :root :root -
-          d /var/mnt/swarm/paperless/media          0777 :root :root -
-          d /var/mnt/swarm/paperless/export         0777 :root :root -
-          d /var/mnt/swarm/paperless/consume        0777 :root :root -
+          d /var/mnt/swarm/paperless         0755 :root :root -
+          d /var/mnt/swarm/paperless/data    0777 :root :root -
+          d /var/mnt/swarm/paperless/media   0777 :root :root -
+          d /var/mnt/swarm/paperless/export  0777 :root :root -
+          d /var/mnt/swarm/paperless/consume 0777 :root :root -
 
     - path: /etc/selinux/local/container-host-access.cil
       mode: 0644
-      user:
-        name: root
-      group:
-        name: root
       contents:
         inline: |
           (allow container_t container_var_run_t (sock_file (getattr open read write ioctl lock append)))
@@ -69,10 +52,6 @@ storage:
 
     - path: /etc/sudoers.d/90-admin
       mode: 0440
-      user:
-        name: root
-      group:
-        name: root
       contents:
         inline: |
           admin ALL=(ALL) NOPASSWD: ALL
@@ -83,7 +62,7 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        Description=Mount Docker Swarm persistent data
+        Description=Docker Swarm persistent data
 
         [Mount]
         What=swarm
@@ -92,32 +71,15 @@ systemd:
         Options=rw,context=system_u:object_r:container_file_t:s0
 
         [Install]
-        WantedBy=multi-user.target
-
-    - name: swarm-storage-prepare.service
-      contents: |
-        [Unit]
-        Description=Prepare Docker Swarm persistent data directories
-        Requires=var-mnt-swarm.mount
-        After=var-mnt-swarm.mount
-        Before=docker.service
-
-        [Service]
-        Type=oneshot
-        ExecStart=/usr/bin/systemd-tmpfiles --create /etc/swarm-storage.tmpfiles
-        RemainAfterExit=yes
+        WantedBy=local-fs.target
 
     - name: docker.service
       dropins:
-        - name: 10-swarm-storage.conf
+        - name: 10-swarm.conf
           contents: |
             [Unit]
             RequiresMountsFor=/var/mnt/swarm
-
-            Requires=swarm-storage-prepare.service
-            After=swarm-storage-prepare.service
-
-            Wants=container-host-access-selinux.service
+            Requires=container-host-access-selinux.service
             After=container-host-access-selinux.service
 
     - name: container-host-access-selinux.service
