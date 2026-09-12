@@ -32,6 +32,16 @@ services:
       - data
       - traefik-public
 
+    healthcheck:
+      test:
+        - CMD
+        - ak
+        - healthcheck
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
     deploy:
       replicas: 1
 
@@ -85,6 +95,16 @@ services:
 
     networks:
       - data
+
+    healthcheck:
+      test:
+        - CMD
+        - ak
+        - healthcheck
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
 
     deploy:
       replicas: 1
