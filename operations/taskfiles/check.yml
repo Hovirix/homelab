@@ -1,63 +1,62 @@
 version: "3"
 
-vars:
-  POLICY_DIR: "{{.ROOT_DIR}}/security/policy"
-
 tasks:
   lint:
     desc: Run lint checks
     deps:
-      - task: lint:actionlint
-      - task: lint:nix
-      - task: lint:shellcheck
-      - task: lint:ansible-lint
-      - task: lint:ansible-playbook
-      - task: lint:tflint
-      - task: lint:treefmt
+      - lint:actionlint
+      - lint:nix
+      - lint:shellcheck
+      - lint:ansible
+      - lint:tofu
+      - lint:butane
+      - lint:docker
+      - lint:treefmt
 
   lint:actionlint:
     internal: true
-    desc: Lint GitHub Actions workflows
-    cmds:
-      - actionlint .github/workflows/*.yml
+    cmd: actionlint .github/workflows/*.yml
 
   lint:nix:
     internal: true
-    desc: Validate Nix flake
-    cmds:
-      - nix flake check
+    cmd: nix flake check --quiet
 
   lint:shellcheck:
     internal: true
-    desc: Lint shell scripts
-    cmds:
-      - shellcheck operations/scripts/*.sh
+    cmd: shellcheck operations/scripts/*.sh
 
-  lint:ansible-lint:
+  lint:ansible:
     internal: true
-    desc: Lint Ansible code
-    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
-    cmds:
-      - ansible-lint
+    dir: infrastructure/ansible
+    cmd: ansible-lint -q
 
-  lint:ansible-playbook:
+  lint:tofu:
     internal: true
-    desc: Syntax check Ansible playbooks
-    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
-    cmds:
-      - for playbook in playbooks/*.yml; do ansible-playbook "$playbook" --syntax-check; done
-
-  lint:tflint:
-    internal: true
-    desc: Lint OpenTofu configuration
     cmds:
       - for: [adguardhome, proxmox, cloudflare, authentik]
-        cmd: tflint --chdir "infrastructure/opentofu/stacks/{{.ITEM}}"
+        cmd: |
+          cd infrastructure/opentofu/stacks/{{.ITEM}}
+          export TF_DATA_DIR="{{.ROOT_DIR}}/.artifacts/tofu/{{.ITEM}}"
+          tflint
+          tofu init -backend=false -input=false -lockfile=readonly -no-color > /dev/null
+          tofu validate -no-color > /dev/null
+
+  lint:butane:
+    internal: true
+    cmd: butane --strict infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu > /dev/null
+
+  lint:docker:
+    internal: true
+    method: none
+    sources:
+      - platform/**/stack.yml
+    cmds:
+      - for: sources
+        cmd: docker stack config -c {{.ITEM}} > /dev/null
 
   lint:treefmt:
     internal: true
-    desc: Check Formatting
-    cmd: treefmt --ci
+    cmd: treefmt --ci --quiet
 
   security:
     desc: Run security checks
@@ -81,7 +80,7 @@ tasks:
   security:secrets:
     internal: true
     cmds:
-      - trivy fs --config security/trivy.yaml --scanners secret --format json --output .artifacts/security/trivy-secrets.json .
+      - trivy fs --quiet --config security/trivy.yaml --scanners secret --format json --output .artifacts/security/trivy-secrets.json .
       - printf '✓ Secrets\n'
 
   security:iac:
@@ -89,14 +88,15 @@ tasks:
     env:
       TF_VAR_opentofu_state_encryption_passphrase: trivy-placeholder
     cmds:
-      - trivy config --config security/trivy.yaml --format json --output .artifacts/security/trivy-iac.json .
+      - trivy config --quiet --config security/trivy.yaml --format json --output .artifacts/security/trivy-iac.json .
       - printf '✓ IaC\n'
 
   security:policy:
     internal: true
+    shopt: [globstar]
     cmds:
-      - conftest verify --policy "{{.POLICY_DIR}}" > .artifacts/security/conftest-verify.txt
-      - conftest test --policy "{{.POLICY_DIR}}" --output json platform/*/stack.yml platform/*/*/stack.yml > .artifacts/security/conftest-policy.json
+      - conftest verify --policy security/policy > .artifacts/security/conftest-verify.txt
+      - conftest test --policy security/policy --output json platform/**/stack.yml > .artifacts/security/conftest-policy.json
       - printf '✓ Policy\n'
 
   security:actions:
@@ -107,10 +107,8 @@ tasks:
 
   security:sbom:
     internal: true
-    cmds:
-      - operations/scripts/security-sbom.sh
+    cmd: operations/scripts/security-sbom.sh
 
   security:vuln:
     internal: true
-    cmds:
-      - operations/scripts/security-vuln.sh
+    cmd: operations/scripts/security-vuln.sh
