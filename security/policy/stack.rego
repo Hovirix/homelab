@@ -10,6 +10,22 @@ deny contains msg if {
 deny contains msg if {
   some name
   service := input.services[name]
+  capability := service.cap_add[_]
+  not allowed_capability(name, capability)
+  msg := sprintf("service %q must not add capability %q", [name, capability])
+}
+
+deny contains msg if {
+  some name
+  service := input.services[name]
+  service.user in {"0", "0:0", "root"}
+  not allowed_root_user(name)
+  msg := sprintf("service %q must not explicitly set a root user", [name])
+}
+
+deny contains msg if {
+  some name
+  service := input.services[name]
   service.network_mode == "host"
   msg := sprintf("service %q must not use host networking", [name])
 }
@@ -91,6 +107,14 @@ allowed_socket_mount(name, mount) if {
   name == "socket-proxy"
   socket_read_only(mount)
 }
+
+# Alloy's host exporters require SYS_ADMIN and root to read host namespaces.
+allowed_capability(name, capability) if {
+  name == "alloy"
+  capability == "SYS_ADMIN"
+}
+
+allowed_root_user(name) if name == "alloy"
 
 allowed_socket_mount(name, mount) if {
   name == "alloy"

@@ -9,6 +9,28 @@ test_denies_privileged_containers if {
   deny with input as object.union(compliant_stack, {"services": {"app": {"image": "example/app:1.0@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "privileged": true}}})
 }
 
+test_denies_unapproved_capabilities if {
+  deny with input as {
+    "services": {
+      "app": {
+        "cap_add": ["SYS_ADMIN"],
+        "image": "example/app:1.0@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      },
+    },
+  }
+}
+
+test_denies_unapproved_explicit_root_user if {
+  deny with input as {
+    "services": {
+      "app": {
+        "image": "example/app:1.0@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "user": "0:0",
+      },
+    },
+  }
+}
+
 test_denies_unpinned_images if {
   deny with input as {"services": {"app": {"image": "example/app:1.0"}}}
 }
