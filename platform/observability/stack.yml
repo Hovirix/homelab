@@ -20,15 +20,26 @@ services:
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'grafana-admins') && 'GrafanaAdmin' || 'Viewer'"
       GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: "true"
+      GF_SMTP_ENABLED: "true"
+      GF_SMTP_HOST: smtp.resend.com:587
+      GF_SMTP_USER: resend
+      GF_SMTP_PASSWORD__FILE: /run/secrets/grafana_smtp_api_key
+      GF_SMTP_FROM_ADDRESS: grafana@hovirix.dev
+      GF_SMTP_FROM_NAME: Grafana
+      GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
 
     secrets:
       - grafana_admin_password
       - grafana_client_id
       - grafana_client_secret
+      - grafana_smtp_api_key
 
     configs:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
+
+      - source: grafana_alerting
+        target: /etc/grafana/provisioning/alerting/hx-lab.yml
 
     networks:
       - observability
@@ -204,6 +215,10 @@ configs:
     name: observability_grafana_datasources_v2
     file: ./configs/grafana/provisioning/datasources.yml
 
+  grafana_alerting:
+    name: observability_grafana_alerting_v1
+    file: ./configs/grafana/provisioning/alerting/hx-lab.yml
+
   loki_config:
     name: observability_loki_config_v2
     file: ./configs/loki/config.yml
@@ -220,4 +235,7 @@ secrets:
     external: true
 
   grafana_client_secret:
+    external: true
+
+  grafana_smtp_api_key:
     external: true

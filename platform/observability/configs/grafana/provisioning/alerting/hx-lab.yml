@@ -1,0 +1,806 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: Email
+    receivers:
+      - uid: email
+        type: email
+        disableResolveMessage: false
+        settings:
+          addresses: homelab@hovirix.dev
+          singleEmail: true
+
+policies:
+  - orgId: 1
+    receiver: Email
+    group_by:
+      - alertname
+    group_wait: 30s
+    group_interval: 5m
+    repeat_interval: 4h
+
+groups:
+  - orgId: 1
+    name: alerts
+    folder: Alerts
+    interval: 1m
+
+    rules:
+
+      # ======================================================================
+      # SWARM NODE MISSING
+      # ----------------------------------------------------------------------
+      # Warning when fewer than 3 node exporters are reporting.
+      # This detects a missing Swarm VM/node from the monitoring point of view.
+      # It does NOT prove Docker Swarm manager quorum state.
+      # ======================================================================
+      - uid: node-missing
+        title: Swarm node missing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                count(up{job="node"} == 1)
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 3
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Fewer than 3 Swarm nodes are reporting metrics
+        labels:
+          severity: warning
+        isPaused: false
+
+      # ======================================================================
+      # MULTIPLE SWARM NODES MISSING
+      # ----------------------------------------------------------------------
+      # Critical when fewer than 2 node exporters are reporting.
+      # With a 3-node setup this means at least two monitored nodes disappeared.
+      # ======================================================================
+      - uid: multiple-nodes-missing
+        title: Multiple Swarm nodes missing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                count(up{job="node"} == 1)
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 2
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Fewer than 2 Swarm nodes are reporting metrics
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # HIGH CPU
+      # ----------------------------------------------------------------------
+      # Warning when a node remains above 90% CPU usage for 15 minutes.
+      # ======================================================================
+      - uid: high-cpu
+        title: High CPU
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 - avg by (node) (
+                  rate(node_cpu_seconds_total{job="node", mode="idle"}[5m])
+                ) * 100
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 90
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        annotations:
+          summary: CPU usage is above 90% on {{ $labels.node }}
+        labels:
+          severity: warning
+        isPaused: false
+
+      # ======================================================================
+      # HIGH MEMORY
+      # ----------------------------------------------------------------------
+      # Warning when a node remains above 90% memory usage for 10 minutes.
+      # Uses MemAvailable rather than MemFree so Linux cache is handled properly.
+      # ======================================================================
+      - uid: high-memory
+        title: High memory
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 * (
+                  1 -
+                  node_memory_MemAvailable_bytes{job="node"}
+                  /
+                  node_memory_MemTotal_bytes{job="node"}
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 90
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Memory usage is above 90% on {{ $labels.node }}
+        labels:
+          severity: warning
+        isPaused: false
+
+      # ======================================================================
+      # FILESYSTEM LOW SPACE
+      # ----------------------------------------------------------------------
+      # Warning when an actual filesystem has less than 15% available space.
+      # Temporary and container overlay filesystems are excluded.
+      # ======================================================================
+      - uid: low-disk-space
+        title: Low disk space
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 *
+                node_filesystem_avail_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+                /
+                node_filesystem_size_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 15
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Less than 15% disk space remains on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: warning
+        isPaused: false
+
+      # ======================================================================
+      # FILESYSTEM CRITICAL SPACE
+      # ----------------------------------------------------------------------
+      # Critical when an actual filesystem has less than 5% available space.
+      # ======================================================================
+      - uid: critical-disk-space
+        title: Critical disk space
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 *
+                node_filesystem_avail_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+                /
+                node_filesystem_size_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 5
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Less than 5% disk space remains on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # FILESYSTEM READ ONLY
+      # ----------------------------------------------------------------------
+      # Critical when a real filesystem is reported read-only.
+      # ======================================================================
+      - uid: filesystem-read-only
+        title: Filesystem read only
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                node_filesystem_readonly{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: Filesystem is read-only on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # CONTAINER OOM
+      # ----------------------------------------------------------------------
+      # Critical when cAdvisor records one or more container OOM events.
+      # The 10-minute window prevents very short-lived OOM events being missed.
+      # ======================================================================
+      - uid: container-oom
+        title: Container OOM
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                sum by (node, stack, service, replica) (
+                  increase(container_oom_events_total{job="cadvisor"}[10m])
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Container OOM detected for {{ $labels.service }} on {{ $labels.node }}
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # POSTGRESQL MISSING
+      # ----------------------------------------------------------------------
+      # Critical when cAdvisor has not seen postgres_server for 3 minutes.
+      # This checks container presence, not whether PostgreSQL accepts queries.
+      # ======================================================================
+      - uid: postgres-missing
+        title: PostgreSQL missing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                absent_over_time(
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service="postgres_server"
+                  }[3m]
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: PostgreSQL container has been missing for at least 3 minutes
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # TRAEFIK MISSING
+      # ----------------------------------------------------------------------
+      # Critical when cAdvisor has not seen traefik_proxy for 3 minutes.
+      # ======================================================================
+      - uid: traefik-missing
+        title: Traefik missing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                absent_over_time(
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service="traefik_proxy"
+                  }[3m]
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Traefik container has been missing for at least 3 minutes
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # AUTHENTIK MISSING
+      # ----------------------------------------------------------------------
+      # Critical when cAdvisor has not seen authentik_server for 3 minutes.
+      # ======================================================================
+      - uid: authentik-missing
+        title: Authentik missing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                absent_over_time(
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service="authentik_server"
+                  }[3m]
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Authentik server container has been missing for at least 3 minutes
+        labels:
+          severity: critical
+        isPaused: false
+
+      # ======================================================================
+      # TRAEFIK HIGH 5XX RATE
+      # ----------------------------------------------------------------------
+      # Warning when BOTH are true over 10 minutes:
+      #   - at least 5 HTTP 5xx responses occurred
+      #   - more than 10% of all Traefik service requests were 5xx
+      #
+      # The minimum error count avoids noisy alerts on very low traffic.
+      # ======================================================================
+      - uid: traefik-high-5xx
+        title: Traefik high 5xx rate
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                (
+                  sum(increase(traefik_service_requests_total{code=~"5.."}[10m])) >= 5
+                )
+                and
+                (
+                  sum(increase(traefik_service_requests_total{code=~"5.."}[10m]))
+                  /
+                  clamp_min(
+                    sum(increase(traefik_service_requests_total[10m])),
+                    1
+                  )
+                  > 0.10
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Traefik 5xx responses are above 10% with at least 5 errors
+        labels:
+          severity: warning
+        isPaused: false
+
