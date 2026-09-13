@@ -95,12 +95,17 @@ services:
         source: /var/mnt/swarm/victoriametrics
         target: /victoria-metrics-data
 
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://127.0.0.1:8428/health || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
     deploy:
       replicas: 1
-
-      placement:
-        constraints:
-          - node.hostname == swarm-03
 
       update_config:
         order: stop-first
@@ -129,15 +134,6 @@ services:
       - type: bind
         source: /var/mnt/swarm/loki
         target: /loki
-
-    healthcheck:
-      test:
-        - CMD-SHELL
-        - wget -q -O /dev/null http://localhost:3100/ready || exit 1
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
 
     deploy:
       replicas: 1
@@ -178,16 +174,36 @@ services:
       - traefik-public
 
     volumes:
+      # Unix exporter
       - /:/host/root:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
+
+      # cAdvisor
       - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
-      - /run/containerd:/run/containerd:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /dev/disk:/dev/disk:ro
+
+      # Journal
       - /var/log/journal:/var/log/journal:ro
       - /run/log/journal:/run/log/journal:ro
+
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -ec
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/12345
+          printf 'GET /-/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3
+          IFS= read -r status <&3
+          [[ "$$status" == "HTTP/"*" 200 "* ]]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
     deploy:
       mode: global
@@ -224,7 +240,7 @@ configs:
     file: ./configs/loki/config.yml
 
   alloy_config:
-    name: observability_alloy_config_v4
+    name: observability_alloy_config_v9
     file: ./configs/alloy/config.alloy
 
 secrets:
