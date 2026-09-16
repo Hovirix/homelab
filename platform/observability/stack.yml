@@ -1,6 +1,6 @@
 services:
   grafana:
-    image: grafana/grafana:13.2.0@sha256:3fd54ae1214669f8355f065ec9f6445d5279a3d77095ab048ca045685272429b
+    image: grafana/grafana:13.2.2@sha256:ac461fb352abc50da10a51c7d02462e9c05488f11f53f14b3ad79a8145f638a0
 
     environment:
       GF_SERVER_DOMAIN: grafana.hovirix.dev
