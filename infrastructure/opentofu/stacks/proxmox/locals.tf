@@ -1,5 +1,5 @@
 locals {
-  proxmox_node         = "pve1"
+  proxmox_node         = "pve"
   image_datastore_id   = "local"
   snippet_datastore_id = "local"
   vm_datastore_id      = "local-zfs"

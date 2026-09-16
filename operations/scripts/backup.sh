@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-host='root@pve1.home.hovirix.dev'
+host='root@pve.home.hovirix.dev'
 
 if ssh \
   -o BatchMode=yes \

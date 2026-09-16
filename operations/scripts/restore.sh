@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-host='root@pve1.home.hovirix.dev'
+host='root@pve.home.hovirix.dev'
 parent='rpool/swarm'
 lock='/run/swarm-zfs-snapshot.lock'
 

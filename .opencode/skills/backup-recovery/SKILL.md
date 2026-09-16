@@ -273,7 +273,7 @@ Then advise the user to open:
 TrueNAS
 → Data Protection
 → Replication Tasks
-→ swarm-restore-truenas-to-pve1
+→ swarm-restore-truenas-to-pve
 ```
 
 Tell the user:
@@ -291,7 +291,7 @@ Open TrueNAS:
 
 Data Protection
 → Replication Tasks
-→ swarm-restore-truenas-to-pve1
+→ swarm-restore-truenas-to-pve
 
 Choose the newest available snapshot at or before 11:00 and run the PUSH restore.
 ```

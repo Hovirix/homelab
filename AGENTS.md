@@ -5,7 +5,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 ## Architecture
 
 - Active stack: Proxmox VE, Fedora CoreOS VMs, Docker Swarm, Traefik, Cloudflared, Authentik, AdGuard Home, PostgreSQL/Valkey, and observability/application stacks. Network infrastructure itself is managed separately.
-- `infrastructure/ansible/` configures only Proxmox hosts/datacenter resources. The active inventory is `pve1.home.hovirix.dev` as `root`.
+- `infrastructure/ansible/` configures only Proxmox hosts/datacenter resources. The active inventory is `pve.home.hovirix.dev` as `root`.
 - `infrastructure/opentofu/stacks/` has four direct stacks: `adguardhome`, `proxmox`, `cloudflare`, and `authentik`. There are no current modules; add one only for a durable boundary or real repetition.
 - Fedora CoreOS source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; `infrastructure/opentofu/stacks/proxmox/build/fcos.ign` is generated and ignored. Regenerate it instead of editing it.
 - Live application data is on Proxmox ZFS and mounted into FCOS through VirtioFS. TrueNAS is the Proxmox backup target, not live service storage.
