@@ -14,10 +14,9 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 
 ## Development And Validation
 
-- Format with `treefmt` via `task fmt`; Treefmt excludes `secrets/**`.
-- Full local validation is `task check`, which runs `task check:lint` then `task check:security`.
-- `task check` does not run formatting, `tofu validate`, Butane rendering, or Docker stack rendering; add focused validation when changed paths require it.
-- Security checks generate ignored SBOM output under `.artifacts/sbom` with Syft, then scan it with Trivy.
+- Format with `treefmt`; Treefmt excludes `secrets/**`.
+- Full local validation is `task check`, which runs linting and security checks, including `tofu validate`, strict Butane rendering, Docker stack rendering, Treefmt verification, Syft SBOM generation, Grype vulnerability scans, and Trivy secret/IaC scans.
+- Local validation proves configuration, not deployment or runtime health.
 
 ## Operations
 
@@ -26,7 +25,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 - Plan/apply order is `adguardhome`, `proxmox`, `cloudflare`, `authentik`; destroy order is reversed. Plan/apply also regenerate FCOS Ignition, and planning writes ignored initialization/build artifacts.
 - Keep each stack's `.terraform.lock.hcl` tracked; never edit state or generated `.terraform/` content.
 - Proxmox Ansible preview/apply commands are `task pve:plan` and `task pve:apply`; `site.yml` imports host config, node-local Proxmox config, then datacenter config.
-- Swarm/service tasks use `operations/scripts/swarm-host.sh`, which picks the first reachable configured node reporting active Swarm membership; it does not verify manager status independently.
+- Swarm/service tasks use `operations/scripts/swarm-host.sh`, which selects the first reachable active Swarm manager.
 - `task deploy` orders secrets, Traefik, Cloudflared, PostgreSQL, Valkey, Authentik, observability, Vaultwarden, then Paperless. Secret delivery creates missing secrets only; it does not rotate existing ones.
 
 ## Observability
@@ -44,7 +43,7 @@ Observability architecture is frozen: Alloy -> VictoriaMetrics/Loki -> Grafana -
 
 ## Secrets And Safety
 
-- Secret material lives in `secrets/*.sops.yaml`; do not decrypt or print it to inspect values. Repo-local OpenCode config denies direct `sops` bash commands.
+- Secret material lives in `secrets/*.sops.yaml`; do not decrypt or print it to inspect values. Repo-local OpenCode config denies direct `sops` and secret-delivery wrappers, but other approved workflows can still require secrets.
 - Remote mutation, backup/restore execution, and destructive commands require explicit user authorization. Some mutating Task entrypoints do not prompt; infra apply/destroy prompt but pass `-auto-approve` to OpenTofu.
 - When invoked, pre-commit runs full-repository `treefmt` and `trivy --config security/trivy.yaml fs --scanners secret .`, regardless of staged paths.
 - Keep traditional documentation minimal. Executable workflows are the operational source of truth; reserve `AGENTS.md` and skills for constraints and procedures code cannot express.

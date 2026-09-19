@@ -12,8 +12,7 @@ When asked why a service was slow, unavailable, erroring, restarting, or unhealt
    - stack/service names
    - dependencies
    - expected topology
-3. Use Grafana MCP to discover actual metrics and Loki labels.
-   Never invent metric names.
+3. Use Grafana MCP, when available, to discover actual metrics and Loki labels. Never invent metric names.
 4. Inspect the affected service:
    - CPU
    - memory
@@ -39,6 +38,8 @@ When asked why a service was slow, unavailable, erroring, restarting, or unhealt
 Do not assume correlation proves causation.
 
 Prefer multiple independent signals before identifying a likely cause.
+
+Repository configuration describes expected topology, not current placement or health.
 
 ## Output
 

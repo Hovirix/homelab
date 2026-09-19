@@ -5,15 +5,39 @@
     "bash": {
       "sops": "deny",
       "sops *": "deny",
+      "task services:secrets*": "deny",
+      "*operations/scripts/swarm-secrets.sh*": "deny",
+    },
+    // Defense in depth for Grafana MCP versions that expose write tools.
+    "grafana_add_activity_to_incident": "deny",
+    "grafana_alerting_manage_rules": "deny",
+    "grafana_alerting_manage_silences": "deny",
+    "grafana_create_annotation": "deny",
+    "grafana_create_datasource": "deny",
+    "grafana_create_folder": "deny",
+    "grafana_create_incident": "deny",
+    "grafana_create_snapshot": "deny",
+    "grafana_delete_annotation": "deny",
+    "grafana_delete_snapshot": "deny",
+    "grafana_find_error_pattern_logs": "deny",
+    "grafana_find_slow_requests": "deny",
+    "grafana_grafana_api_request": "deny",
+    "grafana_install_plugin": "deny",
+    "grafana_update_alert_group": "deny",
+    "grafana_update_annotation": "deny",
+    "grafana_update_dashboard": "deny",
+    "grafana_update_datasource": "deny",
+  },
+
+  "agent": {
+    "plan": {
+      "permission": {
+        "edit": "deny"
+      }
     }
   },
 
   "mcp": {
-    "docker-docs": {
-      "type": "remote",
-      "url": "https://mcp-docs.docker.com/mcp",
-      "enabled": true
-    },
     "grafana": {
       "enabled": true,
       "type": "local",
@@ -28,7 +52,8 @@
         "GRAFANA_SERVICE_ACCOUNT_TOKEN",
         "grafana/mcp-grafana:1.2.0",
         "-t",
-        "stdio"
+        "stdio",
+        "--disable-write"
       ],
       "environment": {
         "GRAFANA_URL": "https://grafana.hovirix.dev",
