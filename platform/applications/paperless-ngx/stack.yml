@@ -29,8 +29,9 @@ services:
       - paperless_client_secret
 
     networks:
-      - data
-      - traefik-public
+      - postgres
+      - valkey
+      - traefik
 
     volumes:
       - type: bind
@@ -80,12 +81,16 @@ services:
         condition: on-failure
 
 networks:
-  data:
-    name: data_data
+  postgres:
+    name: postgres
     external: true
 
-  traefik-public:
-    name: ingress_traefik-public
+  valkey:
+    name: valkey
+    external: true
+
+  traefik:
+    name: traefik
     external: true
 
 configs:

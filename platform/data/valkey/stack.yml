@@ -10,7 +10,7 @@ services:
       - "yes"
 
     networks:
-      data:
+      valkey:
         aliases:
           - valkey
 
@@ -43,6 +43,7 @@ services:
         condition: on-failure
 
 networks:
-  data:
-    name: data_data
-    external: true
+  valkey:
+    name: valkey
+    driver: overlay
+    attachable: true

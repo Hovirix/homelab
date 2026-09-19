@@ -29,8 +29,9 @@ services:
       - authentik_smtp_api_key
 
     networks:
-      - data
-      - traefik-public
+      - authentik
+      - postgres
+      - traefik
 
     healthcheck:
       test:
@@ -94,7 +95,8 @@ services:
       - authentik_smtp_api_key
 
     networks:
-      - data
+      - authentik
+      - postgres
 
     healthcheck:
       test:
@@ -120,12 +122,17 @@ services:
         condition: on-failure
 
 networks:
-  data:
-    name: data_data
+  authentik:
+    name: authentik
+    driver: overlay
+    attachable: true
+
+  postgres:
+    name: postgres
     external: true
 
-  traefik-public:
-    name: ingress_traefik-public
+  traefik:
+    name: traefik
     external: true
 
 secrets:

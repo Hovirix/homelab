@@ -16,7 +16,8 @@ tasks:
       - task: secrets
       - task: traefik:deploy
       - task: cloudflared:deploy
-      - task: data:deploy
+      - task: postgres:deploy
+      - task: valkey:deploy
       - task: authentik:deploy
       - task: observability:deploy
       - task: vaultwarden:deploy
@@ -45,12 +46,6 @@ tasks:
         sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/ingress/cloudflared/stack.yml cloudflared
-
-  data:deploy:
-    desc: Deploy data services
-    cmds:
-      - task: postgres:deploy
-      - task: valkey:deploy
 
   postgres:deploy:
     desc: Deploy PostgreSQL

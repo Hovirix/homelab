@@ -28,7 +28,7 @@ services:
       - --providers.swarm=true
       - --providers.swarm.endpoint=tcp://socket-proxy:2375
       - --providers.swarm.exposedbydefault=false
-      - --providers.swarm.network=ingress_traefik-public
+      - --providers.swarm.network=traefik
 
       - --certificatesresolvers.cloudflare.acme.email=hostmaster@hovirix.dev
       - --certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json
@@ -44,7 +44,7 @@ services:
       - traefik_cf_dns_api_token
 
     networks:
-      - traefik-public
+      - traefik
       - socket-proxy
 
     ports:
@@ -122,12 +122,13 @@ services:
         condition: on-failure
 
 networks:
-  traefik-public:
-    name: ingress_traefik-public
+  traefik:
+    name: traefik
     driver: overlay
     attachable: true
 
   socket-proxy:
+    name: traefik_socket-proxy
     driver: overlay
     internal: true
 

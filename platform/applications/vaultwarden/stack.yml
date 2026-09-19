@@ -18,7 +18,7 @@ services:
       - vaultwarden_client_secret
 
     networks:
-      - traefik-public
+      - traefik
 
     volumes:
       - type: bind
@@ -56,8 +56,8 @@ services:
         condition: on-failure
 
 networks:
-  traefik-public:
-    name: ingress_traefik-public
+  traefik:
+    name: traefik
     external: true
 
 secrets:

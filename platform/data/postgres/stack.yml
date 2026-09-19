@@ -12,7 +12,7 @@ services:
       - postgres_superuser_password
 
     networks:
-      data:
+      postgres:
         aliases:
           - postgres
 
@@ -61,7 +61,7 @@ services:
       - postgres_paperless_password
 
     networks:
-      - data
+      - postgres
 
     deploy:
       mode: replicated-job
@@ -71,8 +71,8 @@ services:
         condition: on-failure
 
 networks:
-  data:
-    name: data_data
+  postgres:
+    name: postgres
     driver: overlay
     attachable: true
 

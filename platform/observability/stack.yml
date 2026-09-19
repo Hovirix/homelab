@@ -43,7 +43,7 @@ services:
 
     networks:
       - observability
-      - traefik-public
+      - traefik
 
     volumes:
       - type: bind
@@ -171,7 +171,7 @@ services:
 
     networks:
       - observability
-      - traefik-public
+      - traefik
 
     volumes:
       # Unix exporter
@@ -220,10 +220,12 @@ services:
 
 networks:
   observability:
+    name: observability
     driver: overlay
+    attachable: true
 
-  traefik-public:
-    name: ingress_traefik-public
+  traefik:
+    name: traefik
     external: true
 
 configs:
