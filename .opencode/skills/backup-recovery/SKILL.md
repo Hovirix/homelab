@@ -5,7 +5,7 @@ description: Use for HX Lab data loss, corruption, PostgreSQL incidents, ZFS rec
 
 # Backup Recovery
 
-This skill is advisory only. Do not execute backup, restore, rollback, database recovery, SSH, ZFS, Docker, Proxmox, or TrueNAS commands.
+This skill is advisory only. Do not execute backup, restore, rollback, database recovery, SSH, ZFS, Docker, or Proxmox commands.
 
 Use repository configuration and evidence supplied by the user. Repository code describes intended recovery mechanisms, not which recovery points currently exist.
 
@@ -22,7 +22,6 @@ Do not choose a recovery point simply because it is newest. State uncertainty ra
 ## Implemented Recovery Mechanisms
 
 - `rpool/swarm` has hourly local Proxmox ZFS snapshots named `auto-YYYY-MM-DD_HH-MM` for short-term recovery.
-- TrueNAS is a Proxmox NFS backup target, not live service storage.
 - `task restore` is the repository restore entrypoint. It is destructive and must never be run by the agent.
 
 If local snapshot availability is unknown, request read-only evidence such as:
@@ -31,7 +30,7 @@ If local snapshot availability is unknown, request read-only evidence such as:
 zfs list -t snapshot -r rpool/swarm
 ```
 
-Do not execute the command. Do not claim that a local or TrueNAS recovery point exists or is healthy without evidence.
+Do not execute the command. Do not claim that a local recovery point exists or is healthy without evidence.
 
 ## Scope Selection
 
@@ -42,7 +41,7 @@ selective file or directory recovery
 application-level recovery
 PostgreSQL-aware recovery
 local ZFS rollback
-Proxmox/TrueNAS backup recovery
+Proxmox backup recovery
 ```
 
 Before a full `rpool/swarm` rollback, warn that dependent workloads must be stopped or safely quiesced and that newer data or snapshots may be lost.
@@ -72,7 +71,7 @@ Safe recovery point
 <time or unknown>
 
 Availability
-<confirmed local | Proxmox/TrueNAS evidence required | unknown>
+<confirmed local | Proxmox backup evidence required | unknown>
 
 Recommended approach
 <smallest safe method>

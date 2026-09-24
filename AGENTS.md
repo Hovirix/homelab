@@ -8,7 +8,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 - `infrastructure/ansible/` configures only Proxmox hosts/datacenter resources. The active inventory is `pve.home.hovirix.dev` as `root`.
 - `infrastructure/opentofu/stacks/` has four direct stacks: `adguardhome`, `proxmox`, `cloudflare`, and `authentik`. There are no current modules; add one only for a durable boundary or real repetition.
 - Fedora CoreOS source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; `infrastructure/opentofu/stacks/proxmox/build/fcos.ign` is generated and ignored. Regenerate it instead of editing it.
-- Live application data is on Proxmox ZFS and mounted into FCOS through VirtioFS. TrueNAS is the Proxmox backup target, not live service storage.
+- Live application data is on Proxmox ZFS and mounted into FCOS through VirtioFS.
 - `platform/` is Docker Swarm desired state. Stack names and deployment order come from `operations/taskfiles/services.yml`; notably, `platform/applications/paperless-ngx` deploys as `paperless`.
 - `.opencode/` contains repository-local OpenCode configuration, agents, commands, and skills; do not treat it as platform application code.
 

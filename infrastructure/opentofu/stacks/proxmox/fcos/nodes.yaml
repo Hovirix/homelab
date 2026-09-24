@@ -1,5 +1,5 @@
 network:
-  vlan_id: 40
+  vlan_id: 30
 
 hosts:
   swarm-01:
