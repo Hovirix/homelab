@@ -1,10 +1,14 @@
-- name: Remove unnecessary Debian repository files
+- name: Remove unnecessary repository files
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
     - /etc/apt/sources.list
     - /etc/apt/sources.list.d/debian.sources
+    - /etc/apt/sources.list.d/pve-enterprise.list
+    - /etc/apt/sources.list.d/ceph.list
+    - /etc/apt/sources.list.d/pve-enterprise.sources
+    - /etc/apt/sources.list.d/ceph.sources
 
 - name: Configure Debian repositories
   ansible.builtin.template:

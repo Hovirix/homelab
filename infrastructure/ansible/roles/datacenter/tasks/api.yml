@@ -56,6 +56,86 @@
   changed_when: false
   run_once: true
 
+- name: Assign hardware mapping administration permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - /mapping
+      - --users
+      - opentofu@pve
+      - --roles
+      - PVEMappingAdmin
+  changed_when: false
+  run_once: true
+
+- name: Assign SDN network usage permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - /sdn/zones/localnetwork
+      - --users
+      - opentofu@pve
+      - --roles
+      - PVESDNUser
+  changed_when: false
+  run_once: true
+
+- name: Query Proxmox roles
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - list
+      - --output-format
+      - json
+  register: datacenter_api_roles
+  changed_when: false
+  run_once: true
+
+- name: Create image download role
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - add
+      - OpenTofuDownload
+      - --privs
+      - Sys.AccessNetwork Sys.Modify
+  when: >-
+    'OpenTofuDownload' not in ( datacenter_api_roles.stdout | from_json | map(attribute='roleid') | list )
+  changed_when: true
+  run_once: true
+
+- name: Configure image download role
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - role
+      - modify
+      - OpenTofuDownload
+      - --privs
+      - Sys.AccessNetwork Sys.Modify
+  changed_when: false
+  run_once: true
+
+- name: Assign image download permissions
+  ansible.builtin.command:
+    argv:
+      - pveum
+      - acl
+      - modify
+      - "/nodes/{{ inventory_hostname }}"
+      - --users
+      - opentofu@pve
+      - --roles
+      - OpenTofuDownload
+  changed_when: false
+  run_once: true
+
 - name: Create OpenTofu API token
   ansible.builtin.command:
     argv:

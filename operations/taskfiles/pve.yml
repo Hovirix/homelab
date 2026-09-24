@@ -1,6 +1,12 @@
 version: "3"
 
 tasks:
+  bootstrap:
+    desc: Apply Proxmox VE host/datacenter configuration (Same as Apply just ask for password)
+    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    cmds:
+      - ansible-playbook playbooks/site.yml --ask-pass
+
   plan:
     desc: Preview Proxmox VE host/datacenter configuration
     dir: "{{.ROOT_DIR}}/infrastructure/ansible"

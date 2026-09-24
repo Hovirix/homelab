@@ -11,5 +11,25 @@
     that:
       - pve_storage_status.stdout | regex_search('(?m)^local\s+dir\s+active\s+') is not none
       - pve_storage_status.stdout | regex_search('(?m)^local-zfs\s+zfspool\s+active\s+') is not none
-    fail_msg: >-
-      Expected Proxmox storages local and local-zfs were not reported as active.
+    fail_msg: Expected Proxmox storages local and local-zfs were not reported as active.
+- name: Read local storage configuration
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - get
+      - /storage/local
+      - --output-format
+      - json
+  register: pve_storage_local
+  changed_when: false
+
+- name: Enable snippets on local storage
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - set
+      - /storage/local
+      - --content
+      - "{{ (pve_storage_local.stdout | from_json).content }},snippets"
+  when: "'snippets' not in (pve_storage_local.stdout | from_json).content"
+  changed_when: true
