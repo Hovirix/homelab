@@ -24,6 +24,9 @@ services:
 
     secrets:
       - paperless_secret_key
+      - paperless_admin_user
+      - paperless_admin_email
+      - paperless_admin_password
       - postgres_paperless_password
       - paperless_client_id
       - paperless_client_secret
@@ -98,6 +101,15 @@ configs:
     file: ./configs/paperless-start.sh
 
 secrets:
+  paperless_admin_user:
+    external: true
+
+  paperless_admin_email:
+    external: true
+
+  paperless_admin_password:
+    external: true
+
   paperless_secret_key:
     external: true
 

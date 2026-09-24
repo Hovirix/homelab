@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+export PAPERLESS_ADMIN_USER="$(</run/secrets/paperless_admin_user)"
+export PAPERLESS_ADMIN_MAIL="$(</run/secrets/paperless_admin_email)"
+export PAPERLESS_ADMIN_PASSWORD="$(</run/secrets/paperless_admin_password)"
+
 export PAPERLESS_SOCIALACCOUNT_PROVIDERS
 PAPERLESS_SOCIALACCOUNT_PROVIDERS="$(
   python3 <<'PY'
