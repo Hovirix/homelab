@@ -1,6 +1,9 @@
 - name: Apply host configuration
   ansible.builtin.import_playbook: hosts.yml
 
+- name: Configure Proxmox VE ACME prerequisites
+  ansible.builtin.import_playbook: acme.yml
+
 - name: Apply node-local Proxmox VE configuration
   ansible.builtin.import_playbook: pve.yml
 

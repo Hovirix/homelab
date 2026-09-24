@@ -1,0 +1,10 @@
+- name: Configure Proxmox VE ACME prerequisites
+  hosts: nodes
+  run_once: true
+
+  tasks:
+    - name: Configure Proxmox VE ACME account and DNS plugin
+      ansible.builtin.import_role:
+        name: datacenter
+        tasks_from: acme
+      tags: [acme]
