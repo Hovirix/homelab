@@ -86,3 +86,12 @@
     - traefik
     - valkey
     - vaultwarden
+
+- name: Allow non-root observability containers to write their data
+  ansible.builtin.file:
+    path: "/rpool/swarm/{{ item }}"
+    state: directory
+    mode: "0777"
+  loop:
+    - grafana
+    - loki
