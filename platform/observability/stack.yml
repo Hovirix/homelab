@@ -81,7 +81,7 @@ services:
         condition: on-failure
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.150.0@sha256:54467c7764a3e6579199af1914bb779f01ce32265cd552eb5ae0d4f8a2b80a97
+    image: victoriametrics/victoria-metrics:v1.152.0@sha256:86ca5fdb6d87d56ba047b044039019ba2bd9042b36e35f6ea34e437b6c825cef
 
     command:
       - -storageDataPath=/victoria-metrics-data
