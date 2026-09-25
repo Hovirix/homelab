@@ -2,44 +2,56 @@
 
 set -euo pipefail
 
-postgres_password_file=/run/secrets/postgres_superuser_password
-authentik_password_file=/run/secrets/postgres_authentik_password
-paperless_password_file=/run/secrets/postgres_paperless_password
-
 export PGPASSWORD
-PGPASSWORD="$(<"$postgres_password_file")"
+PGPASSWORD="$(</run/secrets/postgres_superuser_password)"
 
-until pg_isready --host=postgres --port=5432 --username=postgres >/dev/null 2>&1; do
+authentik_password="$(</run/secrets/postgres_authentik_password)"
+paperless_password="$(</run/secrets/postgres_paperless_password)"
+
+deadline=$((SECONDS + 300))
+
+until pg_isready \
+  --host=postgres \
+  --port=5432 \
+  --username=postgres \
+  >/dev/null 2>&1; do
+  if ((SECONDS >= deadline)); then
+    printf 'PostgreSQL did not become ready within five minutes.\n' >&2
+    exit 1
+  fi
+
   sleep 2
 done
 
-psql --host=postgres --username=postgres --dbname=postgres \
-  --set=authentik_password="$(<"$authentik_password_file")" \
-  --set=paperless_password="$(<"$paperless_password_file")" <<'SQL'
-DO $$
-BEGIN
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'authentik') THEN
-    CREATE ROLE authentik LOGIN;
-  END IF;
+psql \
+  --host=postgres \
+  --port=5432 \
+  --username=postgres \
+  --dbname=postgres \
+  --set=ON_ERROR_STOP=1 \
+  --set=authentik_password="$authentik_password" \
+  --set=paperless_password="$paperless_password" <<'SQL'
 
-  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'paperless') THEN
-    CREATE ROLE paperless LOGIN;
-  END IF;
-END
-$$;
+SELECT 'CREATE ROLE authentik LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'authentik'
+)\gexec
 
-ALTER ROLE authentik WITH PASSWORD :'authentik_password';
-ALTER ROLE paperless WITH PASSWORD :'paperless_password';
+SELECT 'CREATE ROLE paperless LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'paperless'
+)\gexec
+
+ALTER ROLE authentik PASSWORD :'authentik_password';
+ALTER ROLE paperless PASSWORD :'paperless_password';
 
 SELECT 'CREATE DATABASE authentik OWNER authentik'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'authentik')\gexec
+WHERE NOT EXISTS (
+  SELECT FROM pg_database WHERE datname = 'authentik'
+)\gexec
 
 SELECT 'CREATE DATABASE paperless OWNER paperless'
-WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'paperless')\gexec
-
-ALTER DATABASE authentik OWNER TO authentik;
-GRANT ALL PRIVILEGES ON DATABASE authentik TO authentik;
-
-ALTER DATABASE paperless OWNER TO paperless;
-GRANT ALL PRIVILEGES ON DATABASE paperless TO paperless;
+WHERE NOT EXISTS (
+  SELECT FROM pg_database WHERE datname = 'paperless'
+)\gexec
 SQL

@@ -1,6 +1,6 @@
 services:
   server:
-    image: postgres:17.2@sha256:3267c505060a0052e5aa6e5175a7b41ab6b04da2f8c4540fc6e98a37210aa2d3
+    image: ghcr.io/hovirix/postgres:18.6@sha256:180d7699376473b7279121d99c726046b1948cd8baa3f3cc6d75a156f51428dd
 
     environment:
       POSTGRES_USER: postgres
@@ -11,6 +11,20 @@ services:
     secrets:
       - postgres_superuser_password
 
+    configs:
+      - source: postgres_config
+        target: /etc/postgresql/postgresql.conf
+        mode: 0444
+
+      - source: postgres_hba
+        target: /etc/postgresql/pg_hba.conf
+        mode: 0444
+
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+
     networks:
       postgres:
         aliases:
@@ -20,6 +34,9 @@ services:
       - type: bind
         source: /var/mnt/swarm/postgres
         target: /var/lib/postgresql/data
+
+    # PostgreSQL needs time to checkpoint and stop cleanly during Swarm updates.
+    stop_grace_period: 2m
 
     healthcheck:
       test:
@@ -36,6 +53,7 @@ services:
       update_config:
         order: stop-first
         failure_action: rollback
+        monitor: 2m
 
       rollback_config:
         order: stop-first
@@ -44,7 +62,7 @@ services:
         condition: on-failure
 
   reconcile:
-    image: postgres:17.2@sha256:3267c505060a0052e5aa6e5175a7b41ab6b04da2f8c4540fc6e98a37210aa2d3
+    image: ghcr.io/hovirix/postgres:18.6@sha256:180d7699376473b7279121d99c726046b1948cd8baa3f3cc6d75a156f51428dd
 
     command:
       - bash
@@ -77,8 +95,16 @@ networks:
     attachable: true
 
 configs:
+  postgres_config:
+    name: data_postgres_config_20260925
+    file: ./configs/postgresql.conf
+
+  postgres_hba:
+    name: data_postgres_hba_20260925
+    file: ./configs/pg_hba.conf
+
   postgres_reconcile:
-    name: data_postgres_reconcile_20260812
+    name: data_postgres_reconcile_20260925
     file: ./configs/postgres-reconcile.sh
 
 secrets:

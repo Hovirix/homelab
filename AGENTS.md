@@ -17,6 +17,7 @@ HX Lab is a desired-state homelab repository. Treat repository code as intent; r
 - Format with `treefmt`; Treefmt excludes `secrets/**`.
 - Full local validation is `task check`, which runs linting and security checks, including `tofu validate`, strict Butane rendering, Docker stack rendering, Treefmt verification, Syft SBOM generation, Grype vulnerability scans, and Trivy secret/IaC scans.
 - Local validation proves configuration, not deployment or runtime health.
+- Do not run `task check:security` autonomously; run it only when the user explicitly requests it.
 
 ## Operations
 
