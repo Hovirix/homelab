@@ -7,6 +7,8 @@ services:
       GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_OAUTH_AUTO_LOGIN: "true"
       GF_AUTH_GENERIC_OAUTH_ENABLED: "true"
       GF_AUTH_GENERIC_OAUTH_NAME: authentik
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID__FILE: /run/secrets/grafana_client_id
