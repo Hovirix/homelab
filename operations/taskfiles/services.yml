@@ -6,7 +6,7 @@ tasks:
     desc: Create missing platform Swarm secrets
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - operations/scripts/swarm-secrets.sh
 
@@ -27,7 +27,7 @@ tasks:
     internal: true
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack ls
 
@@ -35,7 +35,7 @@ tasks:
     desc: Deploy Traefik
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/ingress/traefik/stack.yml traefik
 
@@ -43,7 +43,7 @@ tasks:
     desc: Deploy Cloudflared
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/ingress/cloudflared/stack.yml cloudflared
 
@@ -51,7 +51,7 @@ tasks:
     desc: Deploy PostgreSQL
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/data/postgres/stack.yml postgres
 
@@ -59,7 +59,7 @@ tasks:
     desc: Deploy Valkey
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/data/valkey/stack.yml valkey
 
@@ -67,7 +67,7 @@ tasks:
     desc: Deploy Authentik
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/identity/stack.yml authentik
 
@@ -75,7 +75,7 @@ tasks:
     desc: Deploy observability
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/observability/stack.yml observability
 
@@ -83,7 +83,7 @@ tasks:
     desc: Deploy Vaultwarden
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/applications/vaultwarden/stack.yml vaultwarden
 
@@ -91,6 +91,6 @@ tasks:
     desc: Deploy Paperless
     env:
       DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm-host.sh"
+        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
     cmds:
       - docker stack deploy --resolve-image changed --compose-file platform/applications/paperless-ngx/stack.yml paperless
