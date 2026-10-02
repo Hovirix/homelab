@@ -76,7 +76,7 @@ flowchart TB
 | Network       | [OpenWrt](https://openwrt.org/)                                               | Routing, DHCP, firewall, VPN   |
 | DNS           | [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)             | Internal DNS                   |
 | Storage       | [OpenZFS](https://openzfs.org/) + [VirtioFS](https://virtio-fs.gitlab.io/)    | Persistent application storage |
-| Backup        | [TrueNAS](https://www.truenas.com/)                                           | Secondary backup storage       |
+| Backup        | [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/)           | Off-site backup                |
 
 Network infrastructure is managed separately in [`hovirix/netlab`](https://github.com/Hovirix/netlab).
 
@@ -150,7 +150,7 @@ AI skills   → queryable procedures and domain knowledge
 - Recovery workflows are automated through Task.
 - Persistent application data is independent from the Swarm lifecycle.
 - ZFS provides local snapshot capabilities.
-- TrueNAS provides secondary backup storage.
+- Hetzner Storage Box provides off-site Restic backup storage.
 - PostgreSQL requires database-aware backups in addition to infrastructure snapshots.
 
 ## License
