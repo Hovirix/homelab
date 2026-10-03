@@ -1,50 +1,40 @@
 # HX Lab
 
-HX Lab is a desired-state homelab repository. Treat repository code as intent; runtime output is only observed evidence from that command.
+HX Lab is a desired-state homelab repository. Repository configuration describes intended state; runtime state requires runtime evidence.
 
-## Architecture
+## Map
 
-- Active stack: Proxmox VE, Fedora CoreOS VMs, Docker Swarm, Traefik, Cloudflared, Authentik, AdGuard Home, PostgreSQL/Valkey, and observability/application stacks. Network infrastructure itself is managed separately.
-- `infrastructure/ansible/` configures only Proxmox hosts/datacenter resources. The active inventory is `pve.home.hovirix.dev` as `root`.
-- `infrastructure/opentofu/stacks/` has four direct stacks: `adguardhome`, `proxmox`, `cloudflare`, and `authentik`. There are no current modules; add one only for a durable boundary or real repetition.
-- Fedora CoreOS source is `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; `infrastructure/opentofu/stacks/proxmox/build/fcos.ign` is generated and ignored. Regenerate it instead of editing it.
-- Live application data is on Proxmox ZFS and mounted into FCOS through VirtioFS.
-- `platform/` is Docker Swarm desired state. Stack names and deployment order come from `operations/taskfiles/services.yml`; notably, `platform/applications/paperless-ngx` deploys as `paperless`.
-- `.opencode/` contains repository-local OpenCode configuration, agents, commands, and skills; do not treat it as platform application code.
+- `infrastructure/opentofu/` manages infrastructure.
+- `infrastructure/ansible/` configures Proxmox VE.
+- `platform/` contains Docker Swarm desired state.
+- `operations/` contains Task workflows and supporting scripts.
+- `secrets/` contains encrypted production secrets.
+- `operations/taskfiles/services.yml` owns service deployment order and stack naming.
 
-## Development And Validation
+Fedora CoreOS is authored in `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; generated `build/fcos.ign` must not be edited directly.
 
-- Format with `treefmt`; Treefmt excludes `secrets/**`.
-- Full local validation is `task check`, which runs linting and security checks, including `tofu validate`, strict Butane rendering, Docker stack rendering, Treefmt verification, Syft SBOM generation, Grype vulnerability scans, and Trivy secret/IaC scans.
-- Local validation proves configuration, not deployment or runtime health.
-- Do not run `task check:security` autonomously; run it only when the user explicitly requests it.
+Persistent application data is independent from disposable Swarm state.
 
-## Operations
+Observability is intentionally `Alloy -> VictoriaMetrics/Loki -> Grafana -> mcp-grafana -> OpenCode`. Do not redesign it unless explicitly requested.
 
-- Prefer Taskfile entrypoints over raw tools when secrets, stack ordering, or host selection are involved.
-- Use `task infra:plan`, `task infra:apply`, or `task infra:destroy` for OpenTofu. They initialize stacks and use `operations/scripts/tofu.sh` for SOPS-backed R2 credentials and state encryption.
-- Plan/apply order is `adguardhome`, `proxmox`, `cloudflare`, `authentik`; destroy order is reversed. Plan/apply also regenerate FCOS Ignition, and planning writes ignored initialization/build artifacts.
-- Keep each stack's `.terraform.lock.hcl` tracked; never edit state or generated `.terraform/` content.
-- Proxmox Ansible preview/apply commands are `task pve:plan` and `task pve:apply`; `site.yml` imports host config, node-local Proxmox config, then datacenter config.
-- The root Taskfile owns Swarm node addresses; `operations/scripts/swarm.sh` selects the first reachable active manager for service tasks.
-- `task deploy` orders secrets, Traefik, Cloudflared, PostgreSQL, Valkey, Authentik, observability, Vaultwarden, then Paperless. Secret delivery creates missing secrets only; it does not rotate existing ones.
+## Boundaries
 
-## Observability
+Prefer Task entrypoints when they encapsulate credentials, ordering, host selection, secrets, or generated artifacts.
 
-Observability architecture is frozen: Alloy -> VictoriaMetrics/Loki -> Grafana -> mcp-grafana -> OpenCode. Do not redesign or replace components unless explicitly requested.
+Remote mutation, deployment, restore, destructive storage operations, secret rotation, and infrastructure apply/destroy require explicit user authorization.
 
-- `task bootstrap` runs infrastructure apply, Proxmox Ansible apply, Swarm init, then service deployment. Treat it as convergence, not guaranteed zero-state bootstrap: provider credentials and the Authentik endpoint may need to exist first.
-- `task status` contacts the live Swarm. `task swarm:rebuild` recreates the Swarm and redeploys services.
+Never decrypt or print secret values for inspection.
 
-## Commit Convention
+Do not infer runtime health, placement, or successful deployment from repository configuration.
 
-- Format is Conventional Commits: `type(scope): description`.
-- Established types are `fix`, `refactor`, `chore`, and `feat`; established scopes include `infrastructure`, `platform`, `operations`, `deps`, `tools`, and `secrets`.
-- Keep the description lowercase. Do not commit, amend, or push unless explicitly requested.
+Use `task check:lint` for normal local validation. Run `task check` or `task check:security` only when explicitly requested.
 
-## Secrets And Safety
+## Git
 
-- Secret declarations live in `secretspec.toml`; production values are stored in `secrets/production.sops.env`. Do not decrypt or print them to inspect values. Repo-local OpenCode config denies direct SOPS and secret-delivery wrappers, but approved SecretSpec workflows can require secrets.
-- Remote mutation, backup/restore execution, and destructive commands require explicit user authorization. Some mutating Task entrypoints do not prompt; infra apply/destroy prompt but pass `-auto-approve` to OpenTofu.
-- When invoked, pre-commit runs full-repository `treefmt` and `trivy --config security/trivy.yaml fs --scanners secret .`, regardless of staged paths.
-- Keep traditional documentation minimal. Executable workflows are the operational source of truth; reserve `AGENTS.md` and skills for constraints and procedures code cannot express.
+Use Conventional Commits: `type(scope): lowercase description`.
+
+Do not commit, amend, push, rewrite history, or bypass hooks unless explicitly requested.
+
+## Documentation
+
+Keep documentation minimal. Executable configuration is the operational source of truth.
