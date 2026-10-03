@@ -44,7 +44,7 @@ Observability architecture is frozen: Alloy -> VictoriaMetrics/Loki -> Grafana -
 
 ## Secrets And Safety
 
-- Secret material lives in `secrets/*.sops.yaml`; do not decrypt or print it to inspect values. Repo-local OpenCode config denies direct `sops` and secret-delivery wrappers, but other approved workflows can still require secrets.
+- Secret declarations live in `secretspec.toml`; production values are stored in `secrets/production.sops.env`. Do not decrypt or print them to inspect values. Repo-local OpenCode config denies direct SOPS and secret-delivery wrappers, but approved SecretSpec workflows can require secrets.
 - Remote mutation, backup/restore execution, and destructive commands require explicit user authorization. Some mutating Task entrypoints do not prompt; infra apply/destroy prompt but pass `-auto-approve` to OpenTofu.
 - When invoked, pre-commit runs full-repository `treefmt` and `trivy --config security/trivy.yaml fs --scanners secret .`, regardless of staged paths.
 - Keep traditional documentation minimal. Executable workflows are the operational source of truth; reserve `AGENTS.md` and skills for constraints and procedures code cannot express.

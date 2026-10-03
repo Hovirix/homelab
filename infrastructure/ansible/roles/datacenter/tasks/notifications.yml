@@ -1,10 +1,3 @@
-- name: Load Proxmox notification secrets
-  community.sops.load_vars:
-    file: "{{ playbook_dir }}/../../../secrets/infrastructure.sops.yaml"
-    name: infrastructure_secrets
-  no_log: true
-  run_once: true
-
 - name: Render Proxmox notification files
   ansible.builtin.set_fact:
     datacenter_notifications_files:

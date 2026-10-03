@@ -1,7 +1,7 @@
 resource "authentik_provider_oauth2" "grafana" {
   name          = "Grafana"
-  client_id     = data.sops_file.identity.data["oauth.grafana.client_id"]
-  client_secret = data.sops_file.identity.data["oauth.grafana.client_secret"]
+  client_id     = var.grafana_client_id
+  client_secret = var.grafana_client_secret
 
   grant_types = ["authorization_code", "refresh_token"]
 

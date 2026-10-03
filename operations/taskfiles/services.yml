@@ -1,19 +1,20 @@
 version: "3"
 
 tasks:
-  secrets:
+
+  secret:sync:
     internal: true
-    desc: Create missing platform Swarm secrets
+    # Automatically runs when Task detects production secret changes.
+    sources: [secrets/production.sops.env]
     env:
       DOCKER_HOST:
         sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - operations/scripts/swarm-secrets.sh
+    cmd: python3 operations/scripts/secrets.py
 
   deploy:
     internal: true
+    deps: ['secret:sync']
     cmds:
-      - task: secrets
       - task: traefik:deploy
       - task: cloudflared:deploy
       - task: postgres:deploy

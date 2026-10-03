@@ -1,5 +1,5 @@
-- name: Print generated Proxmox API tokens to store in SOPS
+- name: Print generated Proxmox API tokens to store with SecretSpec
   ansible.builtin.debug:
     msg: >-
-      Store this token value in secrets/infrastructure.sops.yaml as proxmox.api_token: {{ (datacenter_api_token_create.stdout | from_json).value }}
+      Store this token value with: secretspec set PROXMOX_VE_API_TOKEN 'opentofu@pve!opentofu={{ (datacenter_api_token_create.stdout | from_json).value }}'
   when: datacenter_api_token_create.changed

@@ -1,6 +1,6 @@
 creation_rules:
   # Domain-level secret files used by tools, scripts, OpenTofu, Ansible, etc.
   # Encrypt all values, but keep top-level keys visible.
-  - path_regex: ^secrets/.*\.sops\.ya?ml$
+  - path_regex: ^secrets/.*\.sops\.env$
     encrypted_regex: ^.*$
     pgp: 82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F

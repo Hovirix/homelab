@@ -1,7 +1,7 @@
 resource "authentik_provider_oauth2" "vaultwarden" {
   name          = "Vaultwarden"
-  client_id     = data.sops_file.identity.data["oauth.vaultwarden.client_id"]
-  client_secret = data.sops_file.identity.data["oauth.vaultwarden.client_secret"]
+  client_id     = var.vaultwarden_client_id
+  client_secret = var.vaultwarden_client_secret
 
   grant_types           = ["authorization_code", "refresh_token"]
   authorization_flow    = data.authentik_flow.authorization.id

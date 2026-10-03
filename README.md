@@ -141,7 +141,7 @@ AI skills   → queryable procedures and domain knowledge
 - External exposure is default-deny.
 - Public traffic enters through [Cloudflare](https://www.cloudflare.com/) and Traefik.
 - Authentik provides application authentication and SSO.
-- Secrets are encrypted with [SOPS](https://github.com/getsops/sops) and delivered through Docker Swarm secrets.
+- [SecretSpec](https://secretspec.dev) declares secrets, with [SOPS](https://github.com/getsops/sops) as encrypted storage and Docker Swarm secrets for delivery.
 - Administrative access remains on trusted networks or VPN.
 
 ## Recovery

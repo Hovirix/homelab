@@ -1,63 +1,113 @@
 version: "3"
 
-vars:
-  STACKS: [adguardhome, proxmox, cloudflare, authentik]
-
 tasks:
-  init:
-    internal: true
-    cmds:
-      - for:
-          var: STACKS
-        task: stack
-        vars:
-          STACK: "{{.ITEM}}"
-          ARGS: init
-
   plan:
     desc: Preview infrastructure changes
-    deps: [fcos-render, init]
-    cmds:
-      - for:
-          var: STACKS
-        task: stack
-        vars:
-          STACK: "{{.ITEM}}"
-          ARGS: plan
+    deps:
+      - adguardhome:plan
+      - proxmox:plan
+      - cloudflare:plan
+      - authentik:plan
+      - hetzner:plan
 
   apply:
     desc: Apply infrastructure changes
     prompt: Apply infrastructure changes?
-    deps: [fcos-render, init]
     cmds:
-      - for:
-          var: STACKS
-        task: stack
-        vars:
-          STACK: "{{.ITEM}}"
-          ARGS: apply -auto-approve
+      - task: adguardhome:apply
+      - task: proxmox:apply
+      - task: cloudflare:apply
+      - task: authentik:apply
+      - task: hetzner:apply
 
-  destroy:
-    desc: Destroy managed infrastructure
-    prompt: "Destroy managed infrastructure? This is destructive."
-    deps: [init]
+  adguardhome:plan:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/adguardhome"
     cmds:
-      - for: [authentik, cloudflare, proxmox, adguardhome]
-        task: stack
-        vars:
-          STACK: "{{.ITEM}}"
-          ARGS: destroy -auto-approve
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
+  adguardhome:apply:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/adguardhome"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  adguardhome:destroy:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/adguardhome"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
+
+  proxmox:plan:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox"
+    deps: [fcos-render]
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
+  proxmox:apply:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox"
+    deps: [fcos-render]
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  proxmox:destroy:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
+
+  cloudflare:plan:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/cloudflare"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
+  cloudflare:apply:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/cloudflare"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  cloudflare:destroy:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/cloudflare"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
+
+  authentik:plan:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/authentik"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
+  authentik:apply:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/authentik"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  authentik:destroy:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/authentik"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
+
+  hetzner:apply:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/hetzner"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  hetzner:destroy:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/hetzner"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
 
   fcos-render:
     internal: true
     cmds:
       - mkdir -p "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/build"
       - butane --strict "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu" > "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/proxmox/build/fcos.ign"
-
-  stack:
-    internal: true
-    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/{{.STACK}}"
-    requires:
-      vars: [STACK, ARGS]
-    cmds:
-      - "{{.ROOT_DIR}}/operations/scripts/tofu.sh {{.ROOT_DIR}}/secrets/infrastructure.sops.yaml {{.ARGS}}"

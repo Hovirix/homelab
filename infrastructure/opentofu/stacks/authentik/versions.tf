@@ -6,10 +6,5 @@ terraform {
       source  = "goauthentik/authentik"
       version = "2026.5.1"
     }
-
-    sops = {
-      source  = "carlpett/sops"
-      version = "1.4.1"
-    }
   }
 }
