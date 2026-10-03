@@ -100,6 +100,12 @@ tasks:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
       - secretspec run -P production -S opentofu -- tofu apply -auto-approve
 
+  hetzner:plan:
+    dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/hetzner"
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
   hetzner:destroy:
     dir: "{{.ROOT_DIR}}/infrastructure/opentofu/stacks/hetzner"
     cmds:
