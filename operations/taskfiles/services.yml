@@ -25,7 +25,7 @@ tasks:
       - task: paperless:deploy
 
   status:
-    internal: true
+    desc: Show deployed Docker stacks
     env:
       DOCKER_HOST:
         sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
