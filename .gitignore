@@ -45,3 +45,4 @@ Thumbs.db
 /firmware/openwrt/files/config/wireless
 .artifacts/
 .task/
+/operations/scripts/__pycache__

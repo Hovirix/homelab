@@ -17,7 +17,20 @@ def run(*args, input=None, check=True):
 
 
 def exists(name):
-    return run("docker", "secret", "inspect", name.lower(), check=False).returncode == 0
+    result = run("docker", "secret", "inspect", name.lower(), check=False)
+
+    if result.returncode == 0:
+        return True
+
+    if (
+        "not found" in result.stderr.lower()
+        or "no such secret" in result.stderr.lower()
+    ):
+        return False
+
+    raise RuntimeError(
+        f"Could not inspect Docker secret {name.lower()}: {result.stderr.strip()}"
+    )
 
 
 def changed(name):
@@ -55,12 +68,12 @@ def main():
     ).fields()
 
     for name, value in secrets.items():
-        if exists(name) and changed(name):
-            stop(name)
-            remove(name)
+        if not exists(name):
             create(name, value)
 
-        else:
+        elif changed(name):
+            stop(name)
+            remove(name)
             create(name, value)
 
 
