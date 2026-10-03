@@ -1,19 +1,14 @@
 ---
-description: Debug any HX Lab problem by exploring repository desired state and observing runtime with read-only commands.
+description: Investigate an HX Lab problem without making changes
 agent: plan
 ---
 
 $ARGUMENTS
 
-General-purpose debug. Adapt the entire approach to what the arguments describe.
+Investigate using the relevant repository desired state and read-only runtime evidence.
 
-1. Interpret the symptom: service, stack, network, node, ingress, backup, container, config, provider, workflow, or unknown.
-2. Map it to a domain and explore the matching repository paths first (`platform/**`, `operations/**`, `infrastructure/**`, `Taskfile.yml`) using native tools.
-3. Observe runtime only with read-only commands chosen by what the arguments point to:
-   - Swarm/service: Grafana metrics or logs, `docker service ls`, `docker service ps`, `docker service logs`, or `docker node ls`
-   - Infrastructure: OpenTofu state/plan output, Ansible facts, or approved runtime evidence
-   - Operations/CI: workflow logs and Taskfile entries
-4. Compare desired state vs observed runtime to isolate the cause. Separate symptoms, observed evidence, hypotheses, and next checks.
-5. Propose the least invasive next checks before any mutation.
+Prefer Grafana metrics and Loki logs for runtime incidents when relevant. Distinguish observed facts from hypotheses and do not infer runtime state from configuration.
 
-Never restart services, deploy stacks, apply infrastructure, initialize or leave Swarm, decrypt secrets, or claim root cause without evidence.
+Do not mutate systems or access secret values.
+
+Return the likely cause, strongest evidence, confidence, and next action.

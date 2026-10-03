@@ -5,8 +5,8 @@
     "bash": {
       "sops": "deny",
       "sops *": "deny",
-      "task services:secrets*": "deny",
-      "*operations/scripts/swarm-secrets.sh*": "deny",
+      "task services:secret:sync*": "deny",
+      "*operations/scripts/secrets.py*": "deny",
     },
     // Defense in depth for Grafana MCP versions that expose write tools.
     "grafana_add_activity_to_incident": "deny",
