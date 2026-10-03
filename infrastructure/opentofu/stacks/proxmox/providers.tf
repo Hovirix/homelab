@@ -1,8 +1,5 @@
-provider "sops" {}
-
 provider "proxmox" {
-  endpoint  = "https://pve.home.hovirix.dev:8006/"
-  api_token = "opentofu@pve!opentofu=${data.sops_file.infrastructure.data["proxmox.api_token"]}"
+  endpoint = "https://pve.home.hovirix.dev:8006/"
   ssh {
     agent    = true
     username = "root"

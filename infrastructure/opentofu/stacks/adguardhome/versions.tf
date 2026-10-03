@@ -6,10 +6,5 @@ terraform {
       source  = "gmichels/adguard"
       version = "1.7.0"
     }
-
-    sops = {
-      source  = "carlpett/sops"
-      version = "1.4.1"
-    }
   }
 }

@@ -6,6 +6,7 @@ tasks:
     deps:
       - lint:actionlint
       - lint:nix
+      - lint:python
       - lint:shellcheck
       - lint:ansible
       - lint:tofu
@@ -20,6 +21,10 @@ tasks:
   lint:nix:
     internal: true
     cmd: nix flake check --quiet
+
+  lint:python:
+    internal: true
+    cmd: ruff check operations/scripts/*.py
 
   lint:shellcheck:
     internal: true

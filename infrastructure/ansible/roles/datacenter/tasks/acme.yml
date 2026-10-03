@@ -1,13 +1,7 @@
-- name: Load Proxmox certificate secrets
-  community.sops.load_vars:
-    file: "{{ playbook_dir }}/../../../secrets/infrastructure.sops.yaml"
-    name: infrastructure_secrets
-  no_log: true
-
 - name: Verify Cloudflare ACME token
   ansible.builtin.assert:
     that:
-      - infrastructure_secrets.proxmox.acme_token | length > 0
+      - lookup('ansible.builtin.env', 'PROXMOX_ACME_TOKEN') | length > 0
     fail_msg: Cloudflare ACME token is missing.
   no_log: true
 
@@ -22,7 +16,7 @@
     dest: "{{ datacenter_certificates_cloudflare_credentials.path }}"
     mode: "0600"
     content: |
-      CF_Token={{ infrastructure_secrets.proxmox.acme_token }}
+      CF_Token={{ lookup('ansible.builtin.env', 'PROXMOX_ACME_TOKEN') }}
   no_log: true
 
 - name: Query ACME account

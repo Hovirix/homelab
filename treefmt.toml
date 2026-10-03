@@ -9,9 +9,19 @@ includes = ["**/*.nix"]
 command = "prettier"
 includes = ["**/*.{css,graphql,html,js,json,json5,jsonc,jsx,less,md,mdx,scss,ts,tsx,vue}"]
 
+[formatter.ruff]
+command = "ruff"
+options = ["format"]
+includes = ["**/*.py"]
+
 [formatter.shfmt]
 command = "shfmt"
 includes = ["operations/scripts/*.sh"]
+
+[formatter.taplo]
+command = "taplo"
+options = ["format"]
+includes = ["**/*.toml"]
 
 [formatter.yamlfmt]
 command = "yamlfmt"

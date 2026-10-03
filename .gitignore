@@ -44,3 +44,4 @@ Thumbs.db
 /firmware/openwrt/files/config/network
 /firmware/openwrt/files/config/wireless
 .artifacts/
+.task/

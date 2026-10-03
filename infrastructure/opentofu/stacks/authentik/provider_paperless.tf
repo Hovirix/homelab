@@ -1,7 +1,7 @@
 resource "authentik_provider_oauth2" "paperless" {
   name          = "Paperless"
-  client_id     = data.sops_file.identity.data["oauth.paperless.client_id"]
-  client_secret = data.sops_file.identity.data["oauth.paperless.client_secret"]
+  client_id     = var.paperless_client_id
+  client_secret = var.paperless_client_secret
 
   grant_types = ["authorization_code", "refresh_token"]
 

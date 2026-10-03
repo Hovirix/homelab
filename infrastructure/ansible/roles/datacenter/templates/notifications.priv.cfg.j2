@@ -1,2 +1,2 @@
 smtp: hxlab-smtp
-        password {{ infrastructure_secrets.proxmox.smtp_api_key }}
+        password {{ lookup('ansible.builtin.env', 'PROXMOX_SMTP_API_KEY') }}
