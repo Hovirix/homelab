@@ -8,6 +8,7 @@ resource "authentik_stage_authenticator_webauthn" "mfa" {
 
 resource "authentik_stage_authenticator_validate" "mfa" {
   name                  = "MFA Validation"
+  device_classes        = ["totp", "webauthn"]
   not_configured_action = "configure"
   configuration_stages = [
     authentik_stage_authenticator_totp.mfa.id,
