@@ -150,8 +150,9 @@ AI skills   → queryable procedures and domain knowledge
 - Recovery workflows are automated through Task.
 - Persistent application data is independent from the Swarm lifecycle.
 - ZFS provides local snapshot capabilities.
-- Hetzner Storage Box provides off-site Restic backup storage.
-- PostgreSQL requires database-aware backups in addition to infrastructure snapshots.
+- ZFS provides local recovery points, while Restic copies persistent data off-site to Hetzner Storage Box.
+- Both are whole-filesystem disaster-recovery mechanisms, not PostgreSQL-aware backups.
+- PostgreSQL logical backups, WAL archiving, and PITR remain separate future work.
 
 ## License
 

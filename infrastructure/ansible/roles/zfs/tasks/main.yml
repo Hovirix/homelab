@@ -72,6 +72,7 @@
       compression: lz4
       atime: "off"
       xattr: sa
+      snapdir: visible
 
 - name: Configure Swarm service ZFS datasets
   community.general.zfs:

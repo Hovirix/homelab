@@ -1,0 +1,9 @@
+[Unit]
+Description=Run weekly off-site Restic maintenance
+
+[Timer]
+OnCalendar=Sun *-*-* 04:30:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

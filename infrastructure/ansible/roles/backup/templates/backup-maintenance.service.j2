@@ -1,0 +1,15 @@
+[Unit]
+Description=Maintain off-site Restic repository
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/restic/restic.env
+TimeoutStartSec=12h
+TimeoutStartFailureMode=kill
+TimeoutStopSec=30s
+TimeoutStopFailureMode=kill
+SuccessExitStatus=75
+ExecStart=/usr/bin/flock -n -E 75 /run/offsite-backup.lock restic forget --prune --keep-daily 7 --keep-weekly 4 --keep-monthly 12
+ExecStart=/usr/bin/flock -n -E 75 /run/offsite-backup.lock restic check

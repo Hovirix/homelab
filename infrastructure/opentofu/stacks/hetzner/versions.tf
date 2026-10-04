@@ -6,10 +6,5 @@ terraform {
       source  = "hetznercloud/hcloud"
       version = "1.69.0"
     }
-
-    sops = {
-      source  = "carlpett/sops"
-      version = "1.4.1"
-    }
   }
 }

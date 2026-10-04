@@ -22,6 +22,7 @@ Do not choose a recovery point simply because it is newest. State uncertainty ra
 ## Implemented Recovery Mechanisms
 
 - `rpool/swarm` has hourly local Proxmox ZFS snapshots named `auto-YYYY-MM-DD_HH-MM` for short-term recovery.
+- Off-site Restic backups of `/rpool/swarm` are configured on Hetzner Storage Box independently of local ZFS snapshots. Repository configuration does not prove that a recent off-site snapshot exists.
 - `task restore` is the repository restore entrypoint. It is destructive and must never be run by the agent.
 
 If local snapshot availability is unknown, request read-only evidence such as:

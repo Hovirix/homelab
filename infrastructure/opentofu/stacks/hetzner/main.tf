@@ -2,7 +2,7 @@ resource "hcloud_storage_box" "backups" {
   name             = "backups"
   storage_box_type = "bx11"
   location         = "fsn1"
-  password         = data.sops_file.infrastructure.data["hetzner.storage_box_password"]
+  password         = var.hetzner_storage_box_password
 
   access_settings = {
     reachable_externally = true
@@ -21,11 +21,12 @@ resource "hcloud_storage_box_subaccount" "homelab" {
 
   name           = "homelab"
   home_directory = "homelab"
-  password       = data.sops_file.infrastructure.data["backup.sftp_password"]
+  password       = var.hetzner_storage_box_password
   description    = "Restic backups for HX Lab"
 
   access_settings = {
     reachable_externally = true
+    ssh_enabled          = true
   }
 
   lifecycle {

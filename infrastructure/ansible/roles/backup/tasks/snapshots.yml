@@ -7,7 +7,7 @@
       - -o
       - name
       - rpool/swarm
-  register: swarm_snapshots_zfs_dataset
+  register: backup_swarm_zfs_dataset
   changed_when: false
   failed_when: false
   check_mode: false
@@ -15,8 +15,8 @@
 - name: Verify Docker Swarm ZFS dataset exists
   ansible.builtin.assert:
     that:
-      - swarm_snapshots_zfs_dataset.rc == 0
-      - swarm_snapshots_zfs_dataset.stdout == "rpool/swarm"
+      - backup_swarm_zfs_dataset.rc == 0
+      - backup_swarm_zfs_dataset.stdout == "rpool/swarm"
     fail_msg: Expected ZFS dataset rpool/swarm is missing or could not be queried on {{ inventory_hostname }}; refusing to configure snapshots.
 
 - name: Install Docker Swarm ZFS snapshot script
@@ -43,7 +43,7 @@
     group: root
     mode: "0644"
 
-- name: Enable and start Docker Swarm ZFS snapshot timer
+- name: Enable Docker Swarm ZFS snapshot timer
   ansible.builtin.systemd_service:
     name: swarm-zfs-snapshot.timer
     enabled: true

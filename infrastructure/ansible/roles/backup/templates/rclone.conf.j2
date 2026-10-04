@@ -1,0 +1,6 @@
+[storagebox]
+type = sftp
+host = u682895.your-storagebox.de
+user = u682895-homelab
+port = 23
+pass = {{ lookup('ansible.builtin.env', 'HETZNER_STORAGE_BOX_PASSWORD') }}

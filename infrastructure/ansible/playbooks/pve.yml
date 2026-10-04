@@ -15,4 +15,4 @@
     - acme
     - opentofu_access
     - notifications
-    - swarm_snapshots
+    - backup
