@@ -1,0 +1,97 @@
+- name: Read rpool size
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - list
+      - -Hp
+      - -o
+      - size
+      - rpool
+  register: zfs_rpool_size
+  changed_when: false
+  check_mode: false
+
+- name: Read rpool health
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - list
+      - -H
+      - -o
+      - health
+      - rpool
+  register: zfs_rpool_health
+  changed_when: false
+  check_mode: false
+
+- name: Validate rpool
+  ansible.builtin.assert:
+    that:
+      - zfs_rpool_health.stdout | trim == "ONLINE"
+      - zfs_rpool_size.stdout | trim | int >= 1500 * 1024**3
+    fail_msg: ZFS pool rpool must be ONLINE and at least 1500 GiB.
+
+- name: Read rpool autotrim
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - get
+      - -H
+      - -o
+      - value
+      - autotrim
+      - rpool
+  register: zfs_rpool_autotrim
+  changed_when: false
+  check_mode: false
+
+- name: Enable rpool autotrim
+  ansible.builtin.command:
+    argv:
+      - zpool
+      - set
+      - autotrim=on
+      - rpool
+  when: zfs_rpool_autotrim.stdout | trim != "on"
+  changed_when: true
+
+- name: Configure VM ZFS dataset
+  community.general.zfs:
+    name: rpool/data
+    state: present
+    extra_zfs_properties:
+      compression: lz4
+      atime: "off"
+      xattr: sa
+
+- name: Configure Swarm ZFS dataset
+  community.general.zfs:
+    name: rpool/swarm
+    state: present
+    extra_zfs_properties:
+      compression: lz4
+      atime: "off"
+      xattr: sa
+
+- name: Configure Swarm service ZFS datasets
+  community.general.zfs:
+    name: "rpool/swarm/{{ item }}"
+    state: present
+  loop:
+    - grafana
+    - loki
+    - paperless
+    - postgres
+    - victoriametrics
+    - traefik
+    - valkey
+    - vaultwarden
+
+- name: Allow non-root observability containers to write their data
+  ansible.builtin.file:
+    path: "/rpool/swarm/{{ item }}"
+    state: directory
+    mode: "0777"
+  loop:
+    - grafana
+    - loki

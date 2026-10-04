@@ -1,0 +1,115 @@
+- name: Read OpenTofu API user
+  ansible.builtin.command:
+    argv: [pvesh, get, /access/users/opentofu@pve, --output-format, json]
+  register: opentofu_access_user
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  run_once: true
+
+- name: Create OpenTofu API user
+  ansible.builtin.command:
+    argv: [pveum, user, add, opentofu@pve, --comment, OpenTofu VM lifecycle]
+  when: opentofu_access_user.rc != 0
+  changed_when: opentofu_access_user.rc != 0
+  run_once: true
+
+- name: Update OpenTofu API user comment
+  ansible.builtin.command:
+    argv: [pveum, user, modify, opentofu@pve, --comment, OpenTofu VM lifecycle]
+  when:
+    - opentofu_access_user.rc == 0
+    - (opentofu_access_user.stdout | from_json).comment | default('') != 'OpenTofu VM lifecycle'
+  changed_when: >-
+    (opentofu_access_user.stdout | from_json).comment | default('') != 'OpenTofu VM lifecycle'
+  run_once: true
+
+- name: Read Proxmox roles
+  ansible.builtin.command:
+    argv: [pveum, role, list, --output-format, json]
+  register: opentofu_access_roles
+  changed_when: false
+  check_mode: false
+  run_once: true
+
+- name: Create image download role
+  ansible.builtin.command:
+    argv: [pveum, role, add, OpenTofuDownload, --privs, "{{ opentofu_access_role_privileges | join(' ') }}"]
+  when: >-
+    'OpenTofuDownload' not in (opentofu_access_roles.stdout | from_json | map(attribute='roleid') | list)
+  changed_when: >-
+    'OpenTofuDownload' not in (opentofu_access_roles.stdout | from_json | map(attribute='roleid') | list)
+  run_once: true
+
+- name: Update image download role
+  ansible.builtin.command:
+    argv: [pveum, role, modify, OpenTofuDownload, --privs, "{{ opentofu_access_role_privileges | join(' ') }}"]
+  vars:
+    opentofu_access_current_role_privileges: |-
+      {{ (opentofu_access_roles.stdout | from_json |
+      selectattr('roleid', 'equalto', 'OpenTofuDownload') |
+      map(attribute='privs') | first | default('') |
+      regex_findall('[^,\s]+') | sort | join(',')) }}
+    opentofu_access_desired_role_privileges: "{{ opentofu_access_role_privileges | sort | join(',') }}"
+  when:
+    - >-
+      'OpenTofuDownload' in (opentofu_access_roles.stdout | from_json | map(attribute='roleid') | list)
+    - opentofu_access_current_role_privileges != opentofu_access_desired_role_privileges
+  changed_when: opentofu_access_current_role_privileges != opentofu_access_desired_role_privileges
+  run_once: true
+
+- name: Read Proxmox ACLs
+  ansible.builtin.command:
+    argv: [pvesh, get, /access/acl, --output-format, json]
+  register: opentofu_access_existing_acls
+  changed_when: false
+  check_mode: false
+  run_once: true
+
+- name: Configure OpenTofu ACLs
+  ansible.builtin.command:
+    argv: [pveum, acl, modify, "{{ item.path }}", --users, opentofu@pve, --roles, "{{ item.role }}"]
+  loop: "{{ opentofu_access_acls }}"
+  when: |-
+    (opentofu_access_existing_acls.stdout | from_json |
+    selectattr('ugid', 'equalto', 'opentofu@pve') |
+    selectattr('path', 'equalto', item.path) |
+    selectattr('roleid', 'equalto', item.role) | list | length) == 0
+  changed_when: |-
+    (opentofu_access_existing_acls.stdout | from_json |
+    selectattr('ugid', 'equalto', 'opentofu@pve') |
+    selectattr('path', 'equalto', item.path) |
+    selectattr('roleid', 'equalto', item.role) | list | length) == 0
+  run_once: true
+
+- name: Read OpenTofu API token
+  ansible.builtin.command:
+    argv: [pvesh, get, /access/users/opentofu@pve/token/opentofu, --output-format, json]
+  register: opentofu_access_token
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  no_log: true
+  run_once: true
+
+- name: Create OpenTofu API token
+  ansible.builtin.command:
+    argv: [pveum, user, token, add, opentofu@pve, opentofu, --privsep, "0", --comment, OpenTofu VM lifecycle]
+  when: opentofu_access_token.rc != 0
+  changed_when: opentofu_access_token.rc != 0
+  no_log: true
+  run_once: true
+
+- name: Update OpenTofu API token
+  ansible.builtin.command:
+    argv: [pveum, user, token, modify, opentofu@pve, opentofu, --privsep, "0", --comment, OpenTofu VM lifecycle]
+  when:
+    - opentofu_access_token.rc == 0
+    - |-
+      (opentofu_access_token.stdout | from_json).privsep | int != 0 or
+      (opentofu_access_token.stdout | from_json).comment | default('') != 'OpenTofu VM lifecycle'
+  changed_when: |-
+    (opentofu_access_token.stdout | from_json).privsep | int != 0 or
+    (opentofu_access_token.stdout | from_json).comment | default('') != 'OpenTofu VM lifecycle'
+  no_log: true
+  run_once: true

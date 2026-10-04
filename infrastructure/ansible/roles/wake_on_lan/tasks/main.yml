@@ -1,0 +1,19 @@
+- name: Install Wake-on-LAN tooling
+  ansible.builtin.apt:
+    name: ethtool
+    state: present
+
+- name: Configure Wake-on-LAN systemd service
+  ansible.builtin.template:
+    src: wake-on-lan.service.j2
+    dest: /etc/systemd/system/wake-on-lan.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable Wake-on-LAN service
+  ansible.builtin.systemd_service:
+    name: wake-on-lan.service
+    enabled: true
+    state: started
+    daemon_reload: true

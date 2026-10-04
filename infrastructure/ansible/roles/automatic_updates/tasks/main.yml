@@ -1,0 +1,30 @@
+- name: Install scheduled host update script
+  ansible.builtin.template:
+    src: hxlab-host-update.sh.j2
+    dest: /usr/local/sbin/hxlab-host-update
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure scheduled host update service
+  ansible.builtin.template:
+    src: hxlab-host-update.service.j2
+    dest: /etc/systemd/system/hxlab-host-update.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Configure scheduled host update timer
+  ansible.builtin.template:
+    src: hxlab-host-update.timer.j2
+    dest: /etc/systemd/system/hxlab-host-update.timer
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable scheduled host updates
+  ansible.builtin.systemd_service:
+    name: hxlab-host-update.timer
+    enabled: true
+    state: started
+    daemon_reload: true

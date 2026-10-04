@@ -1,0 +1,134 @@
+# yamllint disable rule:line-length
+- name: Verify Cloudflare ACME token
+  ansible.builtin.assert:
+    that:
+      - lookup('ansible.builtin.env', 'PROXMOX_ACME_TOKEN') | length > 0
+    fail_msg: Cloudflare ACME token is missing.
+  no_log: true
+  run_once: true
+
+- name: Read ACME account
+  ansible.builtin.command:
+    argv: [pvenode, acme, account, info, default, --output-format, json]
+  register: acme_account
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  run_once: true
+
+- name: Read Cloudflare ACME plugin
+  ansible.builtin.command:
+    argv: [pvenode, acme, plugin, config, cloudflare, --output-format, json]
+  register: acme_cloudflare_plugin
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  run_once: true
+
+- name: Deactivate non-production ACME account
+  ansible.builtin.command:
+    argv: [pvenode, acme, account, deactivate, default]
+  when:
+    - acme_account.rc == 0
+    - (acme_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
+  changed_when: acme_account.rc == 0
+  run_once: true
+
+- name: Register production ACME account
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - acme
+      - account
+      - register
+      - default
+      - homelab@hovirix.dev
+      - --directory
+      - https://acme-v02.api.letsencrypt.org/directory
+    stdin: "y\n"
+  when: >-
+    acme_account.rc != 0 or (acme_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
+  changed_when: >-
+    acme_account.rc != 0 or (acme_account.stdout | from_json).directory != 'https://acme-v02.api.letsencrypt.org/directory'
+  run_once: true
+
+- name: Reconcile Cloudflare ACME plugin
+  when:
+    - not ansible_check_mode
+    - >-
+      acme_cloudflare_plugin.rc != 0 or (acme_cloudflare_plugin.stdout | from_json).api != 'cf' or (acme_cloudflare_plugin.stdout | from_json)['validation-delay'] | int != 60
+  run_once: true
+  block:
+    - name: Create temporary Cloudflare credentials file
+      ansible.builtin.tempfile:
+        state: file
+        suffix: -cloudflare
+      register: acme_cloudflare_credentials
+      no_log: true
+
+    - name: Write Cloudflare credentials
+      ansible.builtin.copy:
+        dest: "{{ acme_cloudflare_credentials.path }}"
+        mode: "0600"
+        content: |
+          CF_Token={{ lookup('ansible.builtin.env', 'PROXMOX_ACME_TOKEN') }}
+      no_log: true
+
+    - name: Configure Cloudflare ACME plugin
+      ansible.builtin.command:
+        argv:
+          - pvenode
+          - acme
+          - plugin
+          - "{{ 'add' if acme_cloudflare_plugin.rc != 0 else 'update' }}"
+          - dns
+          - cloudflare
+          - --api
+          - cf
+          - --data
+          - "{{ acme_cloudflare_credentials.path }}"
+          - --validation-delay
+          - "60"
+      changed_when: true
+  always:
+    - name: Remove temporary Cloudflare credentials
+      ansible.builtin.file:
+        path: "{{ acme_cloudflare_credentials.path }}"
+        state: absent
+      no_log: true
+
+- name: Read node ACME configuration
+  ansible.builtin.command:
+    argv: [pvesh, get, "/nodes/{{ inventory_hostname }}/config", --output-format, json]
+  register: acme_node_config
+  changed_when: false
+  check_mode: false
+
+- name: Configure node ACME domain
+  ansible.builtin.command:
+    argv:
+      - pvenode
+      - config
+      - set
+      - --acme
+      - account=default
+      - -acmedomain0
+      - "{{ inventory_hostname }}.{{ domain }},plugin=cloudflare"
+  when: >-
+    (acme_node_config.stdout | from_json).acme | default('') != 'account=default' or (acme_node_config.stdout | from_json).acmedomain0 | default('') != inventory_hostname ~ '.' ~ domain ~ ',plugin=cloudflare'
+  changed_when: >-
+    (acme_node_config.stdout | from_json).acme | default('') != 'account=default' or (acme_node_config.stdout | from_json).acmedomain0 | default('') != inventory_hostname ~ '.' ~ domain ~ ',plugin=cloudflare'
+
+- name: Check whether the ACME certificate expires within thirty days
+  ansible.builtin.command:
+    argv: [openssl, x509, -checkend, "2592000", -noout, -in, /etc/pve/local/pveproxy-ssl.pem]
+  register: acme_certificate_valid
+  changed_when: false
+  failed_when: acme_certificate_valid.rc not in [0, 1]
+  check_mode: false
+
+- name: Order ACME certificate when renewal is required
+  ansible.builtin.command:
+    argv: [pvenode, acme, cert, order]
+  when: acme_certificate_valid.rc == 1
+  changed_when: acme_certificate_valid.rc == 1

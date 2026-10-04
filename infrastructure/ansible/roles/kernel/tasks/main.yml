@@ -1,0 +1,38 @@
+- name: Enable IOMMU kernel parameters
+  ansible.builtin.lineinfile:
+    path: /etc/kernel/cmdline
+    regexp: "^(.*?)(?:\\s+amd_iommu=on)?(?:\\s+iommu=pt)?$"
+    line: '\1 amd_iommu=on iommu=pt'
+    backrefs: true
+  notify: Refresh bootloader
+
+- name: Configure VFIO modules
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/vfio.conf
+    owner: root
+    group: root
+    mode: "0644"
+    content: |
+      vfio
+      vfio_iommu_type1
+      vfio_pci
+  notify: Update initramfs
+
+- name: Configure kernel parameters
+  ansible.posix.sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_file: /etc/sysctl.d/99-hxlab.conf
+    state: present
+    reload: false
+  loop:
+    - {name: kernel.panic, value: "10"}
+    - {name: kernel.panic_on_oops, value: "1"}
+    - {name: kernel.sysrq, value: "1"}
+    - {name: vm.vfs_cache_pressure, value: "50"}
+    - {name: net.ipv4.tcp_keepalive_time, value: "600"}
+    - {name: net.ipv4.tcp_keepalive_intvl, value: "60"}
+    - {name: net.ipv4.tcp_keepalive_probes, value: "5"}
+  loop_control:
+    label: "{{ item.name }}"
+  notify: Reload sysctl

@@ -2,27 +2,17 @@
   hosts: nodes
   serial: 1
 
-  tasks:
-    - name: Configure Proxmox VE repositories
-      ansible.builtin.import_role:
-        name: pve
-        tasks_from: repositories
-      tags: [repositories]
-
-    - name: Configure Proxmox VE storage
-      ansible.builtin.import_role:
-        name: pve
-        tasks_from: storage
-      tags: [storage]
-
-    - name: Configure Proxmox VE acme
-      ansible.builtin.import_role:
-        name: pve
-        tasks_from: acme
-      tags: [acme]
-
-    - name: Configure Docker Swarm ZFS snapshots
-      ansible.builtin.import_role:
-        name: pve
-        tasks_from: snapshots
-      tags: [snapshots]
+  roles:
+    - system
+    - repositories
+    - ssh
+    - wake_on_lan
+    - zfs
+    - kernel
+    - networking
+    - automatic_updates
+    - storage
+    - acme
+    - opentofu_access
+    - notifications
+    - swarm_snapshots
