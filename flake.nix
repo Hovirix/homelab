@@ -79,6 +79,7 @@
                 ansible-language-server
                 bash-language-server
                 nil
+                openssl
                 pre-commit
                 pyright
                 sops
