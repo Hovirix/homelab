@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+
+version: 1
+
+metadata:
+  name: Grafana
+
+entries:
+  - model: authentik_providers_oauth2.oauth2provider
+    id: grafana-provider
+    identifiers:
+      name: Grafana
+    attrs:
+      client_id: !File /run/secrets/grafana_client_id
+      client_secret: !File /run/secrets/grafana_client_secret
+      grant_types:
+        - authorization_code
+        - refresh_token
+      authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+      invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+      logout_method: frontchannel
+      logout_uri: https://grafana.hovirix.dev/logout
+      redirect_uris:
+        - matching_mode: strict
+          redirect_uri_type: authorization
+          url: https://grafana.hovirix.dev/login/generic_oauth
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-entitlements]]
+        - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-email]]
+
+  - model: authentik_core.application
+    id: grafana-application
+    identifiers:
+      slug: grafana
+    attrs:
+      name: Grafana
+      provider: !KeyOf grafana-provider
+
+  - model: authentik_core.group
+    id: grafana-admins
+    identifiers:
+      name: grafana-admins
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf grafana-application
+      order: 0
+    attrs:
+      group: !KeyOf grafana-admins

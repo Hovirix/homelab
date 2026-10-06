@@ -56,7 +56,6 @@ def test_infrastructure():
         "adguardhome",
         "proxmox",
         "cloudflare",
-        "authentik",
         "hetzner",
     ]
 

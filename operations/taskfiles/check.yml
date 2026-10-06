@@ -38,7 +38,7 @@ tasks:
   lint:tofu:
     internal: true
     cmds:
-      - for: [adguardhome, proxmox, cloudflare, authentik]
+      - for: [adguardhome, proxmox, cloudflare]
         cmd: |
           cd infrastructure/opentofu/stacks/{{.ITEM}}
           export TF_DATA_DIR="{{.ROOT_DIR}}/.artifacts/tofu/{{.ITEM}}"
