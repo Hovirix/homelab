@@ -22,7 +22,7 @@ resource "hcloud_storage_box_subaccount" "homelab" {
   name           = "homelab"
   home_directory = "homelab"
   password       = var.hetzner_storage_box_password
-  description    = "Restic backups for HX Lab"
+  description    = "Borg backups for HX Lab"
 
   access_settings = {
     reachable_externally = true

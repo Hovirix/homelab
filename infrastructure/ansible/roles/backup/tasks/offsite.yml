@@ -1,74 +1,44 @@
 - name: Install off-site backup tooling
   ansible.builtin.apt:
     name:
-      - rclone
-      - restic
+      - borgbackup
+      - borgmatic
+      - sshpass
     state: present
 
-- name: Create Restic environment directory
+- name: Create Borgmatic configuration directory
   ansible.builtin.file:
-    path: /etc/restic
+    path: /etc/borgmatic
     state: directory
     owner: root
     group: root
     mode: "0700"
 
-- name: Obscure Storage Box password for rclone
-  ansible.builtin.command:
-    argv:
-      - rclone
-      - obscure
-      - "-"
-    stdin: "{{ lookup('ansible.builtin.env', 'HETZNER_STORAGE_BOX_PASSWORD') }}"
-  register: backup_rclone_password
-  changed_when: false
-  no_log: true
-
-- name: Write rclone Storage Box configuration
-  no_log: true
-  ansible.builtin.template:
-    src: rclone.conf.j2
-    dest: /etc/restic/rclone.conf
-    owner: root
-    group: root
-    mode: "0600"
-
-- name: Write Restic repository password
+- name: Write Storage Box password
   ansible.builtin.copy:
-    content: "{{ lookup('ansible.builtin.env', 'RESTIC_PASSWORD') }}\n"
-    dest: /etc/restic/password
+    content: "{{ lookup('ansible.builtin.env', 'HETZNER_STORAGE_BOX_PASSWORD') }}\n"
+    dest: /etc/borgmatic/storagebox-password
     owner: root
     group: root
     mode: "0600"
   no_log: true
 
-- name: Write Restic environment
-  ansible.builtin.template:
-    src: restic.env.j2
-    dest: /etc/restic/restic.env
+- name: Write Borg repository passphrase
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.env', 'BORG_PASSPHRASE') }}\n"
+    dest: /etc/borgmatic/passphrase
     owner: root
     group: root
     mode: "0600"
+  no_log: true
 
-- name: Check direct off-site backup timer
-  ansible.builtin.stat:
-    path: /etc/systemd/system/offsite-backup.timer
-  register: backup_direct_timer
-
-- name: Stop direct off-site backup timer
-  ansible.builtin.systemd_service:
-    name: offsite-backup.timer
-    enabled: false
-    state: stopped
-  when: backup_direct_timer.stat.exists
-
-- name: Remove direct off-site backup units
-  ansible.builtin.file:
-    path: "/etc/systemd/system/{{ item }}"
-    state: absent
-  loop:
-    - offsite-backup.service
-    - offsite-backup.timer
+- name: Write Borgmatic configuration
+  ansible.builtin.template:
+    src: borgmatic.yaml.j2
+    dest: /etc/borgmatic/config.yaml
+    owner: root
+    group: root
+    mode: "0600"
 
 - name: Install off-site maintenance service
   ansible.builtin.template:

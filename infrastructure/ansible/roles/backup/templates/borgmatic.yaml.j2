@@ -1,0 +1,20 @@
+source_directories:
+  - /rpool/swarm/paperless
+  - /rpool/swarm/postgres
+  - /rpool/swarm/vaultwarden
+
+repositories:
+  - path: ssh://u683062-sub1@u683062.your-storagebox.de:23/./homelab
+
+remote_path: borg-1.4
+ssh_command: >-
+  sshpass -f /etc/borgmatic/storagebox-password
+  ssh -o StrictHostKeyChecking=accept-new
+
+encryption_passcommand: cat /etc/borgmatic/passphrase
+
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 12
+
+zfs:
