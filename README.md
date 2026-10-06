@@ -52,7 +52,7 @@ flowchart TB
     data --> storage
     observability --> storage
 
-    storage -. Backup .-> truenas[TrueNAS]
+    storage -. Backup .-> storagebox[Hetzner Storage Box]
 ```
 
 ## Design Principles
@@ -76,7 +76,7 @@ flowchart TB
 | Network       | [OpenWrt](https://openwrt.org/)                                               | Routing, DHCP, firewall, VPN   |
 | DNS           | [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)             | Internal DNS                   |
 | Storage       | [OpenZFS](https://openzfs.org/) + [VirtioFS](https://virtio-fs.gitlab.io/)    | Persistent application storage |
-| Backup        | [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/)           | Off-site backup                |
+| Backup        | [Borg](https://www.borgbackup.org/) + [borgmatic](https://torsion.org/borgmatic/) + [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/) | Off-site application backup |
 
 Network infrastructure is managed separately in [`hovirix/netlab`](https://github.com/Hovirix/netlab).
 
@@ -149,9 +149,9 @@ AI skills   → queryable procedures and domain knowledge
 - Infrastructure and Swarm configuration are rebuildable from Git.
 - Recovery workflows are automated through Task.
 - Persistent application data is independent from the Swarm lifecycle.
-- ZFS provides local snapshot capabilities.
-- ZFS provides local recovery points, while Restic copies persistent data off-site to Hetzner Storage Box.
-- Both are whole-filesystem disaster-recovery mechanisms, not PostgreSQL-aware backups.
+- ZFS provides hourly local recovery points for all Swarm datasets.
+- Borgmatic backs up Paperless and Vaultwarden to Hetzner Storage Box with Borg.
+- PostgreSQL is not included in off-site backups yet.
 - PostgreSQL logical backups, WAL archiving, and PITR remain separate future work.
 
 ## License
