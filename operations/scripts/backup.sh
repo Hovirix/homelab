@@ -1,22 +1,24 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-host='root@pve.home.hovirix.dev'
-
-if ssh \
+ssh \
   -o BatchMode=yes \
   -o ConnectTimeout=10 \
-  "$host" \
-  '/usr/bin/flock -n -E 75 /run/swarm-zfs-snapshot.lock /usr/local/sbin/swarm-zfs-snapshot'; then
-  printf 'Backup completed successfully.\n'
-else
-  status=$?
+  root@pve.home.hovirix.dev \
+  '/usr/bin/flock -n -E 75 /run/backup.lock /bin/bash -s' <<'REMOTE'
+set -euo pipefail
 
-  if ((status == 75)); then
-    printf 'Backup skipped: snapshot operation already running.\n' >&2
-  else
-    printf 'Backup failed.\n' >&2
-  fi
+dataset='rpool/swarm'
+snapshot_name="manual-$(date -u +%Y-%m-%d_%H-%M-%S)"
+mountpoint="$(zfs get -H -o value mountpoint "$dataset")"
 
-  exit "$status"
-fi
+# Local backup
+zfs snapshot -r "$dataset@$snapshot_name"
+
+# Off-site backup
+set -a
+source /etc/restic/restic.env
+set +a
+
+restic backup "$mountpoint"
+REMOTE

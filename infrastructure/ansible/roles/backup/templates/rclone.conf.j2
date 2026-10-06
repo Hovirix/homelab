@@ -1,6 +1,6 @@
 [storagebox]
 type = sftp
-host = u682895.your-storagebox.de
-user = u682895-homelab
+host = u683062.your-storagebox.de
+user = u683062-sub1
 port = 23
-pass = {{ lookup('ansible.builtin.env', 'HETZNER_STORAGE_BOX_PASSWORD') }}
+pass = {{ backup_rclone_password.stdout }}

@@ -2,11 +2,16 @@ version: "3"
 
 tasks:
   backup:
-    desc: Create a local Swarm recovery snapshot
+    desc: Snapshot Swarm data and back it up off-site
     cmds:
       - operations/scripts/backup.sh
 
-  restore:
-    desc: Restore one local Swarm ZFS dataset snapshot
+  restore:local:
+    desc: Roll back to an explicit local ZFS recovery point
     cmds:
-      - bash operations/scripts/restore.sh
+      - operations/scripts/restore-local.sh
+
+  restore:offsite:
+    desc: Restore an explicit Restic recovery point to a new path
+    cmds:
+      - operations/scripts/restore-offsite.sh

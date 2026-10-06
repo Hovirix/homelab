@@ -13,6 +13,17 @@
     group: root
     mode: "0700"
 
+- name: Obscure Storage Box password for rclone
+  ansible.builtin.command:
+    argv:
+      - rclone
+      - obscure
+      - "-"
+    stdin: "{{ lookup('ansible.builtin.env', 'HETZNER_STORAGE_BOX_PASSWORD') }}"
+  register: backup_rclone_password
+  changed_when: false
+  no_log: true
+
 - name: Write rclone Storage Box configuration
   no_log: true
   ansible.builtin.template:
@@ -25,7 +36,7 @@
 - name: Write Restic repository password
   ansible.builtin.copy:
     content: "{{ lookup('ansible.builtin.env', 'RESTIC_PASSWORD') }}\n"
-    dest: /etc/restic/restic-password
+    dest: /etc/restic/password
     owner: root
     group: root
     mode: "0600"
