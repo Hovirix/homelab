@@ -14,8 +14,8 @@ set -euo pipefail
 /usr/bin/flock -n -E 75 /run/borgmatic.lock /bin/bash -c '
 set -euo pipefail
 
-if ! /usr/bin/borgmatic repo-info >/dev/null 2>&1; then
-  /usr/bin/borgmatic repo-create --make-parent-dirs
+if ! /usr/bin/borgmatic rinfo >/dev/null 2>&1; then
+  /usr/bin/borgmatic rcreate --encryption repokey --make-parent-dirs
 fi
 
 /usr/bin/borgmatic create

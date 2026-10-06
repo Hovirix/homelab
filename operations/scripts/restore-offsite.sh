@@ -10,7 +10,7 @@ archive_output=$(
 set -euo pipefail
 
 lock="$1"
-flock -n -E 75 "$lock" borgmatic repo-list --short
+flock -n -E 75 "$lock" borgmatic rlist --short
 REMOTE
 )
 [[ -n $archive_output ]] || {
