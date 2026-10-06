@@ -89,10 +89,30 @@ services:
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_OUTPOSTS__DISCOVER: "false"
 
+    configs:
+      - source: authentik_stages
+        target: /blueprints/stages.yaml
+        mode: 0444
+      - source: authentik_provider_grafana
+        target: /blueprints/provider_grafana.yaml
+        mode: 0444
+      - source: authentik_provider_paperless
+        target: /blueprints/provider_paperless.yaml
+        mode: 0444
+      - source: authentik_provider_vaultwarden
+        target: /blueprints/provider_vaultwarden.yaml
+        mode: 0444
+
     secrets:
       - authentik_secret_key
       - postgres_authentik_password
       - authentik_smtp_api_key
+      - grafana_client_id
+      - grafana_client_secret
+      - paperless_client_id
+      - paperless_client_secret
+      - vaultwarden_client_id
+      - vaultwarden_client_secret
 
     networks:
       - authentik
@@ -135,6 +155,23 @@ networks:
     name: traefik
     external: true
 
+configs:
+  authentik_stages:
+    name: identity_authentik_stages_20261005
+    file: ./blueprints/stages.yaml
+
+  authentik_provider_grafana:
+    name: identity_authentik_provider_grafana_20261005
+    file: ./blueprints/provider_grafana.yaml
+
+  authentik_provider_paperless:
+    name: identity_authentik_provider_paperless_20261005
+    file: ./blueprints/provider_paperless.yaml
+
+  authentik_provider_vaultwarden:
+    name: identity_authentik_provider_vaultwarden_20261005
+    file: ./blueprints/provider_vaultwarden.yaml
+
 secrets:
   authentik_secret_key:
     external: true
@@ -143,4 +180,22 @@ secrets:
     external: true
 
   authentik_smtp_api_key:
+    external: true
+
+  grafana_client_id:
+    external: true
+
+  grafana_client_secret:
+    external: true
+
+  paperless_client_id:
+    external: true
+
+  paperless_client_secret:
+    external: true
+
+  vaultwarden_client_id:
+    external: true
+
+  vaultwarden_client_secret:
     external: true
