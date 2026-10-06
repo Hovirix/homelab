@@ -1,17 +1,20 @@
 version: "3"
 
+vars:
+  PVE: root@pve.home.hovirix.dev
+
 tasks:
   backup:
     desc: Snapshot Swarm data and back it up off-site
     cmds:
-      - operations/scripts/backup.sh
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s < operations/scripts/backup.sh
 
   restore:local:
     desc: Roll back to an explicit local ZFS recovery point
     cmds:
-      - operations/scripts/restore-local.sh
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- local < operations/scripts/restore.sh
 
   restore:offsite:
-    desc: Restore an explicit Restic recovery point to a new path
+    desc: Stage an explicit Borg recovery point
     cmds:
-      - operations/scripts/restore-offsite.sh
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- offsite < operations/scripts/restore.sh
