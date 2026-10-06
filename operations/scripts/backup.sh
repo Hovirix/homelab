@@ -1,24 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ssh \
-  -o BatchMode=yes \
-  -o ConnectTimeout=10 \
-  root@pve.home.hovirix.dev \
-  '/usr/bin/flock -n -E 75 /run/backup.lock /bin/bash -s' <<'REMOTE'
+host='root@pve.home.hovirix.dev'
+ssh_opts=(-o BatchMode=yes -o ConnectTimeout=10)
+
+ssh "${ssh_opts[@]}" "$host" /bin/bash -s <<'REMOTE'
 set -euo pipefail
 
-dataset='rpool/swarm'
-snapshot_name="manual-$(date -u +%Y-%m-%d_%H-%M-%S)"
-mountpoint="$(zfs get -H -o value mountpoint "$dataset")"
+/usr/bin/flock -n -E 75 \
+  /run/swarm-zfs-snapshot.lock \
+  /usr/local/sbin/swarm-zfs-snapshot
 
-# Local backup
-zfs snapshot -r "$dataset@$snapshot_name"
+/usr/bin/flock -n -E 75 /run/borgmatic.lock /bin/bash -c '
+set -euo pipefail
 
-# Off-site backup
-set -a
-source /etc/restic/restic.env
-set +a
+if ! /usr/bin/borgmatic repo-info >/dev/null 2>&1; then
+  /usr/bin/borgmatic repo-create --make-parent-dirs
+fi
 
-restic backup "$mountpoint"
+/usr/bin/borgmatic create
+'
 REMOTE
