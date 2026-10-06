@@ -31,9 +31,9 @@ Use `task check:lint` for normal local validation. Run `task check` or `task che
 
 ## Git
 
-Use Conventional Commits: `type(scope): lowercase description`.
-
-Do not commit, amend, push, rewrite history, or bypass hooks unless explicitly requested.
+Use `type(scope): lowercase description` for commits, issues, and pull requests. Allowed types: `feat`, `fix`, `refactor`, `chore`. Allowed scopes: `infrastructure`, `platform`, `operations`, `security`, `secrets`, `tools`, `deps`.
+Issues: body uses `Goal`, `Context`, `Done when`.
+Pull requests: body uses `What`, `Checks`.
 
 ## Documentation
 
