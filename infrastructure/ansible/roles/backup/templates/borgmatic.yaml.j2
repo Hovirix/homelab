@@ -1,27 +1,28 @@
-location:
-  source_directories:
-    - /rpool/swarm/paperless
-    - /rpool/swarm/vaultwarden
-  repositories:
-    - ssh://u683062-sub1@u683062.your-storagebox.de:23/./borg
-  remote_path: borg-1.4
+source_directories:
+  - /rpool/swarm/paperless
+  - /rpool/swarm/vaultwarden
 
-storage:
-  ssh_command: >-
-    sshpass -f /etc/borgmatic/storagebox-password
-    ssh -o StrictHostKeyChecking=accept-new
-    -o UserKnownHostsFile=/etc/borgmatic/known_hosts
-    -o PreferredAuthentications=password
-    -o PubkeyAuthentication=no
-  encryption_passcommand: cat /etc/borgmatic/passphrase
-  compression: lz4
+repositories:
+  - ssh://u683062-sub1@u683062.your-storagebox.de:23/./borg
 
-retention:
-  keep_daily: 7
-  keep_weekly: 4
-  keep_monthly: 12
+remote_path: borg-1.4
+ssh_command: >-
+  sshpass -f /etc/borgmatic/storagebox-password
+  ssh -o StrictHostKeyChecking=accept-new
+  -o UserKnownHostsFile=/etc/borgmatic/known_hosts
+  -o PreferredAuthentications=password
+  -o PubkeyAuthentication=no
 
-consistency:
-  checks:
-    - name: repository
-    - name: archives
+encryption_passcommand: cat /etc/borgmatic/passphrase
+compression: lz4
+user_runtime_directory: /run
+
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 12
+
+checks:
+  - name: repository
+  - name: archives
+
+zfs:

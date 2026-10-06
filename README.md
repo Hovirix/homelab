@@ -150,7 +150,7 @@ AI skills   → queryable procedures and domain knowledge
 - Recovery workflows are automated through Task.
 - Persistent application data is independent from the Swarm lifecycle.
 - ZFS provides hourly local recovery points for all Swarm datasets.
-- Borgmatic backs up Paperless and Vaultwarden to Hetzner Storage Box with Borg.
+- Borgmatic takes temporary ZFS snapshots of Paperless and Vaultwarden and backs them up to Hetzner Storage Box with Borg.
 - PostgreSQL is not included in off-site backups yet.
 - PostgreSQL logical backups, WAL archiving, and PITR remain separate future work.
 

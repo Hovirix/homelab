@@ -22,7 +22,7 @@ Do not choose a recovery point simply because it is newest. State uncertainty ra
 ## Implemented Recovery Mechanisms
 
 - `rpool/swarm` has hourly local Proxmox ZFS snapshots named `auto-YYYY-MM-DD_HH-MM` for short-term recovery.
-- Off-site Borg backups of `/rpool/swarm/paperless` and `/rpool/swarm/vaultwarden` are configured on Hetzner Storage Box independently of local ZFS snapshots. Repository configuration does not prove that a recent off-site archive exists.
+- Off-site Borg backups of `/rpool/swarm/paperless` and `/rpool/swarm/vaultwarden` use temporary borgmatic ZFS snapshots and are stored on Hetzner Storage Box. Repository configuration does not prove that a recent off-site archive exists.
 - `task restore:local` performs a destructive ZFS rollback and must never be run by the agent.
 - `task restore:offsite` stages selected Borg data under `/rpool/restore` without replacing live data. This skill is advisory and must not execute it.
 

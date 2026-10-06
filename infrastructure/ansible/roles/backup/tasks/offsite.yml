@@ -6,6 +6,20 @@
       - sshpass
     state: present
 
+- name: Read borgmatic version
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - --version
+  register: backup_borgmatic_version
+  changed_when: false
+
+- name: Verify borgmatic supports ZFS snapshots
+  ansible.builtin.assert:
+    that:
+      - (backup_borgmatic_version.stdout | trim) is version('1.9.3', '>=')
+    fail_msg: borgmatic >= 1.9.3 is required for ZFS snapshot backups.
+
 - name: Remove legacy off-site backup tooling
   ansible.builtin.apt:
     name:
