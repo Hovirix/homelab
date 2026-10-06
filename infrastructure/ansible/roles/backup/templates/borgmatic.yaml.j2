@@ -11,6 +11,7 @@ remote_path: borg-1.4
 ssh_command: >-
   sshpass -f /etc/borgmatic/storagebox-password
   ssh -o StrictHostKeyChecking=accept-new
+  -o UserKnownHostsFile=/etc/borgmatic/known_hosts
   -o PreferredAuthentications=password
   -o PubkeyAuthentication=no
 
