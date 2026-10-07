@@ -69,24 +69,20 @@ tasks:
       - mkdir -p .artifacts/security
       - printf '\nSecurity\n'
       - printf '────────────────────────────────────────────────────────────\n'
-      - task: security:secrets
+      - trivy fs --quiet --config security/trivy.yaml --scanners secret --format json --output .artifacts/security/trivy-secrets.json .
+      - printf '✓ Secrets\n'
       - task: security:iac
       - task: security:policy
-      - task: security:actions
+      - zizmor --quiet --format=json-v1 .github/workflows > .artifacts/security/zizmor.json
+      - printf '✓ Actions\n'
 
       - printf '\nSBOM\n'
       - printf '────────────────────────────────────────────────────────────\n'
-      - task: security:sbom
+      - operations/scripts/security-sbom.sh
 
       - printf '\nVulnerabilities\n'
       - printf '────────────────────────────────────────────────────────────\n'
-      - task: security:vuln
-
-  security:secrets:
-    internal: true
-    cmds:
-      - trivy fs --quiet --config security/trivy.yaml --scanners secret --format json --output .artifacts/security/trivy-secrets.json .
-      - printf '✓ Secrets\n'
+      - operations/scripts/security-vuln.sh
 
   security:iac:
     internal: true
@@ -103,17 +99,3 @@ tasks:
       - conftest verify --policy security/policy > .artifacts/security/conftest-verify.txt
       - conftest test --policy security/policy --output json platform/**/stack.yml > .artifacts/security/conftest-policy.json
       - printf '✓ Policy\n'
-
-  security:actions:
-    internal: true
-    cmds:
-      - zizmor --quiet --format=json-v1 .github/workflows > .artifacts/security/zizmor.json
-      - printf '✓ Actions\n'
-
-  security:sbom:
-    internal: true
-    cmd: operations/scripts/security-sbom.sh
-
-  security:vuln:
-    internal: true
-    cmd: operations/scripts/security-vuln.sh

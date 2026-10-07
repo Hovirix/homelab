@@ -3,16 +3,14 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
+  outputs = { nixpkgs, ... }:
+    let
+      systems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
+    in
     {
-      self,
-      nixpkgs,
-      flake-utils,
-    }:
-    flake-utils.lib.eachDefaultSystem (
+      devShells = nixpkgs.lib.genAttrs systems (
       system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -64,30 +62,29 @@
         ];
       in
       {
-        devShells = {
-          ci = pkgs.mkShell {
-            packages = validation ++ security ++ formatters ++ utilities;
-          };
+        ci = pkgs.mkShell {
+          packages = validation ++ security ++ formatters ++ utilities;
+        };
 
-          default = pkgs.mkShell {
-            packages =
-              validation
-              ++ security
-              ++ formatters
-              ++ utilities
-              ++ (with pkgs; [
-                ansible-language-server
-                bash-language-server
-                nil
-                openssl
-                pre-commit
-                pyright
-                sops
-                tofu-ls
-                yaml-language-server
-              ]);
-          };
+        default = pkgs.mkShell {
+          packages =
+            validation
+            ++ security
+            ++ formatters
+            ++ utilities
+            ++ (with pkgs; [
+              ansible-language-server
+              bash-language-server
+              nil
+              openssl
+              pre-commit
+              pyright
+              sops
+              tofu-ls
+              yaml-language-server
+            ]);
         };
       }
-    );
+      );
+    };
 }
