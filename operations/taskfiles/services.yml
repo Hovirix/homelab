@@ -4,94 +4,33 @@ tasks:
 
   secret:sync:
     internal: true
+    env: &docker-env
+      DOCKER_HOST:
+        sh: operations/scripts/swarm.sh
     # Automatically runs when Task detects production secret changes.
     sources: [secrets/production.sops.env]
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmd: python3 operations/scripts/secrets.py
+    cmd: operations/scripts/secrets.py
 
   deploy:
     internal: true
     deps: ['secret:sync']
+    env: *docker-env
+    vars:
+      STACKS:
+        - {name: traefik, file: platform/ingress/traefik/stack.yml}
+        - {name: cloudflared, file: platform/ingress/cloudflared/stack.yml}
+        - {name: postgres, file: platform/data/postgres/stack.yml}
+        - {name: valkey, file: platform/data/valkey/stack.yml}
+        - {name: authentik, file: platform/identity/stack.yml}
+        - {name: observability, file: platform/observability/stack.yml}
+        - {name: vaultwarden, file: platform/applications/vaultwarden/stack.yml}
+        - {name: paperless, file: platform/applications/paperless-ngx/stack.yml}
     cmds:
-      - task: traefik:deploy
-      - task: cloudflared:deploy
-      - task: postgres:deploy
-      - task: valkey:deploy
-      - task: authentik:deploy
-      - task: observability:deploy
-      - task: vaultwarden:deploy
-      - task: paperless:deploy
+      - for: {var: STACKS}
+        cmd: docker stack deploy --resolve-image changed --compose-file {{.ITEM.file}} {{.ITEM.name}}
 
   status:
     desc: Show deployed Docker stacks
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
+    env: *docker-env
     cmds:
       - docker stack ls
-
-  traefik:deploy:
-    desc: Deploy Traefik
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/ingress/traefik/stack.yml traefik
-
-  cloudflared:deploy:
-    desc: Deploy Cloudflared
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/ingress/cloudflared/stack.yml cloudflared
-
-  postgres:deploy:
-    desc: Deploy PostgreSQL
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/data/postgres/stack.yml postgres
-
-  valkey:deploy:
-    desc: Deploy Valkey
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/data/valkey/stack.yml valkey
-
-  authentik:deploy:
-    desc: Deploy Authentik
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/identity/stack.yml authentik
-
-  observability:deploy:
-    desc: Deploy observability
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/observability/stack.yml observability
-
-  vaultwarden:deploy:
-    desc: Deploy Vaultwarden
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/applications/vaultwarden/stack.yml vaultwarden
-
-  paperless:deploy:
-    desc: Deploy Paperless
-    env:
-      DOCKER_HOST:
-        sh: "{{.ROOT_DIR}}/operations/scripts/swarm.sh"
-    cmds:
-      - docker stack deploy --resolve-image changed --compose-file platform/applications/paperless-ngx/stack.yml paperless

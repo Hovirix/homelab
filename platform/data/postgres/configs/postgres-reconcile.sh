@@ -8,20 +8,10 @@ PGPASSWORD="$(</run/secrets/postgres_superuser_password)"
 authentik_password="$(</run/secrets/postgres_authentik_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 
-deadline=$((SECONDS + 300))
-
-until pg_isready \
-  --host=postgres \
-  --port=5432 \
-  --username=postgres \
-  >/dev/null 2>&1; do
-  if ((SECONDS >= deadline)); then
-    printf 'PostgreSQL did not become ready within five minutes.\n' >&2
-    exit 1
-  fi
-
-  sleep 2
-done
+if ! timeout 300 bash -c 'until pg_isready --host=postgres --port=5432 --username=postgres >/dev/null 2>&1; do sleep 2; done'; then
+  printf 'PostgreSQL did not become ready within five minutes.\n' >&2
+  exit 1
+fi
 
 psql \
   --host=postgres \

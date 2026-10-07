@@ -12,21 +12,6 @@
 
 HX Lab manages my homelab infrastructure and application platform as code. Compute is reproducible, persistent state is independent from the Swarm lifecycle, and [Task](https://taskfile.dev/) provides the main operational interface.
 
----
-
-## Table of Contents
-
-- [Architecture](#architecture)
-- [Design Principles](#design-principles)
-- [Infrastructure](#infrastructure)
-- [Platform](#platform)
-- [Repository](#repository)
-- [Operations](#operations)
-- [Documentation](#documentation)
-- [Security](#security)
-- [Recovery](#recovery)
-- [License](#license)
-
 ## Architecture
 
 ```mermaid
@@ -57,13 +42,7 @@ flowchart TB
 
 ## Design Principles
 
-| Principle              | What it means here                                                          |
-| ---------------------- | --------------------------------------------------------------------------- |
-| Infrastructure as Code | Infrastructure and configuration are versioned and reproducible.            |
-| Separation of Concerns | Each tool owns a clear part of the system.                                  |
-| Rebuildable Compute    | Hosts and services are recreated from code rather than maintained manually. |
-| Independent State      | Persistent data survives Swarm and compute rebuilds.                        |
-| Automated Operations   | Task provides repeatable deployment and recovery workflows.                 |
+Configuration is versioned, compute is rebuildable, persistent state is independent, and Task provides repeatable operations.
 
 ## Infrastructure
 
@@ -94,47 +73,15 @@ Network infrastructure is managed separately in [`hovirix/netlab`](https://githu
 
 ## Repository
 
-```text
-.
-├── infrastructure/     # Provisioning and host configuration
-├── platform/           # Docker Swarm stacks
-├── operations/         # Task workflows and scripts
-├── secrets/            # SOPS-encrypted secrets
-├── security/           # Security tooling
-├── .github/workflows/  # CI workflows
-├── Taskfile.yml        # Operational interface
-├── flake.nix           # Development environment
-└── AGENTS.md           # Architecture and agent context
-```
+See [`AGENTS.md`](AGENTS.md) for the repository map and operational boundaries.
 
 ## Operations
 
-[Task](https://taskfile.dev/) is the primary operational interface.
-
-```bash
-task             # List available commands
-task check       # Validate the repository
-task bootstrap   # Bootstrap the homelab
-task deploy      # Deploy platform services
-task status      # Show platform status
-```
-
-Provisioning, configuration, validation, secret delivery, Swarm initialization, deployment, and recovery are automated to keep normal operations and incident recovery fast and repeatable.
-
-AI context and domain-specific agent skills provide queryable operational knowledge to diagnose incidents and guide the appropriate recovery workflows.
+Run `task --list` to see the operational workflows.
 
 ## Documentation
 
-HX Lab intentionally keeps traditional written documentation and runbooks to a minimum.
-
-Infrastructure, configuration, deployment, validation, and recovery workflows are declared as code and remain the source of truth. Architecture decisions, constraints, conventions, and procedures that cannot be expressed directly in code are maintained through `AGENTS.md`, AI context, and domain-specific agent skills.
-
-```text
-Code        → source of truth
-Task        → operations and recovery
-AGENTS.md   → architecture and project rules
-AI skills   → queryable procedures and domain knowledge
-```
+Executable configuration is the source of truth; `AGENTS.md` and `.opencode/skills/` cover project rules and procedures.
 
 ## Security
 

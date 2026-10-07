@@ -55,24 +55,23 @@
   when: zfs_rpool_autotrim.stdout | trim != "on"
   changed_when: true
 
-- name: Configure VM ZFS dataset
+- name: Configure base ZFS datasets
   community.general.zfs:
-    name: rpool/data
+    name: "rpool/{{ item.name }}"
     state: present
-    extra_zfs_properties:
-      compression: lz4
-      atime: "off"
-      xattr: sa
-
-- name: Configure Swarm ZFS dataset
-  community.general.zfs:
-    name: rpool/swarm
-    state: present
-    extra_zfs_properties:
-      compression: lz4
-      atime: "off"
-      xattr: sa
-      snapdir: visible
+    extra_zfs_properties: "{{ item.properties }}"
+  loop:
+    - name: data
+      properties:
+        compression: lz4
+        atime: "off"
+        xattr: sa
+    - name: swarm
+      properties:
+        compression: lz4
+        atime: "off"
+        xattr: sa
+        snapdir: visible
 
 - name: Configure Swarm service ZFS datasets
   community.general.zfs:

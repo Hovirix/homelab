@@ -14,11 +14,9 @@ services:
     configs:
       - source: postgres_config
         target: /etc/postgresql/postgresql.conf
-        mode: 0444
 
       - source: postgres_hba
         target: /etc/postgresql/pg_hba.conf
-        mode: 0444
 
     command:
       - postgres
@@ -51,12 +49,8 @@ services:
       replicas: 1
 
       update_config:
-        order: stop-first
         failure_action: rollback
         monitor: 2m
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -91,20 +85,19 @@ services:
 networks:
   postgres:
     name: postgres
-    driver: overlay
     attachable: true
 
 configs:
   postgres_config:
-    name: data_postgres_config_20260925
+    name: data_postgres_config
     file: ./configs/postgresql.conf
 
   postgres_hba:
-    name: data_postgres_hba_20260925
+    name: data_postgres_hba
     file: ./configs/pg_hba.conf
 
   postgres_reconcile:
-    name: data_postgres_reconcile_20260925
+    name: data_postgres_reconcile
     file: ./configs/postgres-reconcile.sh
 
 secrets:

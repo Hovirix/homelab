@@ -3,9 +3,7 @@ services:
     image: grafana/grafana:13.2.0@sha256:3fd54ae1214669f8355f065ec9f6445d5279a3d77095ab048ca045685272429b
 
     environment:
-      GF_SERVER_DOMAIN: grafana.hovirix.dev
       GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
-      GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
       GF_AUTH_OAUTH_AUTO_LOGIN: "true"
@@ -18,7 +16,6 @@ services:
       GF_AUTH_GENERIC_OAUTH_API_URL: https://authentik.hovirix.dev/application/o/userinfo/
       GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email entitlements
       GF_AUTH_SIGNOUT_REDIRECT_URL: https://authentik.hovirix.dev/application/o/grafana/end-session/
-      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: "true"
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'grafana-admins') && 'GrafanaAdmin' || 'Viewer'"
       GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: "true"
@@ -27,7 +24,6 @@ services:
       GF_SMTP_USER: resend
       GF_SMTP_PASSWORD__FILE: /run/secrets/grafana_smtp_api_key
       GF_SMTP_FROM_ADDRESS: grafana@hovirix.dev
-      GF_SMTP_FROM_NAME: Grafana
       GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
 
     secrets:
@@ -68,16 +64,11 @@ services:
         - traefik.enable=true
         - traefik.http.routers.grafana.rule=Host(`grafana.hovirix.dev`)
         - traefik.http.routers.grafana.entrypoints=websecure
-        - traefik.http.routers.grafana.tls=true
-        - traefik.http.routers.grafana.tls.certresolver=cloudflare
         - traefik.http.services.grafana.loadbalancer.server.port=3000
 
       update_config:
         order: start-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -110,11 +101,7 @@ services:
       replicas: 1
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -141,11 +128,7 @@ services:
       replicas: 1
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -211,11 +194,7 @@ services:
       mode: global
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -223,11 +202,9 @@ services:
 networks:
   observability:
     name: observability
-    driver: overlay
     attachable: true
 
   traefik:
-    name: traefik
     external: true
 
 configs:
@@ -236,7 +213,7 @@ configs:
     file: ./configs/grafana/provisioning/datasources.yml
 
   grafana_alerting:
-    name: observability_grafana_alerting_v1
+    name: observability_grafana_alerting
     file: ./configs/grafana/provisioning/alerting/hx-lab.yml
 
   loki_config:

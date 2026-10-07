@@ -8,7 +8,6 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   vm_id     = each.value.vm_id
 
   stop_on_destroy = true
-  protection      = false
 
   cpu {
     cores = each.value.cpu_cores
@@ -36,7 +35,6 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   }
 
   network_device {
-    bridge      = local.network_bridge
     mac_address = each.value.mac
     vlan_id     = local.fcos_config.network.vlan_id
   }
