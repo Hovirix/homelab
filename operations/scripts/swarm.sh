@@ -18,10 +18,12 @@ swarm_manager_host() {
   return 1
 }
 
-init() {
-  primary_state="$(docker --host "$primary_host" info --format '{{.Swarm.LocalNodeState}}')"
+is_active() {
+  [[ $(docker --host "$1" info --format '{{.Swarm.LocalNodeState}}' 2>/dev/null) == "active" ]]
+}
 
-  if [[ $primary_state != "active" ]]; then
+init() {
+  if ! is_active "$primary_host"; then
     printf 'Initializing swarm on %s\n' "$primary_host"
     docker --host "$primary_host" swarm init --advertise-addr "$advertise_addr"
   fi
@@ -29,9 +31,7 @@ init() {
   token="$(docker --host "$primary_host" swarm join-token --quiet manager)"
 
   for host in "${manager_hosts[@]:1}"; do
-    node_state="$(docker --host "$host" info --format '{{.Swarm.LocalNodeState}}')"
-
-    if [[ $node_state != "active" ]]; then
+    if ! is_active "$host"; then
       printf 'Joining manager %s\n' "$host"
       docker --host "$host" swarm join --token "$token" "$manager_endpoint"
     fi
@@ -44,9 +44,7 @@ status() {
 
 rebuild() {
   for host in "${manager_hosts[@]:1}" "$primary_host"; do
-    node_state="$(docker --host "$host" info --format '{{.Swarm.LocalNodeState}}')"
-
-    if [[ $node_state == "active" ]]; then
+    if is_active "$host"; then
       printf 'Leaving swarm on %s\n' "$host"
       docker --host "$host" swarm leave --force
     fi

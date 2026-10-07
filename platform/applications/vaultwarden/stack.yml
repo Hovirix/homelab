@@ -41,23 +41,16 @@ services:
         - traefik.enable=true
         - traefik.http.routers.vaultwarden.rule=Host(`vaultwarden.hovirix.dev`)
         - traefik.http.routers.vaultwarden.entrypoints=websecure
-        - traefik.http.routers.vaultwarden.tls=true
-        - traefik.http.routers.vaultwarden.tls.certresolver=cloudflare
         - traefik.http.services.vaultwarden.loadbalancer.server.port=80
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
 
 networks:
   traefik:
-    name: traefik
     external: true
 
 secrets:

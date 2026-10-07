@@ -64,15 +64,6 @@ deny contains msg if {
 }
 
 deny contains msg if {
-  some name
-  service := input.services[name]
-  secret := service.secrets[_]
-  secret_name := service_secret_name(secret)
-  not input.secrets[secret_name].external
-  msg := sprintf("service %q secret %q must be an external Swarm secret", [name, secret_name])
-}
-
-deny contains msg if {
   secret_name := object.keys(input.secrets)[_]
   not input.secrets[secret_name].external
   msg := sprintf("secret %q must use the external Swarm secret model", [secret_name])
@@ -102,9 +93,8 @@ docker_socket_mount(mount) if {
   mount.source == "/var/run/docker.sock"
 }
 
-# Alloy needs a local read-only socket for node-local Docker discovery and logs.
 allowed_socket_mount(name, mount) if {
-  name == "socket-proxy"
+  name in {"socket-proxy", "alloy"}
   socket_read_only(mount)
 }
 
@@ -115,11 +105,6 @@ allowed_capability(name, capability) if {
 }
 
 allowed_root_user(name) if name == "alloy"
-
-allowed_socket_mount(name, mount) if {
-  name == "alloy"
-  socket_read_only(mount)
-}
 
 socket_read_only(mount) if {
   is_string(mount)
@@ -133,22 +118,8 @@ socket_read_only(mount) if {
 allowed_port(name, service, port) if {
   startswith(service.image, "traefik:")
   name == "proxy"
-  port.target == 80
-  port.published == 80
-}
-
-allowed_port(name, service, port) if {
-  startswith(service.image, "traefik:")
-  name == "proxy"
-  port.target == 443
-  port.published == 443
-}
-
-service_secret_name(secret) := secret if is_string(secret)
-
-service_secret_name(secret) := secret.source if {
-  is_object(secret)
-  secret.source
+  port.target in {80, 443}
+  port.published == port.target
 }
 
 secret_environment_key(key) if regex.match("(?i)(password|secret|token|api_key)", key)

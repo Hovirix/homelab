@@ -41,8 +41,6 @@ secrets.yml
 *.swp
 .DS_Store
 Thumbs.db
-/firmware/openwrt/files/config/network
-/firmware/openwrt/files/config/wireless
 .artifacts/
 .task/
 /operations/scripts/__pycache__

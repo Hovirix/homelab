@@ -40,7 +40,6 @@ locals {
 resource "adguard_rewrite" "records" {
   for_each = local.dns_records
 
-  domain  = each.value.domain
-  answer  = each.value.answer
-  enabled = lookup(each.value, "enabled", true)
+  domain = each.value.domain
+  answer = each.value.answer
 }

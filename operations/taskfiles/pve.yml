@@ -3,18 +3,18 @@ version: "3"
 tasks:
   bootstrap:
     desc: Apply Proxmox VE host/datacenter configuration (Same as Apply just ask for password)
-    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --ask-pass
 
   plan:
     desc: Preview Proxmox VE host/datacenter configuration
-    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --check --diff
 
   apply:
     desc: Apply Proxmox VE host/datacenter configuration
-    dir: "{{.ROOT_DIR}}/infrastructure/ansible"
+    dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml

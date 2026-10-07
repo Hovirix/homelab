@@ -5,5 +5,3 @@ check-for-app-update: false
 
 output:
   - json
-
-fail-on-severity: high

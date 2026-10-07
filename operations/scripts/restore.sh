@@ -3,6 +3,9 @@ set -euo pipefail
 
 mode="${1:?usage: restore.sh local|offsite}"
 parent='rpool/swarm'
+dataset=""
+snapshot=""
+archive=""
 
 select_dataset() {
   mapfile -t datasets < <(
@@ -11,10 +14,18 @@ select_dataset() {
       sort
   )
 
-  echo 'Select dataset:'
-  select dataset in "${datasets[@]}"; do
-    [[ -n $dataset ]] && return
+  pick 'Select dataset:' dataset "${datasets[@]}"
+}
+
+pick() {
+  local prompt="$1" var="$2"
+  shift 2
+
+  echo "$prompt"
+  select choice in "$@"; do
+    [[ -n $choice ]] && break
   done
+  printf -v "$var" '%s' "$choice"
 }
 
 restore_local() {
@@ -24,10 +35,7 @@ restore_local() {
     zfs list -H -t snapshot -o name -S creation "$parent/$dataset"
   )
 
-  echo 'Select snapshot:'
-  select snapshot in "${snapshots[@]}"; do
-    [[ -n $snapshot ]] && break
-  done
+  pick 'Select snapshot:' snapshot "${snapshots[@]}"
 
   flock -n /run/swarm-zfs-snapshot.lock zfs rollback "$snapshot"
 }
@@ -37,10 +45,7 @@ restore_offsite() {
 
   mapfile -t archives < <(borgmatic repo-list --short)
 
-  echo 'Select archive:'
-  select archive in "${archives[@]}"; do
-    [[ -n $archive ]] && break
-  done
+  pick 'Select archive:' archive "${archives[@]}"
 
   mapfile -t datasets < <(
     borgmatic list --archive "$archive" --short |
@@ -52,10 +57,7 @@ restore_offsite() {
       sort -u
   )
 
-  echo 'Select dataset:'
-  select dataset in "${datasets[@]}"; do
-    [[ -n $dataset ]] && break
-  done
+  pick 'Select dataset:' dataset "${datasets[@]}"
 
   staging="$restore_parent/$dataset-$(date -u +%Y-%m-%d_%H-%M-%S)"
   zfs create -p "$staging"

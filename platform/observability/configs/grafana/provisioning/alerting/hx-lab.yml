@@ -28,13 +28,10 @@ groups:
 
     rules:
 
-      # ======================================================================
       # SWARM NODE MISSING
-      # ----------------------------------------------------------------------
       # Warning when fewer than 3 node exporters are reporting.
       # This detects a missing Swarm VM/node from the monitoring point of view.
       # It does NOT prove Docker Swarm manager quorum state.
-      # ======================================================================
       - uid: node-missing
         title: Swarm node missing
         condition: C
@@ -89,12 +86,9 @@ groups:
           severity: warning
         isPaused: false
 
-      # ======================================================================
       # MULTIPLE SWARM NODES MISSING
-      # ----------------------------------------------------------------------
       # Critical when fewer than 2 node exporters are reporting.
       # With a 3-node setup this means at least two monitored nodes disappeared.
-      # ======================================================================
       - uid: multiple-nodes-missing
         title: Multiple Swarm nodes missing
         condition: C
@@ -149,11 +143,8 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # HIGH CPU
-      # ----------------------------------------------------------------------
       # Warning when a node remains above 90% CPU usage for 15 minutes.
-      # ======================================================================
       - uid: high-cpu
         title: High CPU
         condition: C
@@ -210,12 +201,9 @@ groups:
           severity: warning
         isPaused: false
 
-      # ======================================================================
       # HIGH MEMORY
-      # ----------------------------------------------------------------------
       # Warning when a node remains above 90% memory usage for 10 minutes.
       # Uses MemAvailable rather than MemFree so Linux cache is handled properly.
-      # ======================================================================
       - uid: high-memory
         title: High memory
         condition: C
@@ -275,12 +263,9 @@ groups:
           severity: warning
         isPaused: false
 
-      # ======================================================================
       # FILESYSTEM LOW SPACE
-      # ----------------------------------------------------------------------
       # Warning when an actual filesystem has less than 15% available space.
       # Temporary and container overlay filesystems are excluded.
-      # ======================================================================
       - uid: low-disk-space
         title: Low disk space
         condition: C
@@ -344,11 +329,8 @@ groups:
           severity: warning
         isPaused: false
 
-      # ======================================================================
       # FILESYSTEM CRITICAL SPACE
-      # ----------------------------------------------------------------------
       # Critical when an actual filesystem has less than 5% available space.
-      # ======================================================================
       - uid: critical-disk-space
         title: Critical disk space
         condition: C
@@ -412,11 +394,8 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # FILESYSTEM READ ONLY
-      # ----------------------------------------------------------------------
       # Critical when a real filesystem is reported read-only.
-      # ======================================================================
       - uid: filesystem-read-only
         title: Filesystem read only
         condition: C
@@ -474,12 +453,9 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # CONTAINER OOM
-      # ----------------------------------------------------------------------
       # Critical when cAdvisor records one or more container OOM events.
       # The 10-minute window prevents very short-lived OOM events being missed.
-      # ======================================================================
       - uid: container-oom
         title: Container OOM
         condition: C
@@ -536,12 +512,9 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # POSTGRESQL MISSING
-      # ----------------------------------------------------------------------
       # Critical when cAdvisor has not seen postgres_server for 3 minutes.
       # This checks container presence, not whether PostgreSQL accepts queries.
-      # ======================================================================
       - uid: postgres-missing
         title: PostgreSQL missing
         condition: C
@@ -601,11 +574,8 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # TRAEFIK MISSING
-      # ----------------------------------------------------------------------
       # Critical when cAdvisor has not seen traefik_proxy for 3 minutes.
-      # ======================================================================
       - uid: traefik-missing
         title: Traefik missing
         condition: C
@@ -665,11 +635,8 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # AUTHENTIK MISSING
-      # ----------------------------------------------------------------------
       # Critical when cAdvisor has not seen authentik_server for 3 minutes.
-      # ======================================================================
       - uid: authentik-missing
         title: Authentik missing
         condition: C
@@ -729,15 +696,12 @@ groups:
           severity: critical
         isPaused: false
 
-      # ======================================================================
       # TRAEFIK HIGH 5XX RATE
-      # ----------------------------------------------------------------------
       # Warning when BOTH are true over 10 minutes:
       #   - at least 5 HTTP 5xx responses occurred
       #   - more than 10% of all Traefik service requests were 5xx
       #
       # The minimum error count avoids noisy alerts on very low traffic.
-      # ======================================================================
       - uid: traefik-high-5xx
         title: Traefik high 5xx rate
         condition: C
@@ -803,4 +767,3 @@ groups:
         labels:
           severity: warning
         isPaused: false
-
