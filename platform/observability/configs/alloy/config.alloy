@@ -1,11 +1,4 @@
-logging {
-	level  = "info"
-	format = "logfmt"
-}
-
-// =============================================================================
 // LOGS — Docker / Swarm
-// =============================================================================
 
 discovery.docker "local" {
 	host = "unix:///var/run/docker.sock"
@@ -26,9 +19,7 @@ loki.source.docker "local" {
 	forward_to = [loki.write.default.receiver]
 }
 
-// =============================================================================
 // LOGS — systemd journal
-// =============================================================================
 
 loki.relabel "journal" {
 	forward_to = []
@@ -56,9 +47,7 @@ loki.source.journal "system" {
 	forward_to    = [loki.write.default.receiver]
 }
 
-// =============================================================================
 // LOGS — Loki
-// =============================================================================
 
 loki.write "default" {
 	endpoint {
@@ -66,9 +55,7 @@ loki.write "default" {
 	}
 }
 
-// =============================================================================
 // METRICS — Containers / cAdvisor
-// =============================================================================
 
 prometheus.exporter.cadvisor "containers" {
 	// Host metrics belong to exporter.unix.
@@ -136,9 +123,7 @@ prometheus.relabel "containers" {
 	}
 }
 
-// =============================================================================
 // METRICS — Host / Unix
-// =============================================================================
 
 prometheus.exporter.unix "host" {
 	rootfs_path = "/host/root"
@@ -211,9 +196,7 @@ prometheus.relabel "host" {
 	}
 }
 
-// =============================================================================
 // METRICS — Traefik
-// =============================================================================
 
 discovery.relabel "traefik" {
 	targets = discovery.docker.local.targets
@@ -252,9 +235,7 @@ prometheus.relabel "traefik" {
 	}
 }
 
-// =============================================================================
 // METRICS — VictoriaMetrics
-// =============================================================================
 
 prometheus.remote_write "default" {
 	endpoint {

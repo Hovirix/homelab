@@ -33,11 +33,7 @@ services:
       replicas: 1
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -45,5 +41,4 @@ services:
 networks:
   valkey:
     name: valkey
-    driver: overlay
     attachable: true

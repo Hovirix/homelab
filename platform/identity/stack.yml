@@ -50,16 +50,10 @@ services:
         - traefik.enable=true
         - traefik.http.routers.authentik.rule=Host(`authentik.hovirix.dev`)
         - traefik.http.routers.authentik.entrypoints=websecure
-        - traefik.http.routers.authentik.tls=true
-        - traefik.http.routers.authentik.tls.certresolver=cloudflare
         - traefik.http.services.authentik.loadbalancer.server.port=9000
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -92,16 +86,12 @@ services:
     configs:
       - source: authentik_stages
         target: /blueprints/stages.yaml
-        mode: 0444
       - source: authentik_provider_grafana
         target: /blueprints/provider_grafana.yaml
-        mode: 0444
       - source: authentik_provider_paperless
         target: /blueprints/provider_paperless.yaml
-        mode: 0444
       - source: authentik_provider_vaultwarden
         target: /blueprints/provider_vaultwarden.yaml
-        mode: 0444
 
     secrets:
       - authentik_secret_key
@@ -132,11 +122,7 @@ services:
       replicas: 1
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
@@ -144,15 +130,12 @@ services:
 networks:
   authentik:
     name: authentik
-    driver: overlay
     attachable: true
 
   postgres:
-    name: postgres
     external: true
 
   traefik:
-    name: traefik
     external: true
 
 configs:

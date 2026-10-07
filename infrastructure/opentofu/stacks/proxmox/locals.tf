@@ -3,7 +3,6 @@ locals {
   image_datastore_id   = "local"
   snippet_datastore_id = "local"
   vm_datastore_id      = "local-zfs"
-  network_bridge       = "vmbr0"
   fcos_image_file_name = "fedora-coreos-stable-proxmoxve.qcow2.img"
 
   fcos_config        = yamldecode(file("${path.module}/fcos/nodes.yaml"))

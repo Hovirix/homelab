@@ -69,31 +69,22 @@ services:
         - traefik.enable=true
         - traefik.http.routers.paperless.rule=Host(`paperless.hovirix.dev`)
         - traefik.http.routers.paperless.entrypoints=websecure
-        - traefik.http.routers.paperless.tls=true
-        - traefik.http.routers.paperless.tls.certresolver=cloudflare
         - traefik.http.services.paperless.loadbalancer.server.port=8000
 
       update_config:
-        order: stop-first
         failure_action: rollback
-
-      rollback_config:
-        order: stop-first
 
       restart_policy:
         condition: on-failure
 
 networks:
   postgres:
-    name: postgres
     external: true
 
   valkey:
-    name: valkey
     external: true
 
   traefik:
-    name: traefik
     external: true
 
 configs:
