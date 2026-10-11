@@ -2,6 +2,11 @@ version: "3"
 
 vars:
   PVE: root@pve.home.hovirix.dev
+  STACK_FILES:
+    map:
+      postgres: platform/data/postgres/stack.yml
+      vaultwarden: platform/applications/vaultwarden/stack.yml
+      paperless: platform/applications/paperless-ngx/stack.yml
 
 tasks:
   backup:
@@ -15,6 +20,18 @@ tasks:
       - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- local < operations/scripts/restore.sh
 
   restore:offsite:
-    desc: Stage an explicit Borg recovery point
+    desc: Stage and verify an explicit Borg recovery point
     cmds:
       - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- offsite < operations/scripts/restore.sh
+
+  restore:cutover:
+    desc: 'Cut verified staged data over to the live service (stop stack, swap data, redeploy, verify). Usage: task restore:cutover DATASET=postgres STAGING=rpool/restore/postgres-<ts>'
+    env:
+      DOCKER_HOST:
+        sh: operations/scripts/swarm.sh
+    cmds:
+      - docker stack rm {{.DATASET}}
+      - while [ -n "$(docker stack services {{.DATASET}} -q 2>/dev/null)" ]; do sleep 5; done
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- cutover {{.DATASET}} {{.STAGING}} < operations/scripts/restore.sh
+      - docker stack deploy --resolve-image changed --compose-file {{index .STACK_FILES .DATASET}} {{.DATASET}}
+      - docker stack services {{.DATASET}}
