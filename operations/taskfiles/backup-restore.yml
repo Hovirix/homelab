@@ -2,36 +2,74 @@ version: "3"
 
 vars:
   PVE: root@pve.home.hovirix.dev
-  STACK_FILES:
-    map:
-      postgres: platform/data/postgres/stack.yml
-      vaultwarden: platform/applications/vaultwarden/stack.yml
-      paperless: platform/applications/paperless-ngx/stack.yml
 
 tasks:
   backup:
     desc: Snapshot Swarm data and back it up off-site
     cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s < operations/scripts/backup.sh
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s < operations/scripts/backup.sh
 
   restore:local:
-    desc: Roll back to an explicit local ZFS recovery point
-    cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- local < operations/scripts/restore.sh
-
-  restore:offsite:
-    desc: Stage and verify an explicit Borg recovery point
-    cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- offsite < operations/scripts/restore.sh
-
-  restore:cutover:
-    desc: 'Cut verified staged data over to the live service (stop stack, swap data, redeploy, verify). Usage: task restore:cutover DATASET=postgres STAGING=rpool/restore/postgres-<ts>'
+    desc: Confirmed local ZFS rollback; requires DATASET SNAPSHOT CONFIRM
     env:
       DOCKER_HOST:
         sh: operations/scripts/swarm.sh
     cmds:
-      - docker stack rm {{.DATASET}}
-      - while [ -n "$(docker stack services {{.DATASET}} -q 2>/dev/null)" ]; do sleep 5; done
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- cutover {{.DATASET}} {{.STAGING}} < operations/scripts/restore.sh
-      - docker stack deploy --resolve-image changed --compose-file {{index .STACK_FILES .DATASET}} {{.DATASET}}
-      - docker stack services {{.DATASET}}
+      - |
+        set -eu
+        case "{{.DATASET}}" in
+          postgres) stop="paperless authentik postgres"; start="postgres authentik paperless" ;;
+          valkey) stop="paperless valkey"; start="valkey paperless" ;;
+          paperless|vaultwarden) stop="{{.DATASET}}"; start="{{.DATASET}}" ;;
+          grafana|loki|victoriametrics) stop="observability"; start="observability" ;;
+          traefik) stop="traefik"; start="traefik" ;;
+          *) printf 'Unknown persistent dataset: %s\n' "{{.DATASET}}" >&2; exit 2 ;;
+        esac
+        ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- validate-local "{{.DATASET}}" "{{.SNAPSHOT}}" "{{.CONFIRM}}" < operations/scripts/restore.sh
+        quiesced=1
+        for stack in $stop; do
+          if ! docker stack rm "$stack"; then quiesced=0; break; fi
+        done
+        if [ "$quiesced" = 1 ]; then
+          for stack in $stop; do
+            gone=
+            for attempt in $(seq 1 120); do
+              if [ -z "$(docker stack services "$stack" -q 2>/dev/null)" ]; then gone=1; break; fi
+              sleep 5
+            done
+            if [ "$gone" != 1 ]; then quiesced=0; break; fi
+          done
+        fi
+        rollback_status=1
+        if [ "$quiesced" = 1 ]; then
+          ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- local "{{.DATASET}}" "{{.SNAPSHOT}}" "{{.CONFIRM}}" < operations/scripts/restore.sh || rollback_status=$?
+        fi
+        deploy_status=0
+        for stack in $start; do
+          case "$stack" in
+            postgres) file=platform/data/postgres/stack.yml ;;
+            authentik) file=platform/identity/stack.yml ;;
+            paperless) file=platform/applications/paperless-ngx/stack.yml ;;
+            valkey) file=platform/data/valkey/stack.yml ;;
+            vaultwarden) file=platform/applications/vaultwarden/stack.yml ;;
+            observability) file=platform/observability/stack.yml ;;
+            traefik) file=platform/ingress/traefik/stack.yml ;;
+          esac
+          docker stack deploy --resolve-image changed --compose-file "$file" "$stack" || deploy_status=1
+        done
+        convergence_status=0
+        for stack in $start; do
+          converged=
+          for attempt in $(seq 1 120); do
+            replicas="$(docker stack services "$stack" --format '{{"{{"}}.Replicas{{"}}"}}')"
+            if [ -n "$replicas" ] && ! printf '%s\n' "$replicas" | awk -F/ '$1 != $2 {bad=1} END {exit !bad}'; then converged=1; break; fi
+            sleep 5
+          done
+          if [ "$converged" != 1 ]; then printf 'Stack did not converge: %s\n' "$stack" >&2; convergence_status=1; fi
+        done
+        [ "$quiesced" = 1 ] && [ "$rollback_status" = 0 ] && [ "$deploy_status" = 0 ] && [ "$convergence_status" = 0 ]
+
+  restore:offsite:
+    desc: Stage a selected Borg archive; requires DATASET ARCHIVE
+    cmds:
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- offsite "{{.DATASET}}" "{{.ARCHIVE}}" < operations/scripts/restore.sh
