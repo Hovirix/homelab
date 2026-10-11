@@ -1,8 +1,0 @@
-log:
-  quiet: true
-
-check-for-app-update: false
-
-source:
-  image:
-    default-pull-source: registry

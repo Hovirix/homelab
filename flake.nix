@@ -38,8 +38,6 @@
 
         security = with pkgs; [
           conftest
-          grype
-          syft
           trivy
           zizmor
         ];
@@ -57,7 +55,6 @@
 
         utilities = with pkgs; [
           go-task
-          jq
           yq-go
         ];
       in
