@@ -767,3 +767,194 @@ groups:
         labels:
           severity: warning
         isPaused: false
+
+      # BACKUP STALE
+      # Critical when no successful off-site backup completed in the last 48 hours.
+      # Contract metric backup_last_success_timestamp_seconds is NOT exported by the
+      # current Alloy pipeline (node/cadvisor/traefik jobs only), so this rule stays
+      # Normal until a backup job exports it. Tune the 48h threshold to the backup
+      # schedule; off-site backups are currently manual (task backup).
+      - uid: backup-stale
+        title: Backup stale
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                time() - backup_last_success_timestamp_seconds
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 172800
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: No successful backup for over 48 hours
+        labels:
+          severity: critical
+        isPaused: false
+
+      # BACKUP FAILED
+      # Critical when the most recent backup run reported failure.
+      # Contract metric backup_last_status (1 = success, 0 = failure) is NOT exported
+      # by the current Alloy pipeline, so this rule stays Normal until a backup job
+      # exports it. Freshness alone would catch this late; this fires immediately.
+      - uid: backup-failed
+        title: Backup failed
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                backup_last_status
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 1
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Most recent backup run failed
+        labels:
+          severity: critical
+        isPaused: false
+
+      # BACKUP DESTINATION LOW SPACE
+      # Critical when the local Swarm data filesystem that stages ZFS snapshots for
+      # off-site backup has less than 10% available space. This fires earlier than the
+      # generic critical-disk-space rule because a full staging area breaks snapshots
+      # and restores, not just services.
+      # The remote Hetzner Storage Box usage is NOT scraped by this pipeline, so a
+      # full backup destination itself is not detected by this rule.
+      - uid: backup-destination-low-space
+        title: Backup destination low space
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 *
+                node_filesystem_avail_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs",
+                  mountpoint=~"/var/mnt/swarm.*"
+                }
+                /
+                node_filesystem_size_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs",
+                  mountpoint=~"/var/mnt/swarm.*"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 10
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Less than 10% backup staging space remains on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: critical
+        isPaused: false
