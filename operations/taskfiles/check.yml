@@ -81,26 +81,22 @@ tasks:
     cmd: mkdir -p .artifacts/security/sarif
 
   security:ci:
-    internal: true
     deps: ['security:prepare']
     cmd: zizmor --offline --quiet --format=sarif .github/workflows > .artifacts/security/sarif/ci.sarif
 
   security:iac:
-    internal: true
     deps: ['security:prepare']
     env:
       TF_VAR_opentofu_state_encryption_passphrase: trivy-placeholder
     cmd: trivy config --exit-code 1 --format sarif --output .artifacts/security/sarif/iac.sarif .
 
   security:policies:
-    internal: true
     shopt: [globstar]
     cmds:
       - conftest verify --quiet --policy security/policy
       - conftest test --quiet --policy security/policy platform/**/stack.yml
 
   security:secrets:
-    internal: true
     deps: ['security:prepare']
     cmd: trivy fs --scanners secret --exit-code 1 --format json --output .artifacts/security/secrets.json .
 
@@ -109,6 +105,5 @@ tasks:
     cmd: operations/scripts/security-sbom.sh
 
   security:vuln:
-    internal: true
     deps: ['security:sbom']
     cmd: operations/scripts/security-vuln.sh
