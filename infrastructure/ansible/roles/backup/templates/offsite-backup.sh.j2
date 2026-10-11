@@ -2,6 +2,32 @@
 {% raw %}
 set -euo pipefail
 
+status_dir='/rpool/swarm/backup-status'
+status_file="$status_dir/backup.prom"
+status=0
+
+# Export the alert contract (backup_last_status, backup_last_success_timestamp_seconds)
+# as a textfile on the shared dataset, where Alloy's unix exporter scrapes it.
+report_backup_status() {
+  install -d -m 0755 -o root -g root "$status_dir"
+  if ((status == 1)); then
+    last_success="$(date +%s)"
+  else
+    last_success="$(awk '$1 == "backup_last_success_timestamp_seconds" {print $2}' "$status_file" 2>/dev/null || true)"
+    last_success="${last_success:-0}"
+  fi
+  {
+    printf '# HELP backup_last_success_timestamp_seconds Unix timestamp of the last successful off-site backup.\n'
+    printf '# TYPE backup_last_success_timestamp_seconds gauge\n'
+    printf 'backup_last_success_timestamp_seconds %s\n' "$last_success"
+    printf '# HELP backup_last_status Result of the last off-site backup run (1 success, 0 failure).\n'
+    printf '# TYPE backup_last_status gauge\n'
+    printf 'backup_last_status %s\n' "$status"
+  } >"$status_file.tmp"
+  mv "$status_file.tmp" "$status_file"
+}
+trap report_backup_status EXIT
+
 flock -n -E 75 \
   /run/swarm-zfs-snapshot.lock \
   /usr/local/sbin/swarm-zfs-snapshot
@@ -13,4 +39,5 @@ if ! borgmatic repo-info >/dev/null 2>&1; then
 fi
 
 borgmatic create
+status=1
 {% endraw %}

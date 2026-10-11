@@ -159,6 +159,9 @@ prometheus.exporter.unix "host" {
 		// Clock.
 		"time",
 		"timex",
+
+		// Backup.
+		"textfile",
 	]
 
 	filesystem {
@@ -167,6 +170,10 @@ prometheus.exporter.unix "host" {
 
 	netdev {
 		device_exclude = "^(lo|veth.+|docker.+|br-.+)$"
+	}
+
+	textfile {
+		directory = "/host/root/var/mnt/swarm/backup-status"
 	}
 }
 
