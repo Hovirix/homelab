@@ -128,6 +128,7 @@ systemd:
         RestartSec=5
         ExecStartPre=-/usr/bin/docker rm -f keepalived
         ExecStartPre=/usr/local/bin/keepalived-render.sh
+        # shortcut: keepalived digest is invisible to renovate (tracks stack.yml only), bump manually on keepalived CVEs
         ExecStart=/usr/bin/docker run --rm --name keepalived --network host --cap-add NET_ADMIN --cap-add NET_RAW --cap-add NET_BROADCAST --volume /etc/keepalived/keepalived.conf:/etc/keepalived/keepalived.conf:ro --entrypoint /usr/local/sbin/keepalived osixia/keepalived:2.4.3@sha256:4bf02d569ed240e6da272242b368ce5a25cf0f7d92114536367ee2c963c318a2 --dont-fork --log-console --vrrp -f /etc/keepalived/keepalived.conf
         ExecStop=/usr/bin/docker stop keepalived
 
