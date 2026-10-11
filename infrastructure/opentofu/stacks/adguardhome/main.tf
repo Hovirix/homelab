@@ -7,17 +7,7 @@ locals {
 
     home_wildcard = {
       domain = "*.hovirix.dev"
-      answer = "10.30.0.101"
-    }
-
-    home_wildcard_2 = {
-      domain = "*.hovirix.dev"
-      answer = "10.30.0.102"
-    }
-
-    home_wildcard_3 = {
-      domain = "*.hovirix.dev"
-      answer = "10.30.0.103"
+      answer = "10.30.0.100"
     }
 
     "swarm-01" = {

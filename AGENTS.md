@@ -11,7 +11,7 @@ HX Lab is a desired-state homelab repository. Repository configuration describes
 - `secrets/` contains encrypted production secrets.
 - `operations/taskfiles/services.yml` owns service deployment order and stack naming.
 
-Fedora CoreOS is authored in `infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu`; generated `build/fcos.ign` must not be edited directly.
+Fedora CoreOS is authored in `infrastructure/opentofu/stacks/proxmox/fcos/swarm-*.bu`; generated `build/*.ign` must not be edited directly.
 
 Persistent application data is independent from disposable Swarm state.
 

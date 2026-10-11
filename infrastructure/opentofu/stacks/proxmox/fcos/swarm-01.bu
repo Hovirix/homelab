@@ -1,0 +1,44 @@
+variant: fcos
+version: 1.7.0
+
+passwd:
+  users:
+    - name: admin
+      groups:
+        - wheel
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
+
+    - name: deploy
+      groups:
+        - docker
+      ssh_authorized_keys:
+        - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPTAawDXqCZS9g+Q+2/L8chJ5gD97WLaKKi6DG4nccuA openpgp:0x3602CA24
+
+storage:
+  trees:
+    - local: common/etc
+      path: /etc
+    - local: swarm-01/etc
+      path: /etc
+
+  files:
+    - path: /etc/NetworkManager/system-connections/swarm.nmconnection
+      mode: 0600
+    - path: /etc/sudoers.d/90-admin
+      mode: 0440
+
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/keepalived.service
+      target: /usr/lib/systemd/system/keepalived.service
+
+systemd:
+  units:
+    - name: var-mnt-swarm.mount
+      enabled: true
+
+    - name: container-host-access-selinux.service
+      enabled: true
+
+    - name: keepalived-install.service
+      enabled: true

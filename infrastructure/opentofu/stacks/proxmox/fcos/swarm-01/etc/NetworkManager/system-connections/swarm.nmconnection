@@ -1,0 +1,13 @@
+[connection]
+id=swarm
+type=ethernet
+interface-name=ens18
+
+[ipv4]
+method=manual
+address1=10.30.0.101/24,10.30.0.1
+dns=10.30.0.1;
+dns-search=home.hovirix.dev;
+
+[ipv6]
+method=disabled

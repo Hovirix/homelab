@@ -51,7 +51,13 @@ tasks:
 
   lint:butane:
     internal: true
-    cmd: butane --strict infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu > /dev/null
+    dir: infrastructure/opentofu/stacks/proxmox
+    method: none
+    sources:
+      - fcos/swarm-*.bu
+    cmds:
+      - for: sources
+        cmd: butane --strict --files-dir fcos {{.ITEM}} > /dev/null
 
   lint:docker:
     internal: true

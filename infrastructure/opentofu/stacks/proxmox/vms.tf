@@ -35,13 +35,12 @@ resource "proxmox_virtual_environment_vm" "fcos" {
   }
 
   network_device {
-    mac_address = each.value.mac
-    vlan_id     = local.fcos_config.network.vlan_id
+    vlan_id = local.fcos_config.network.vlan_id
   }
 
   initialization {
     datastore_id        = local.vm_datastore_id
-    vendor_data_file_id = proxmox_virtual_environment_file.fcos_ignition.id
+    vendor_data_file_id = proxmox_virtual_environment_file.fcos_ignition[each.key].id
   }
 
   operating_system {

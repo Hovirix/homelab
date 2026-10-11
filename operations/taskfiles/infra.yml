@@ -89,6 +89,9 @@ tasks:
 
   fcos-render:
     internal: true
+    dir: infrastructure/opentofu/stacks/proxmox
     cmds:
-      - mkdir -p infrastructure/opentofu/stacks/proxmox/build
-      - butane --strict infrastructure/opentofu/stacks/proxmox/fcos/fcos.bu > infrastructure/opentofu/stacks/proxmox/build/fcos.ign
+      - mkdir -p build
+      - butane --strict --files-dir fcos fcos/swarm-01.bu > build/swarm-01.ign
+      - butane --strict --files-dir fcos fcos/swarm-02.bu > build/swarm-02.ign
+      - butane --strict --files-dir fcos fcos/swarm-03.bu > build/swarm-03.ign
