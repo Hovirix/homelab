@@ -11,3 +11,4 @@ scan:
     - .artifacts
     - .direnv
     - .git
+    - .opencode
