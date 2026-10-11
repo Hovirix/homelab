@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-sbom_dir=".artifacts/sbom"
+sbom_dir=".artifacts/security/sbom"
 
 mkdir -p "$sbom_dir"
 rm -f "$sbom_dir"/*.cdx.json
@@ -21,7 +21,5 @@ fi
 while IFS= read -r image; do
   slug="$(printf '%s' "$image" | tr '/:@' '_')"
 
-  syft "$image" --output "cyclonedx-json=$sbom_dir/$slug.cdx.json"
-
-  printf '✓ %s\n' "${image%@sha256:*}"
+  trivy image --scanners vuln --format cyclonedx --output "$sbom_dir/$slug.cdx.json" "$image"
 done <<<"$images"
