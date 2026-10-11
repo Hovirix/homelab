@@ -769,11 +769,6 @@ groups:
         isPaused: false
 
       # BACKUP STALE
-      # Critical when no successful off-site backup completed in the last 48 hours.
-      # Contract metric backup_last_success_timestamp_seconds is NOT exported by the
-      # current Alloy pipeline (node/cadvisor/traefik jobs only), so this rule stays
-      # Normal until a backup job exports it. Tune the 48h threshold to the backup
-      # schedule; off-site backups are currently manual (task backup).
       - uid: backup-stale
         title: Backup stale
         condition: C
@@ -789,7 +784,7 @@ groups:
                 uid: metrics
               editorMode: code
               expr: |
-                time() - backup_last_success_timestamp_seconds
+                time() - max(backup_last_success_timestamp_seconds)
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
@@ -819,7 +814,7 @@ groups:
               refId: C
               type: math
 
-        noDataState: OK
+        noDataState: Alerting
         execErrState: Error
         for: 0s
         annotations:
@@ -829,10 +824,6 @@ groups:
         isPaused: false
 
       # BACKUP FAILED
-      # Critical when the most recent backup run reported failure.
-      # Contract metric backup_last_status (1 = success, 0 = failure) is NOT exported
-      # by the current Alloy pipeline, so this rule stays Normal until a backup job
-      # exports it. Freshness alone would catch this late; this fires immediately.
       - uid: backup-failed
         title: Backup failed
         condition: C
@@ -848,7 +839,7 @@ groups:
                 uid: metrics
               editorMode: code
               expr: |
-                backup_last_status
+                max(backup_last_status)
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
@@ -878,7 +869,7 @@ groups:
               refId: C
               type: math
 
-        noDataState: OK
+        noDataState: Alerting
         execErrState: Error
         for: 0s
         annotations:
@@ -887,21 +878,15 @@ groups:
           severity: critical
         isPaused: false
 
-      # BACKUP DESTINATION LOW SPACE
-      # Critical when the local Swarm data filesystem that stages ZFS snapshots for
-      # off-site backup has less than 10% available space. This fires earlier than the
-      # generic critical-disk-space rule because a full staging area breaks snapshots
-      # and restores, not just services.
-      # The remote Hetzner Storage Box usage is NOT scraped by this pipeline, so a
-      # full backup destination itself is not detected by this rule.
-      - uid: backup-destination-low-space
-        title: Backup destination low space
+      # STORAGE BOX CAPACITY
+      - uid: storagebox-capacity
+        title: Storage Box capacity low or query failed
         condition: C
         data:
           - refId: A
             datasourceUid: metrics
             relativeTimeRange:
-              from: 900
+              from: 600
               to: 0
             model:
               datasource:
@@ -909,18 +894,9 @@ groups:
                 uid: metrics
               editorMode: code
               expr: |
-                100 *
-                node_filesystem_avail_bytes{
-                  job="node",
-                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs",
-                  mountpoint=~"/var/mnt/swarm.*"
-                }
-                /
-                node_filesystem_size_bytes{
-                  job="node",
-                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs",
-                  mountpoint=~"/var/mnt/swarm.*"
-                }
+                (max(backup_storagebox_query_success) == bool 0)
+                or
+                (max(backup_storagebox_available_bytes) / max(backup_storagebox_total_bytes) < bool 0.1)
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
@@ -946,24 +922,21 @@ groups:
               datasource:
                 type: __expr__
                 uid: __expr__
-              expression: $B < 10
+              expression: $B > 0
               refId: C
               type: math
 
-        noDataState: OK
+        noDataState: Alerting
         execErrState: Error
-        for: 10m
+        for: 5m
         annotations:
-          summary: Less than 10% backup staging space remains on {{ $labels.node }} {{ $labels.mountpoint }}
+          summary: Storage Box capacity query failed or available capacity is below 10%
         labels:
           severity: critical
         isPaused: false
 
       # REPLICA DEFICIT
-      # Warning when a global service runs on fewer than 3 nodes.
-      # Only Alloy (observability_alloy) and cloudflared (cloudflared_tunnel) use global
-      # mode, so only they can show a deficit while still running. Single-replica
-      # services are covered by the *-missing presence checks instead.
+      # Warning when fewer than 3 cAdvisor observations are present for global services.
       - uid: replica-deficit
         title: Replica deficit
         condition: C
@@ -1018,18 +991,18 @@ groups:
         execErrState: Error
         for: 5m
         annotations:
-          summary: Service {{ $labels.service }} is running below 3 expected replicas
+          summary: Fewer than 3 cAdvisor observations for service {{ $labels.service }}
         labels:
           severity: warning
         isPaused: false
 
-      # CONTAINER RESTART LOOP
+      # REPEATED CONTAINER STARTS
       # Warning when a service slot restarted more than twice in 30 minutes.
       # Single restarts from rolling updates stay below the threshold; a redeploy
       # burst of three or more in 30 minutes can still trip it.
       # This tracks container starts, not exit causes; check Loki logs for the reason.
       - uid: container-restart-loop
-        title: Container restart loop
+        title: Repeated container starts
         condition: C
         data:
           - refId: A
@@ -1077,18 +1050,16 @@ groups:
         execErrState: Error
         for: 5m
         annotations:
-          summary: Container restart loop detected for {{ $labels.service }} on {{ $labels.node }}
+          summary: Repeated container starts detected for {{ $labels.service }} on {{ $labels.node }}
         labels:
           severity: warning
         isPaused: false
 
       # CLOUDFLARED MISSING
-      # Critical when cAdvisor has not seen cloudflared_tunnel for 3 minutes.
-      # This checks container presence, not tunnel registration with Cloudflare;
-      # the cloudflared :2000 metrics endpoint is not scraped by this pipeline.
-      # Partial replica loss on a single node is covered by replica-deficit.
+      # Critical when cAdvisor has not observed a cloudflared container for 3 minutes.
+      # The public HTTP probe provides evidence about the tunnel and endpoint path.
       - uid: cloudflared-missing
-        title: Cloudflared missing
+        title: Cloudflared container missing
         condition: C
         data:
           - refId: A
@@ -1147,10 +1118,6 @@ groups:
         isPaused: false
 
       # PUBLIC ENDPOINT DOWN
-      # Critical when the Traefik metrics endpoint stops reporting.
-      # All public traffic enters through Traefik behind the Cloudflare tunnel, so an
-      # unscrapable edge proxy means public endpoint health cannot be confirmed.
-      # This does NOT probe the public URL; there is no blackbox probe in this pipeline.
       - uid: public-endpoint-down
         title: Public endpoint down
         condition: C
@@ -1166,7 +1133,7 @@ groups:
                 uid: metrics
               editorMode: code
               expr: |
-                up{job="traefik"}
+                max(probe_success{job="public"})
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
@@ -1200,7 +1167,7 @@ groups:
         execErrState: Error
         for: 2m
         annotations:
-          summary: Traefik is not reporting metrics; public endpoint health unknown
+          summary: Public HTTP health probe failed
         labels:
           severity: critical
         isPaused: false

@@ -43,7 +43,7 @@ loki.relabel "journal" {
 loki.source.journal "system" {
 	max_age       = "24h"
 	relabel_rules = loki.relabel.journal.rules
-	labels        = { job = "systemd-journal" }
+	labels        = {job = "systemd-journal"}
 	forward_to    = [loki.write.default.receiver]
 }
 
@@ -129,6 +129,10 @@ prometheus.exporter.unix "host" {
 	rootfs_path = "/host/root"
 	procfs_path = "/host/proc"
 	sysfs_path  = "/host/sys"
+
+	textfile {
+		directory = "/host/root/var/mnt/swarm/backup-status"
+	}
 
 	set_collectors = [
 		// Compute.
@@ -233,6 +237,30 @@ prometheus.relabel "traefik" {
 		action = "labeldrop"
 		regex  = "instance"
 	}
+}
+
+// METRICS — Public HTTP health probe
+
+prometheus.exporter.blackbox "public" {
+	config = `
+modules:
+  http_2xx:
+    prober: http
+    timeout: 5s
+    http:
+      method: GET
+`
+	targets = [{
+		"__param_module" = "http_2xx",
+		"__param_target" = "https://grafana.hovirix.dev/api/health",
+		"job"            = "public",
+	}]
+}
+
+prometheus.scrape "public" {
+	targets         = prometheus.exporter.blackbox.public.targets
+	forward_to      = [prometheus.remote_write.default.receiver]
+	scrape_interval = "30s"
 }
 
 // METRICS — VictoriaMetrics
