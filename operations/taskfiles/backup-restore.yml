@@ -14,18 +14,21 @@ tasks:
     env:
       DOCKER_HOST:
         sh: operations/scripts/swarm.sh
+      DATASET: '{{.DATASET}}'
+      SNAPSHOT: '{{.SNAPSHOT}}'
+      CONFIRM: '{{.CONFIRM}}'
     cmds:
       - |
         set -eu
-        case "{{.DATASET}}" in
+        case "$DATASET" in
           postgres) stop="paperless authentik postgres"; start="postgres authentik paperless" ;;
           valkey) stop="paperless valkey"; start="valkey paperless" ;;
-          paperless|vaultwarden) stop="{{.DATASET}}"; start="{{.DATASET}}" ;;
+          paperless|vaultwarden) stop="$DATASET"; start="$DATASET" ;;
           grafana|loki|victoriametrics) stop="observability"; start="observability" ;;
           traefik) stop="traefik"; start="traefik" ;;
-          *) printf 'Unknown persistent dataset: %s\n' "{{.DATASET}}" >&2; exit 2 ;;
+          *) printf 'Unknown persistent dataset: %s\n' "$DATASET" >&2; exit 2 ;;
         esac
-        ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- validate-local "{{.DATASET}}" "{{.SNAPSHOT}}" "{{.CONFIRM}}" < operations/scripts/restore.sh
+        ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- validate-local "$DATASET" "$SNAPSHOT" "$CONFIRM" < operations/scripts/restore.sh
         quiesced=1
         for stack in $stop; do
           if ! docker stack rm "$stack"; then quiesced=0; break; fi
@@ -42,7 +45,7 @@ tasks:
         fi
         rollback_status=1
         if [ "$quiesced" = 1 ]; then
-          ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- local "{{.DATASET}}" "{{.SNAPSHOT}}" "{{.CONFIRM}}" < operations/scripts/restore.sh || rollback_status=$?
+          ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- local "$DATASET" "$SNAPSHOT" "$CONFIRM" < operations/scripts/restore.sh || rollback_status=$?
         fi
         deploy_status=0
         for stack in $start; do
@@ -71,5 +74,8 @@ tasks:
 
   restore:offsite:
     desc: Stage a selected Borg archive; requires DATASET ARCHIVE
+    env:
+      DATASET: '{{.DATASET}}'
+      ARCHIVE: '{{.ARCHIVE}}'
     cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- offsite "{{.DATASET}}" "{{.ARCHIVE}}" < operations/scripts/restore.sh
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 "{{.PVE}}" bash -s -- offsite "$DATASET" "$ARCHIVE" < operations/scripts/restore.sh
