@@ -62,3 +62,87 @@
     enabled: true
     state: started
     daemon_reload: true
+
+- name: Add PostgreSQL apt keyring
+  ansible.builtin.get_url:
+    url: https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    dest: /etc/apt/keyrings/postgres.asc
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add PostgreSQL apt repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/postgres.asc] https://apt.postgresql.org/pub/repos/apt {{ ansible_distribution_release }}-pgdg main"
+    state: present
+    filename: pgdg
+
+- name: Ensure PostgreSQL common configuration directory exists
+  ansible.builtin.file:
+    path: /etc/postgresql-common
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Prevent automatic PostgreSQL cluster creation
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql-common/createcluster.conf
+    regexp: "^#?\\s*create_main_cluster"
+    line: create_main_cluster = false
+    create: true
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install PostgreSQL backup tooling
+  ansible.builtin.apt:
+    name: postgresql-18
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure PostgreSQL service stays disabled
+  ansible.builtin.systemd_service:
+    name: postgresql.service
+    enabled: false
+    daemon_reload: true
+
+- name: Install PostgreSQL dump hook
+  ansible.builtin.template:
+    src: postgres-dump.sh.j2
+    dest: /usr/local/sbin/postgres-dump
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install off-site backup script
+  ansible.builtin.template:
+    src: offsite-backup.sh.j2
+    dest: /usr/local/sbin/offsite-backup
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install off-site backup service
+  ansible.builtin.template:
+    src: offsite-backup.service.j2
+    dest: /etc/systemd/system/offsite-backup.service
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Install off-site backup timer
+  ansible.builtin.template:
+    src: offsite-backup.timer.j2
+    dest: /etc/systemd/system/offsite-backup.timer
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable off-site backup timer
+  ansible.builtin.systemd_service:
+    name: offsite-backup.timer
+    enabled: true
+    state: started
+    daemon_reload: true

@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+{% raw %}
+# Logical dumps of every v1 PostgreSQL database for off-site backup.
+#
+# Borgmatic runs this as a before_backup hook on PVE. PVE cannot reach the
+# Swarm-only PostgreSQL service, so dumps come from a transient server
+# started on a ZFS clone with trust auth: the snapshot is atomic, the clone
+# has no writers, and live data is never touched.
+
+set -euo pipefail
+
+databases=(authentik paperless)
+dataset='rpool/swarm/postgres'
+dump_dir='/rpool/swarm/postgres/dumps'
+clone='rpool/pg-dump-clone'
+clone_mount='/var/lib/pg-dump-clone'
+pg_bin='/usr/lib/postgresql/18/bin'
+port=54399
+
+sockdir="$(mktemp -d /tmp/pg-dump-XXXXXX)"
+stamp="$(date -u +%Y-%m-%d_%H-%M-%S)"
+snapshot="$dataset@pgdump-$stamp"
+pgdata="$clone_mount/pgdata"
+
+cleanup() {
+  runuser -u postgres -- "$pg_bin/pg_ctl" -D "$pgdata" -m fast stop >/dev/null 2>&1 || true
+  zfs unmount "$clone" >/dev/null 2>&1 || true
+  zfs destroy "$clone" >/dev/null 2>&1 || true
+  zfs destroy "$snapshot" >/dev/null 2>&1 || true
+  rm -rf "$sockdir" || true
+  rmdir "$clone_mount" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
+
+# Discard leftovers from an interrupted run; the backup lock rules out concurrency.
+zfs destroy "$clone" >/dev/null 2>&1 || true
+mapfile -t stale < <(zfs list -H -t snapshot -o name "$dataset" | awk -F@ '$2 ~ /^pgdump-/')
+if ((${#stale[@]} > 0)); then
+  zfs destroy "${stale[@]}"
+fi
+
+install -d -m 0700 -o root -g root "$dump_dir"
+chown postgres:postgres "$sockdir"
+
+zfs snapshot "$snapshot"
+zfs clone -o mountpoint="$clone_mount" "$snapshot" "$clone"
+
+# The clone is disposable, so normalize ownership here instead of touching live data.
+chown -R postgres:postgres "$clone_mount"
+chmod 0700 "$pgdata"
+mv "$pgdata/postgresql.auto.conf" "$pgdata/postgresql.auto.conf.orig" >/dev/null 2>&1 || true
+
+cat >"$sockdir/pg_hba.conf" <<'EOF'
+local all all trust
+host all all 127.0.0.1/32 trust
+host all all ::1/128 trust
+EOF
+chown postgres:postgres "$sockdir/pg_hba.conf"
+chmod 0600 "$sockdir/pg_hba.conf"
+
+cat >"$sockdir/postgresql.conf" <<EOF
+data_directory = '$pgdata'
+hba_file = '$sockdir/pg_hba.conf'
+listen_addresses = ''
+port = $port
+unix_socket_directories = '$sockdir'
+shared_buffers = '256MB'
+max_connections = 10
+EOF
+chown postgres:postgres "$sockdir/postgresql.conf"
+
+if ! runuser -u postgres -- "$pg_bin/pg_ctl" -D "$pgdata" -o "-c config_file=$sockdir/postgresql.conf" -l "$sockdir/server.log" -w -t 120 start; then
+  cat "$sockdir/server.log" >&2 || true
+  exit 1
+fi
+
+"$pg_bin/pg_dumpall" --host="$sockdir" --port="$port" --username=postgres --globals-only --file="$dump_dir/globals.sql"
+for db in "${databases[@]}"; do
+  "$pg_bin/pg_dump" --host="$sockdir" --port="$port" --username=postgres --format=custom --file="$dump_dir/$db.dump" "$db"
+done
+chmod 0600 "$dump_dir"/*.sql "$dump_dir"/*.dump
+{% endraw %}

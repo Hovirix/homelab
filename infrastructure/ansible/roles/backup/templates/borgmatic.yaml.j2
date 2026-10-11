@@ -18,3 +18,6 @@ keep_weekly: 4
 keep_monthly: 12
 
 zfs:
+
+before_backup:
+  - /usr/local/sbin/postgres-dump

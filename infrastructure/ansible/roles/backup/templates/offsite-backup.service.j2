@@ -1,0 +1,13 @@
+[Unit]
+Description=Create off-site Borg backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+TimeoutStartSec=12h
+TimeoutStartFailureMode=kill
+TimeoutStopSec=30s
+TimeoutStopFailureMode=kill
+SuccessExitStatus=75
+ExecStart=/usr/bin/flock -n -E 75 /run/offsite-backup.lock /usr/local/sbin/offsite-backup
