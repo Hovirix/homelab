@@ -1,33 +1,44 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-set -uo pipefail
+dir=".artifacts/security/sarif/images"
+mkdir -p "$dir"
+rm -f "$dir"/*.sarif
 
-sbom_dir=".artifacts/security/sbom"
-report_dir=".artifacts/security/vuln"
+images="$(
+  find platform -type f -name stack.yml -exec \
+    yq -N -r '.services[]? | select(.image != null) | .image' {} + |
+    sort -u
+)"
 
-mkdir -p "$report_dir"
-rm -f "$report_dir"/*.json
+[[ -n "$images" ]] || {
+  echo "No images found" >&2
+  exit 1
+}
 
 failed=0
-for sbom in "$sbom_dir"/*.cdx.json; do
-  if [[ ! -f "$sbom" ]]; then
-    printf 'No SBOMs found\n' >&2
-    exit 1
-  fi
 
-  name="$(basename "$sbom" .cdx.json)"
-  report="$report_dir/$name.json"
-  if trivy sbom --severity HIGH,CRITICAL --exit-code 1 --format json --output "$report" "$sbom"; then
-    continue
-  fi
+while IFS= read -r image; do
+  name="$(printf '%s' "$image" | tr '/:@' '_')"
+  report="$dir/$name.sarif"
 
-  if [[ -s "$report" ]]; then
-    printf 'High/Critical vulnerabilities: %s\n' "$name" >&2
+  trivy image \
+    --scanners vuln \
+    --severity HIGH,CRITICAL \
+    --exit-code 0 \
+    --format sarif \
+    --output "$report" \
+    "$image"
+
+  SARIF_ID="images/$name/" yq -i -o=json \
+    '.runs[0].automationDetails.id = strenv(SARIF_ID)' "$report"
+
+  count="$(yq -r '.runs[0].results | length' "$report")"
+  echo "$image: $count vulnerabilities"
+
+  if ((count > 0)); then
     failed=1
-  else
-    printf 'Scan failed: %s\n' "$name" >&2
-    exit 1
   fi
-done
+done <<<"$images"
 
 exit "$failed"
