@@ -96,7 +96,7 @@ def main():
     for name, value in secrets.items():
         present = exists(name)
         is_changed = present and changed(name)
-        users = services_using(name) if present else []
+        users = services_using(name) if is_changed else []
         plan.append((name, value, present, is_changed))
         if is_changed and (name in STATEFUL_SECRETS or users):
             blocked.append((name, users))
