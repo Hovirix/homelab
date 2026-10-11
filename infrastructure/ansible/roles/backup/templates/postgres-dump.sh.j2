@@ -39,8 +39,12 @@ cleanup() {
   fi
   rm -rf "$sockdir" || result=1
   [[ -z "$tmpdump" ]] || rm -rf "$tmpdump" || result=1
-  if [[ -n "$olddump" && -d "$olddump" && ! -d "$dump_dir" ]]; then
-    mv "$olddump" "$dump_dir" || result=1
+  if [[ -n "$olddump" && -d "$olddump" ]]; then
+    if [[ -d "$dump_dir" ]]; then
+      rm -rf "$olddump" || result=1
+    else
+      mv "$olddump" "$dump_dir" || result=1
+    fi
   fi
   rmdir "$clone_mount" >/dev/null 2>&1 || result=1
   return "$result"
