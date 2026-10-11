@@ -5,32 +5,45 @@ set -euo pipefail
 status_dir='/rpool/swarm/backup-status'
 status_file="$status_dir/backup.prom"
 status=0
+capacity_status=0
+capacity_total=0
+capacity_available=0
 
 # Export the alert contract (backup_last_status, backup_last_success_timestamp_seconds)
 # as a textfile on the shared dataset, where Alloy's unix exporter scrapes it.
 report_backup_status() {
+  result=$?
+  trap - EXIT
   install -d -m 0755 -o root -g root "$status_dir"
-  if ((status == 1)); then
+  if ((result == 0 && status == 1)); then
     last_success="$(date +%s)"
   else
     last_success="$(awk '$1 == "backup_last_success_timestamp_seconds" {print $2}' "$status_file" 2>/dev/null || true)"
     last_success="${last_success:-0}"
   fi
   {
-    printf '# HELP backup_last_success_timestamp_seconds Unix timestamp of the last successful off-site backup.\n'
-    printf '# TYPE backup_last_success_timestamp_seconds gauge\n'
     printf 'backup_last_success_timestamp_seconds %s\n' "$last_success"
-    printf '# HELP backup_last_status Result of the last off-site backup run (1 success, 0 failure).\n'
-    printf '# TYPE backup_last_status gauge\n'
     printf 'backup_last_status %s\n' "$status"
+    printf 'backup_storagebox_capacity_query_status %s\n' "$capacity_status"
+    if ((capacity_status == 1)); then
+      printf 'backup_storagebox_capacity_bytes_total %s\n' "$capacity_total"
+      printf 'backup_storagebox_capacity_bytes_available %s\n' "$capacity_available"
+    fi
   } >"$status_file.tmp"
   mv "$status_file.tmp" "$status_file"
+  return "$result"
 }
 trap report_backup_status EXIT
 
 flock -n -E 75 \
   /run/swarm-zfs-snapshot.lock \
   /usr/local/sbin/swarm-zfs-snapshot
+
+if capacity="$(sshpass -f /etc/borgmatic/storagebox-password ssh -p 23 -o BatchMode=no -o StrictHostKeyChecking=accept-new u683062-sub1@u683062.your-storagebox.de 'df -Pk .' 2>/dev/null | awk 'NR == 2 {print $2, $4}')" && [[ "$capacity" =~ ^([0-9]+)[[:space:]]+([0-9]+)$ ]]; then
+  capacity_total=$((BASH_REMATCH[1] * 1024))
+  capacity_available=$((BASH_REMATCH[2] * 1024))
+  capacity_status=1
+fi
 
 if ! borgmatic repo-info >/dev/null 2>&1; then
   borgmatic repo-create \
