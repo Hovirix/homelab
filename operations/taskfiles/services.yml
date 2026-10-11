@@ -30,7 +30,7 @@ tasks:
         cmd: docker stack deploy --resolve-image changed --compose-file {{.ITEM.file}} {{.ITEM.name}}
 
   status:
-    desc: Show deployed Docker stacks
+    desc: Show deployed Docker services
     env: *docker-env
     cmds:
-      - docker stack ls
+      - docker service ls --format 'table {{"{{"}}.Name{{"}}"}}\t{{"{{"}}.Replicas{{"}}"}}\t{{"{{"}}.Image{{"}}"}}'
