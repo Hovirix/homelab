@@ -9,7 +9,7 @@ repos:
         always_run: true
       - id: trivy-secret
         name: trivy secret scan
-        entry: trivy --config security/trivy.yaml fs --scanners secret .
+        entry: trivy --config security/trivy.yaml fs --scanners secret --exit-code 1 .
         language: system
         pass_filenames: false
         always_run: true

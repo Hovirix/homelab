@@ -1,10 +1,13 @@
 quiet: true
-exit-code: 1
+
+image:
+  source:
+    - remote
 
 scan:
   skip-version-check: true
+  disable-telemetry: true
   skip-dirs:
     - .artifacts
     - .direnv
     - .git
-    - .opencode

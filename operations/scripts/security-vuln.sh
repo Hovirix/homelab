@@ -2,40 +2,32 @@
 
 set -uo pipefail
 
-sbom_dir=".artifacts/sbom"
-report_dir=".artifacts/security/grype"
+sbom_dir=".artifacts/security/sbom"
+report_dir=".artifacts/security/vuln"
 
 mkdir -p "$report_dir"
 rm -f "$report_dir"/*.json
 
 failed=0
-total=0
-
 for sbom in "$sbom_dir"/*.cdx.json; do
   if [[ ! -f "$sbom" ]]; then
     printf 'No SBOMs found\n' >&2
     exit 1
   fi
 
-  total=$((total + 1))
-
   name="$(basename "$sbom" .cdx.json)"
   report="$report_dir/$name.json"
-  image="$(jq -r '.metadata.component.name // empty' "$sbom" 2>/dev/null)"
-  [[ -n $image ]] || image="$name"
+  if trivy sbom --severity HIGH,CRITICAL --exit-code 1 --format json --output "$report" "$sbom"; then
+    continue
+  fi
 
-  if grype "sbom:$sbom" --fail-on high --file "$report" >/dev/null 2>&1; then
-    printf '✓ %s\n' "${image%@sha256:*}"
+  if [[ -s "$report" ]]; then
+    printf 'High/Critical vulnerabilities: %s\n' "$name" >&2
+    failed=1
   else
-    printf '✗ %s\n' "${image%@sha256:*}"
-    failed=$((failed + 1))
+    printf 'Scan failed: %s\n' "$name" >&2
+    exit 1
   fi
 done
 
-if ((failed > 0)); then
-  printf '\n✗ FAILED  %d/%d images contain High/Critical vulnerabilities\n' \
-    "$failed" "$total"
-  exit 1
-fi
-
-printf '\n✓ PASSED  no High/Critical vulnerabilities found\n'
+exit "$failed"
