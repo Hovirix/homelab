@@ -64,34 +64,13 @@ def services_using(name):
     return sorted(users)
 
 
-def rotation_order(name):
-    if name == "POSTGRES_SUPERUSER_PASSWORD":
-        return (0, name)
-    if name in STATEFUL_SECRETS:
-        return (1, name)
-    return (2, name)
-
-
-def refusal_message(refused):
+def refusal_message(blocked):
     details = ", ".join(
-        f"{name} (used by: {', '.join(users)})" for name, users in refused
+        f"{name} (consumers: {', '.join(users) or 'none'})" for name, users in blocked
     )
-    ordered = ", ".join(name for name, _ in refused)
     return (
-        f"Refusing to rotate in-use Swarm secret(s): {details}.\n"
-        "Role passwords must update in Postgres before dependents "
-        "receive new secrets.\n"
-        "Ordered manual procedure (no `docker service rm`):\n"
-        "  1. Confirm Postgres backup/restore path.\n"
-        "  2. Update database roles first via the postgres reconcile job "
-        "with the current superuser credential, then verify with "
-        "pg_isready and a superuser login.\n"
-        f"  3. Rotate in order ({ordered}): detach with "
-        "`docker service update --secret-rm`, `docker secret rm`, "
-        "`docker secret create`, re-attach with "
-        "`docker service update --secret-add`.\n"
-        "  4. Redeploy stacks in order (postgres, authentik, paperless) "
-        "and verify `docker service ls` plus dependent health."
+        f"Refusing secret changes: {details}. "
+        "An explicit tested rotation workflow is required."
     )
 
 
@@ -112,23 +91,26 @@ def main():
         reason="reconcile Docker Swarm secrets",
     ).fields()
 
-    refused = []
+    plan = []
+    blocked = []
     for name, value in secrets.items():
-        if not exists(name):
-            create(name, value)
+        present = exists(name)
+        is_changed = present and changed(name)
+        users = services_using(name) if present else []
+        plan.append((name, value, present, is_changed))
+        if is_changed and (name in STATEFUL_SECRETS or users):
+            blocked.append((name, users))
 
-        elif changed(name):
-            users = services_using(name)
-            if users:
-                refused.append((name, users))
-                continue
+    if blocked:
+        print(refusal_message(blocked), file=sys.stderr)
+        raise SystemExit(1)
+
+    for name, value, present, is_changed in plan:
+        if not present:
+            create(name, value)
+        elif is_changed:
             remove(name)
             create(name, value)
-
-    if refused:
-        refused.sort(key=lambda item: rotation_order(item[0]))
-        print(refusal_message(refused), file=sys.stderr)
-        raise SystemExit(1)
 
 
 if __name__ == "__main__":
