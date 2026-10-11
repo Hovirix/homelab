@@ -4,8 +4,8 @@
 
 **A declarative, rebuildable self-hosted platform built on [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment/overview) and [Docker Swarm](https://docs.docker.com/engine/swarm/).**
 
-[![CI](https://github.com/Hovirix/homelab/actions/workflows/<workflow>.yml/badge.svg)](...)
-[![Security](https://github.com/Hovirix/homelab/actions/workflows/<security-workflow>.yml/badge.svg)](...)
+[![CI](https://github.com/Hovirix/homelab/actions/workflows/checks.yml/badge.svg)](https://github.com/Hovirix/homelab/actions/workflows/checks.yml)
+[![Security](https://github.com/Hovirix/homelab/actions/workflows/security.yml/badge.svg)](https://github.com/Hovirix/homelab/actions/workflows/security.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 </div>
