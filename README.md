@@ -97,8 +97,9 @@ Executable configuration is the source of truth; `AGENTS.md` and `.opencode/skil
 - Recovery workflows are automated through Task.
 - Persistent application data is independent from the Swarm lifecycle.
 - ZFS provides hourly local recovery points for all Swarm datasets.
-- Borgmatic takes temporary ZFS snapshots of Paperless, PostgreSQL, and Vaultwarden and backs them up to Hetzner Storage Box with Borg.
-- PostgreSQL logical backups, WAL archiving, and PITR remain separate future work.
+- A daily systemd timer on PVE (`offsite-backup.timer`) snapshots Swarm data, writes logical dumps of every v1 PostgreSQL database (Authentik and Paperless, plus global roles) under `rpool/swarm/postgres/dumps`, and archives Paperless, PostgreSQL, and Vaultwarden to Hetzner Storage Box with Borg. Retention keeps 7 daily, 4 weekly, and 12 monthly archives, with weekly prune, compact, and check.
+- PostgreSQL recovery uses the logical dumps: restore `globals.sql` with `psql`, recreate each empty database, restore its dump with `pg_restore`, then validate Authentik login/SSO and the Paperless UI/API before returning service to users. WAL archiving and PITR remain future work.
+- Backup freshness and failure are observable on PVE with `systemctl list-timers offsite-backup.timer`, `journalctl -u offsite-backup.service`, and `borgmatic repo-list`.
 
 ## License
 
