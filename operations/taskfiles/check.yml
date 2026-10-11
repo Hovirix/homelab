@@ -98,12 +98,8 @@ tasks:
 
   security:secrets:
     deps: ['security:prepare']
-    cmd: trivy fs --scanners secret --exit-code 1 --format json --output .artifacts/security/secrets.json .
-
-  security:sbom:
-    internal: true
-    cmd: operations/scripts/security-sbom.sh
+    cmd: trivy fs --scanners secret --exit-code 1 --format sarif --output .artifacts/security/sarif/secrets.sarif .
 
   security:vuln:
-    deps: ['security:sbom']
+    deps: ['security:prepare']
     cmd: operations/scripts/security-vuln.sh
