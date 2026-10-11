@@ -958,3 +958,249 @@ groups:
         labels:
           severity: critical
         isPaused: false
+
+      # REPLICA DEFICIT
+      # Warning when a global service runs on fewer than 3 nodes.
+      # Only Alloy (observability_alloy) and cloudflared (cloudflared_tunnel) use global
+      # mode, so only they can show a deficit while still running. Single-replica
+      # services are covered by the *-missing presence checks instead.
+      - uid: replica-deficit
+        title: Replica deficit
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                count by (service) (
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service=~"observability_alloy|cloudflared_tunnel"
+                  }
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 3
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Service {{ $labels.service }} is running below 3 expected replicas
+        labels:
+          severity: warning
+        isPaused: false
+
+      # CONTAINER RESTART LOOP
+      # Warning when a service slot restarted more than twice in 30 minutes.
+      # Single restarts from rolling updates stay below the threshold; a redeploy
+      # burst of three or more in 30 minutes can still trip it.
+      # This tracks container starts, not exit causes; check Loki logs for the reason.
+      - uid: container-restart-loop
+        title: Container restart loop
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 1800
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                changes(container_start_time_seconds{job="cadvisor"}[30m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 2
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Container restart loop detected for {{ $labels.service }} on {{ $labels.node }}
+        labels:
+          severity: warning
+        isPaused: false
+
+      # CLOUDFLARED MISSING
+      # Critical when cAdvisor has not seen cloudflared_tunnel for 3 minutes.
+      # This checks container presence, not tunnel registration with Cloudflare;
+      # the cloudflared :2000 metrics endpoint is not scraped by this pipeline.
+      # Partial replica loss on a single node is covered by replica-deficit.
+      - uid: cloudflared-missing
+        title: Cloudflared missing
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                absent_over_time(
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service="cloudflared_tunnel"
+                  }[3m]
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Cloudflared tunnel container has been missing for at least 3 minutes
+        labels:
+          severity: critical
+        isPaused: false
+
+      # PUBLIC ENDPOINT DOWN
+      # Critical when the Traefik metrics endpoint stops reporting.
+      # All public traffic enters through Traefik behind the Cloudflare tunnel, so an
+      # unscrapable edge proxy means public endpoint health cannot be confirmed.
+      # This does NOT probe the public URL; there is no blackbox probe in this pipeline.
+      - uid: public-endpoint-down
+        title: Public endpoint down
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                up{job="traefik"}
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 1
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Traefik is not reporting metrics; public endpoint health unknown
+        labels:
+          severity: critical
+        isPaused: false
