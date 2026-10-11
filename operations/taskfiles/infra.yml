@@ -13,8 +13,9 @@ tasks:
     desc: Apply infrastructure changes
     prompt: Apply infrastructure changes?
     cmds:
-      - task: adguardhome:apply
       - task: proxmox:apply
+      - task: adguardhome:check-vip
+      - task: adguardhome:apply
       - task: cloudflare:apply
       - task: hetzner:apply
 
@@ -27,6 +28,10 @@ tasks:
     cmds:
       - task: stack:run
         vars: {STACK: adguardhome, ARGS: apply -auto-approve}
+
+  adguardhome:check-vip:
+    cmds:
+      - curl --insecure --silent --show-error --connect-timeout 3 --max-time 5 https://10.30.0.100/ -o /dev/null
 
   adguardhome:destroy:
     cmds:

@@ -60,8 +60,8 @@ storage:
 
           # Render this node's keepalived.conf. All Swarm nodes share this
           # script; VRRP priority derives from the node's own address so
-          # 10.30.0.101 is primary and the 10.30.0.100 ingress VIP floats
-          # to a survivor when a node goes down.
+          # The lowest node address has highest priority; ingress health is
+          # checked locally before this node can own the VIP.
           VIP="10.30.0.100"
 
           iface="$(ip -o -4 addr show | awk '$4 ~ /^10\.30\.0\./ {print $2; exit}')"
@@ -69,14 +69,31 @@ storage:
           addr="$(ip -o -4 addr show dev "$iface" | awk -v vip="$VIP" '$3 == "inet" && $4 ~ /^10\.30\.0\./ {split($4, a, "/"); if (a[1] != vip) {print a[1]; exit}}')"
           [[ -n "$addr" ]] || { echo "no 10.30.0.x address on $iface" >&2; exit 1; }
 
+          peers=""
+          for peer in 10.30.0.101 10.30.0.102 10.30.0.103; do
+            [[ "$peer" == "$addr" ]] || peers+="    $peer\n"
+          done
+
           mkdir -p /etc/keepalived
           cat > /etc/keepalived/keepalived.conf <<EOF
+          vrrp_script chk_ingress {
+            script "/bin/sh -c 'wget -q -T 2 -O /dev/null --no-check-certificate https://127.0.0.1/ || [ \$? -eq 8 ]'"
+            interval 2
+            fall 2
+            rise 2
+          }
           vrrp_instance swarm_ingress {
             state BACKUP
             interface $iface
             virtual_router_id 51
             priority $((256 - ${addr##*.}))
             advert_int 1
+            unicast_peer {
+          $(printf '%b' "$peers")
+            }
+            track_script {
+              chk_ingress
+            }
             virtual_ipaddress {
               $VIP/24 dev $iface
             }
@@ -128,8 +145,8 @@ systemd:
         RestartSec=5
         ExecStartPre=-/usr/bin/docker rm -f keepalived
         ExecStartPre=/usr/local/bin/keepalived-render.sh
-        # shortcut: keepalived digest is invisible to renovate (tracks stack.yml only), bump manually on keepalived CVEs
-        ExecStart=/usr/bin/docker run --rm --name keepalived --network host --cap-add NET_ADMIN --cap-add NET_RAW --cap-add NET_BROADCAST --volume /etc/keepalived/keepalived.conf:/etc/keepalived/keepalived.conf:ro --entrypoint /usr/local/sbin/keepalived osixia/keepalived:2.4.3@sha256:4bf02d569ed240e6da272242b368ce5a25cf0f7d92114536367ee2c963c318a2 --dont-fork --log-console --vrrp -f /etc/keepalived/keepalived.conf
+        # shortcut: Renovate ignores this embedded image, review its digest for updates and CVEs manually
+        ExecStart=/usr/bin/docker run --rm --name keepalived --network host --cap-add NET_ADMIN --cap-add NET_RAW --cap-add NET_BROADCAST --volume /etc/keepalived/keepalived.conf:/etc/keepalived/keepalived.conf:ro,Z --entrypoint /usr/local/sbin/keepalived osixia/keepalived:2.4.3@sha256:4bf02d569ed240e6da272242b368ce5a25cf0f7d92114536367ee2c963c318a2 --dont-fork --log-console --vrrp -f /etc/keepalived/keepalived.conf
         ExecStop=/usr/bin/docker stop keepalived
 
         [Install]

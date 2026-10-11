@@ -6,7 +6,7 @@ locals {
     }
 
     # Ingress VIP floated by keepalived VRRP across the Swarm nodes.
-    # Reserve 10.30.0.100 outside the DHCP range; it always lands on a live node.
+    # Reserve 10.30.0.100 outside the DHCP range; keepalived assigns it to a node passing its local ingress check.
     home_ingress = {
       domain = "*.hovirix.dev"
       answer = "10.30.0.100"
