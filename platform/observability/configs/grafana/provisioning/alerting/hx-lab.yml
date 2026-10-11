@@ -894,9 +894,9 @@ groups:
                 uid: metrics
               editorMode: code
               expr: |
-                (max(backup_storagebox_query_success) == bool 0)
+                (max(backup_storagebox_capacity_query_status) == bool 0)
                 or
-                (max(backup_storagebox_available_bytes) / max(backup_storagebox_total_bytes) < bool 0.1)
+                (max(backup_storagebox_capacity_bytes_available) / max(backup_storagebox_capacity_bytes_total) < bool 0.1)
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
