@@ -51,6 +51,38 @@ storage:
           (allow container_t proc_t (file (getattr open read)))
           (allow container_t proc_t (lnk_file (getattr read)))
 
+    - path: /usr/local/bin/keepalived-render.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/usr/bin/env bash
+          set -euo pipefail
+
+          # Render this node's keepalived.conf. All Swarm nodes share this
+          # script; VRRP priority derives from the node's own address so
+          # 10.30.0.101 is primary and the 10.30.0.100 ingress VIP floats
+          # to a survivor when a node goes down.
+          VIP="10.30.0.100"
+
+          iface="$(ip -o -4 addr show | awk '$4 ~ /^10\.30\.0\./ {print $2; exit}')"
+          [[ -n "$iface" ]] || { echo "no 10.30.0.x interface" >&2; exit 1; }
+          addr="$(ip -o -4 addr show dev "$iface" | awk -v vip="$VIP" '$3 == "inet" && $4 ~ /^10\.30\.0\./ {split($4, a, "/"); if (a[1] != vip) {print a[1]; exit}}')"
+          [[ -n "$addr" ]] || { echo "no 10.30.0.x address on $iface" >&2; exit 1; }
+
+          mkdir -p /etc/keepalived
+          cat > /etc/keepalived/keepalived.conf <<EOF
+          vrrp_instance swarm_ingress {
+            state BACKUP
+            interface $iface
+            virtual_router_id 51
+            priority $((256 - ${addr##*.}))
+            advert_int 1
+            virtual_ipaddress {
+              $VIP/24 dev $iface
+            }
+          }
+          EOF
+
     - path: /etc/sudoers.d/90-admin
       mode: 0440
       contents:
@@ -82,6 +114,25 @@ systemd:
             RequiresMountsFor=/var/mnt/swarm
             Requires=container-host-access-selinux.service
             After=container-host-access-selinux.service
+
+    - name: keepalived.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Swarm ingress VIP (VRRP)
+        Wants=docker.service network-online.target
+        After=docker.service network-online.target
+
+        [Service]
+        Restart=always
+        RestartSec=5
+        ExecStartPre=-/usr/bin/docker rm -f keepalived
+        ExecStartPre=/usr/local/bin/keepalived-render.sh
+        ExecStart=/usr/bin/docker run --rm --name keepalived --network host --cap-add NET_ADMIN --cap-add NET_RAW --cap-add NET_BROADCAST --volume /etc/keepalived/keepalived.conf:/etc/keepalived/keepalived.conf:ro --entrypoint /usr/local/sbin/keepalived osixia/keepalived:2.4.3@sha256:4bf02d569ed240e6da272242b368ce5a25cf0f7d92114536367ee2c963c318a2 --dont-fork --log-console --vrrp -f /etc/keepalived/keepalived.conf
+        ExecStop=/usr/bin/docker stop keepalived
+
+        [Install]
+        WantedBy=multi-user.target
 
     - name: container-host-access-selinux.service
       contents: |
