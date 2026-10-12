@@ -43,3 +43,4 @@ networks:
 secrets:
   cloudflared_tunnel_token:
     external: true
+    name: "cloudflared_tunnel_token_eba19c7658d7"

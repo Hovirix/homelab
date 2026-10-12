@@ -7,9 +7,9 @@ tasks:
     env: &docker-env
       DOCKER_HOST:
         sh: operations/scripts/swarm.sh
-    # Automatically runs when Task detects production secret changes.
-    sources: [secrets/production.sops.env]
-    cmd: operations/scripts/secrets.py
+    cmds:
+      - operations/scripts/secrets.py
+      - operations/scripts/secrets.py --render
 
   deploy:
     internal: true
@@ -28,6 +28,7 @@ tasks:
     cmds:
       - for: {var: STACKS}
         cmd: docker stack deploy --resolve-image changed --compose-file {{.ITEM.file}} {{.ITEM.name}}
+      - defer: operations/scripts/secrets.py --clean
 
   status:
     desc: Show deployed Docker services

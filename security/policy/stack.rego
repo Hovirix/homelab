@@ -70,6 +70,14 @@ deny contains msg if {
 }
 
 deny contains msg if {
+  secret_name := object.keys(input.secrets)[_]
+  secret := input.secrets[secret_name]
+  secret.name
+  not regex.match(sprintf("^%s_[a-f0-9]{12}$", [secret_name]), secret.name)
+  msg := sprintf("secret %q must use a ciphertext-derived version name", [secret_name])
+}
+
+deny contains msg if {
   some name
   service := input.services[name]
   key := object.keys(service.environment)[_]

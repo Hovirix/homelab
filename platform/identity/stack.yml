@@ -158,27 +158,36 @@ configs:
 secrets:
   authentik_secret_key:
     external: true
+    name: "authentik_secret_key_23a93a635d23"
 
   postgres_authentik_password:
     external: true
+    name: "postgres_authentik_password_7b6c7b2d278e"
 
   authentik_smtp_api_key:
     external: true
+    name: "authentik_smtp_api_key_b7b5cef33729"
 
   grafana_client_id:
     external: true
+    name: "grafana_client_id_87d8575089a0"
 
   grafana_client_secret:
     external: true
+    name: "grafana_client_secret_6c13624a3f9b"
 
   paperless_client_id:
     external: true
+    name: "paperless_client_id_46fc0dcd55ee"
 
   paperless_client_secret:
     external: true
+    name: "paperless_client_secret_5d0f250afbf7"
 
   vaultwarden_client_id:
     external: true
+    name: "vaultwarden_client_id_6b084351cc1c"
 
   vaultwarden_client_secret:
     external: true
+    name: "vaultwarden_client_secret_8ca9aa288eab"

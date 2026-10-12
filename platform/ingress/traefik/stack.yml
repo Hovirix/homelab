@@ -122,3 +122,4 @@ networks:
 secrets:
   traefik_cf_dns_api_token:
     external: true
+    name: "traefik_cf_dns_api_token_f97cf50f949d"

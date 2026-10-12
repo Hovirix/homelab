@@ -49,6 +49,10 @@ test_denies_plaintext_secret_environment if {
   deny with input as {"services": {"app": {"image": app_image, "environment": {"APP_TOKEN": "plaintext"}}}}
 }
 
+test_denies_unversioned_secret_name if {
+  deny with input as object.union(compliant_stack, {"secrets": {"app_token": {"external": true, "name": "app_token"}}})
+}
+
 compliant_stack := {
   "services": {
     "proxy": {
@@ -68,5 +72,5 @@ compliant_stack := {
       "environment": {"APP_TOKEN_FILE": "/run/secrets/app_token"},
     },
   },
-  "secrets": {"app_token": {"external": true}},
+  "secrets": {"app_token": {"external": true, "name": "app_token_aaaaaaaaaaaa"}},
 }

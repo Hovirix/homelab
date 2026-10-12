@@ -103,9 +103,12 @@ configs:
 secrets:
   postgres_superuser_password:
     external: true
+    name: "postgres_superuser_password_3efce0f89928"
 
   postgres_authentik_password:
     external: true
+    name: "postgres_authentik_password_7b6c7b2d278e"
 
   postgres_paperless_password:
     external: true
+    name: "postgres_paperless_password_cdd4621df825"

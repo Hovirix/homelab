@@ -56,6 +56,8 @@ networks:
 secrets:
   vaultwarden_client_id:
     external: true
+    name: "vaultwarden_client_id_6b084351cc1c"
 
   vaultwarden_client_secret:
     external: true
+    name: "vaultwarden_client_secret_8ca9aa288eab"

@@ -227,12 +227,16 @@ configs:
 secrets:
   grafana_admin_password:
     external: true
+    name: "grafana_admin_password_01094f120f29"
 
   grafana_client_id:
     external: true
+    name: "grafana_client_id_87d8575089a0"
 
   grafana_client_secret:
     external: true
+    name: "grafana_client_secret_6c13624a3f9b"
 
   grafana_smtp_api_key:
     external: true
+    name: "grafana_smtp_api_key_c3d7929657f9"
