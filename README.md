@@ -96,9 +96,9 @@ Executable configuration is the source of truth; `AGENTS.md` and `.opencode/skil
 - Infrastructure and Swarm configuration are rebuildable from Git.
 - Recovery workflows are automated through Task.
 - Persistent application data is independent from the Swarm lifecycle.
-- ZFS provides hourly local recovery points for all Swarm datasets.
+- Sanoid provides 24 hourly local recovery points for all Swarm datasets.
 - Borgmatic takes temporary ZFS snapshots of Paperless, PostgreSQL, and Vaultwarden and backs them up to Hetzner Storage Box with Borg.
-- PostgreSQL logical backups, WAL archiving, and PITR remain separate future work.
+- PostgreSQL recovery uses the physical ZFS-backed recovery points; logical backups, WAL archiving, and PITR remain separate future work.
 
 ## License
 

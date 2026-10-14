@@ -40,25 +40,75 @@
     group: root
     mode: "0600"
 
-- name: Install off-site maintenance service
+- name: Validate Borgmatic configuration
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - config
+      - validate
+      - --config
+      - /etc/borgmatic/config.yaml
+  changed_when: false
+
+- name: Check Borg repository
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - repo-info
+  register: backup_borg_repository
+  changed_when: false
+  failed_when: false
+
+- name: Create Borg repository
+  ansible.builtin.command:
+    argv:
+      - borgmatic
+      - repo-create
+      - --encryption
+      - repokey
+      - --make-parent-dirs
+  when: backup_borg_repository.rc != 0
+  changed_when: true
+
+- name: Install Borgmatic scripts
   ansible.builtin.template:
-    src: backup-maintenance.service.j2
-    dest: /etc/systemd/system/backup-maintenance.service
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: "0750"
+  loop:
+    - src: restore.sh.j2
+      dest: /usr/local/sbin/restore
+
+- name: Create isolated off-site restore directory
+  ansible.builtin.file:
+    path: /rpool/restore
+    state: directory
+    owner: root
+    group: root
+    mode: "0700"
+
+- name: Create Borgmatic service drop-in directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/borgmatic.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Allow Borgmatic ZFS snapshot mounts
+  ansible.builtin.template:
+    src: borgmatic-zfs.conf.j2
+    dest: /etc/systemd/system/borgmatic.service.d/zfs.conf
     owner: root
     group: root
     mode: "0644"
+  notify: Reload systemd
 
-- name: Install off-site maintenance timer
-  ansible.builtin.template:
-    src: backup-maintenance.timer.j2
-    dest: /etc/systemd/system/backup-maintenance.timer
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Enable off-site maintenance timer
+- name: Enable distribution Borgmatic timer
   ansible.builtin.systemd_service:
-    name: backup-maintenance.timer
+    name: borgmatic.timer
     enabled: true
     state: started
     daemon_reload: true

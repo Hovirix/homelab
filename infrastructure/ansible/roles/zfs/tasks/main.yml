@@ -75,17 +75,24 @@
 
 - name: Configure Swarm service ZFS datasets
   community.general.zfs:
-    name: "rpool/swarm/{{ item }}"
+    name: "rpool/swarm/{{ item.name }}"
     state: present
+    extra_zfs_properties: "{{ item.properties | default({}) }}"
   loop:
-    - grafana
-    - loki
-    - paperless
-    - postgres
-    - victoriametrics
-    - traefik
-    - valkey
-    - vaultwarden
+    - name: grafana
+    - name: loki
+    - name: paperless
+      properties:
+        "org.torsion.borgmatic:backup": auto
+    - name: postgres
+      properties:
+        "org.torsion.borgmatic:backup": auto
+    - name: victoriametrics
+    - name: traefik
+    - name: valkey
+    - name: vaultwarden
+      properties:
+        "org.torsion.borgmatic:backup": auto
 
 - name: Allow non-root observability containers to write their data
   ansible.builtin.file:

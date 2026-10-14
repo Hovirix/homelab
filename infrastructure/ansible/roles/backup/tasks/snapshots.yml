@@ -19,33 +19,30 @@
       - backup_swarm_zfs_dataset.stdout == "rpool/swarm"
     fail_msg: Expected ZFS dataset rpool/swarm is missing or could not be queried on {{ inventory_hostname }}; refusing to configure snapshots.
 
-- name: Install Docker Swarm ZFS snapshot script
-  ansible.builtin.template:
-    src: swarm-zfs-snapshot.sh.j2
-    dest: /usr/local/sbin/swarm-zfs-snapshot
+- name: Install Sanoid
+  ansible.builtin.apt:
+    name: sanoid
+    state: present
+
+- name: Create Sanoid configuration directory
+  ansible.builtin.file:
+    path: /etc/sanoid
+    state: directory
     owner: root
     group: root
     mode: "0755"
 
-- name: Install Docker Swarm ZFS snapshot service
+- name: Configure Sanoid
   ansible.builtin.template:
-    src: swarm-zfs-snapshot.service.j2
-    dest: /etc/systemd/system/swarm-zfs-snapshot.service
+    src: sanoid.conf.j2
+    dest: /etc/sanoid/sanoid.conf
     owner: root
     group: root
     mode: "0644"
 
-- name: Install Docker Swarm ZFS snapshot timer
-  ansible.builtin.template:
-    src: swarm-zfs-snapshot.timer.j2
-    dest: /etc/systemd/system/swarm-zfs-snapshot.timer
-    owner: root
-    group: root
-    mode: "0644"
-
-- name: Enable Docker Swarm ZFS snapshot timer
+- name: Enable Sanoid timer
   ansible.builtin.systemd_service:
-    name: swarm-zfs-snapshot.timer
+    name: sanoid.timer
     enabled: true
     state: started
     daemon_reload: true

@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+{% raw %}
+set -euo pipefail
+umask 077
+
+mode="${1:?usage: restore local|offsite}"
+parent='rpool/swarm'
+
+pick() {
+  local prompt="$1" var="$2" selected
+  shift 2
+
+  (( $# )) || {
+    printf 'No recovery points found.\n' >&2
+    exit 1
+  }
+
+  printf '%s\n' "$prompt"
+  select selected in "$@"; do
+    [[ -n $selected ]] && {
+      printf -v "$var" '%s' "$selected"
+      return
+    }
+  done
+}
+
+restore_local() {
+  local dataset snapshot confirmation
+
+  mapfile -t datasets < <(
+    zfs list -H -o name -d 1 "$parent" |
+      sed -n "s#^$parent/##p" |
+      sort
+  )
+  pick 'Select dataset:' dataset "${datasets[@]}"
+
+  mapfile -t snapshots < <(
+    zfs list -H -t snapshot -o name -S creation "$parent/$dataset"
+  )
+  pick 'Select snapshot:' snapshot "${snapshots[@]}"
+
+  printf 'Stop workloads that use %s before rolling back %s.\n' "$parent/$dataset" "$snapshot"
+  printf 'This destroys snapshots newer than %s.\n' "$snapshot"
+  read -r -p 'Type ROLLBACK to continue: ' confirmation
+  [[ $confirmation == ROLLBACK ]] || exit 1
+  zfs rollback -r "$snapshot"
+}
+
+restore_offsite() {
+  local archive archive_listing dataset dataset_listing destination
+
+  archive_listing="$(mktemp)"
+  if ! borgmatic --no-color -l --short >"$archive_listing"; then
+    rm -f "$archive_listing"
+    return 1
+  fi
+  mapfile -t archives < <(sed '/Listing archives/d' "$archive_listing")
+  rm -f "$archive_listing"
+  pick 'Select archive:' archive "${archives[@]}"
+
+  dataset_listing="$(mktemp)"
+  if ! borgmatic --no-color list --archive "$archive" --short >"$dataset_listing"; then
+    rm -f "$dataset_listing"
+    return 1
+  fi
+  mapfile -t datasets < <(awk -F/ '$1 == "rpool" && $2 == "swarm" && NF >= 3 { print $3 }' "$dataset_listing" | sort -u)
+  rm -f "$dataset_listing"
+  pick 'Select dataset:' dataset "${datasets[@]}"
+
+  destination="$(mktemp -d "/rpool/restore/$dataset-$(date -u +%Y-%m-%d_%H-%M-%S)-XXXXXX")"
+  borgmatic extract \
+    --archive "$archive" \
+    --path "$parent/$dataset" \
+    --destination "$destination" \
+    --strip-components 3
+  printf 'Extracted archive to %s\n' "$destination"
+}
+
+case "$mode" in
+  local) restore_local ;;
+  offsite) restore_offsite ;;
+  *)
+    printf 'usage: %s local|offsite\n' "$0" >&2
+    exit 2
+    ;;
+esac
+{% endraw %}

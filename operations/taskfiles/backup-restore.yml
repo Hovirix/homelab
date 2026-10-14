@@ -5,16 +5,16 @@ vars:
 
 tasks:
   backup:
-    desc: Snapshot Swarm data and back it up off-site
+    desc: Back up Borgmatic ZFS snapshots off-site
     cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s < operations/scripts/backup.sh
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} systemctl start borgmatic.service
 
   restore:local:
-    desc: Roll back to an explicit local ZFS recovery point
+    desc: Interactively roll back one dataset to a Sanoid recovery point
     cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- local < operations/scripts/restore.sh
+      - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore local
 
   restore:offsite:
-    desc: Stage an explicit Borg recovery point
+    desc: Interactively extract a Borg recovery point below /rpool/restore
     cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} bash -s -- offsite < operations/scripts/restore.sh
+      - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore offsite

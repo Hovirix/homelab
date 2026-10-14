@@ -1,4 +1,4 @@
-- name: Configure Docker Swarm ZFS snapshots
+- name: Configure Sanoid snapshots
   ansible.builtin.import_tasks: snapshots.yml
 
 - name: Configure off-site backups
