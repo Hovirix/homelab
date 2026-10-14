@@ -1,10 +1,16 @@
 ---
 description: Use for read-only HX Lab security review of exposure, identity, Docker privileges, secrets, backups, remote execution, destructive operations, and supply-chain risk.
 mode: subagent
-permission:
-  edit: deny
-  bash: deny
-  task: deny
+permissions:
+  - action: edit
+    resource: "*"
+    effect: deny
+  - action: shell
+    resource: "*"
+    effect: deny
+  - action: subagent
+    resource: "*"
+    effect: deny
 ---
 
 Review HX Lab repository evidence for external exposure, published ports, Cloudflared routes, authentication and authorization, Docker socket and manager access, privileged containers, host mounts/networking, secret handling, backups, remote execution, destructive operations, and provider/image supply-chain risk.

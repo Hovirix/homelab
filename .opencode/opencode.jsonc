@@ -1,45 +1,44 @@
 {
   "$schema": "https://opencode.ai/config.json",
 
-  "permission": {
-    "bash": {
-      "sops": "deny",
-      "sops *": "deny",
-      "task services:secret:sync*": "deny",
-      "*operations/scripts/secrets.py*": "deny",
-    },
-  },
-
+  "permissions": [
+    { "action": "shell", "resource": "sops", "effect": "deny" },
+    { "action": "shell", "resource": "sops *", "effect": "deny" },
+    { "action": "shell", "resource": "task services:secret:sync*", "effect": "deny" },
+    { "action": "shell", "resource": "*operations/scripts/secrets.py*", "effect": "deny" },
+  ],
 
   "mcp": {
-    "grafana": {
-      "enabled": true,
-      "type": "local",
-      "command": [
-        "secretspec",
-        "run",
-        "-P",
-        "production",
-        "-S",
-        "opencode",
-        "--reason",
-        "provide read-only Grafana observability access to OpenCode",
-        "--",
-        "docker",
-        "run",
-        "--rm",
-        "-i",
-        "-e",
-        "GRAFANA_URL",
-        "-e",
-        "GRAFANA_SERVICE_ACCOUNT_TOKEN",
-        "grafana/mcp-grafana:1.2.0",
-        "-t",
-        "stdio",
-        "--disable-write"
-      ],
-      "environment": {
-        "GRAFANA_URL": "https://grafana.hovirix.dev"
+    "servers": {
+      "grafana": {
+        "disabled": false,
+        "type": "local",
+        "command": [
+          "secretspec",
+          "run",
+          "-P",
+          "production",
+          "-S",
+          "opencode",
+          "--reason",
+          "provide read-only Grafana observability access to OpenCode",
+          "--",
+          "docker",
+          "run",
+          "--rm",
+          "-i",
+          "-e",
+          "GRAFANA_URL",
+          "-e",
+          "GRAFANA_SERVICE_ACCOUNT_TOKEN",
+          "grafana/mcp-grafana:1.2.0",
+          "-t",
+          "stdio",
+          "--disable-write"
+        ],
+        "environment": {
+          "GRAFANA_URL": "https://grafana.hovirix.dev"
+        }
       }
     }
   }
