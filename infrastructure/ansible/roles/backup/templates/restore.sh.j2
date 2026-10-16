@@ -40,7 +40,7 @@ restore_local() {
   pick 'Select snapshot:' snapshot "${snapshots[@]}"
 
   printf 'Stop workloads that use %s before rolling back %s.\n' "$parent/$dataset" "$snapshot"
-  printf 'This destroys snapshots newer than %s.\n' "$snapshot"
+  printf 'This discards all data written after %s and destroys newer snapshots.\n' "$snapshot"
   read -r -p 'Type ROLLBACK to continue: ' confirmation
   [[ $confirmation == ROLLBACK ]] || exit 1
   zfs rollback -r "$snapshot"
@@ -67,12 +67,20 @@ restore_offsite() {
   rm -f "$dataset_listing"
   pick 'Select dataset:' dataset "${datasets[@]}"
 
+  borgmatic check --only data --match-archives "$archive" --force
   destination="$(mktemp -d "/rpool/restore/$dataset-$(date -u +%Y-%m-%d_%H-%M-%S)-XXXXXX")"
-  borgmatic extract \
+  if ! borgmatic extract \
     --archive "$archive" \
     --path "$parent/$dataset" \
     --destination "$destination" \
-    --strip-components 3
+    --strip-components 3; then
+    printf 'Extraction failed; inspect partial data at %s\n' "$destination" >&2
+    return 1
+  fi
+  if [[ -z $(find "$destination" -mindepth 1 -print -quit) ]]; then
+    printf 'Extraction produced no files at %s\n' "$destination" >&2
+    return 1
+  fi
   printf 'Extracted archive to %s\n' "$destination"
 }
 
