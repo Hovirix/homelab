@@ -2,19 +2,11 @@ version: "3"
 
 tasks:
 
-  secret:sync:
+  deploy:
     internal: true
     env: &docker-env
       DOCKER_HOST:
         sh: operations/scripts/swarm.sh
-    cmds:
-      - operations/scripts/secrets.py
-      - operations/scripts/secrets.py --render
-
-  deploy:
-    internal: true
-    deps: ['secret:sync']
-    env: *docker-env
     vars:
       STACKS:
         - {name: traefik, file: platform/ingress/traefik/stack.yml}
@@ -26,9 +18,10 @@ tasks:
         - {name: vaultwarden, file: platform/applications/vaultwarden/stack.yml}
         - {name: paperless, file: platform/applications/paperless-ngx/stack.yml}
     cmds:
+      - python operations/scripts/secrets.py
       - for: {var: STACKS}
-        cmd: docker stack deploy --resolve-image changed --compose-file {{.ITEM.file}} {{.ITEM.name}}
-      - defer: operations/scripts/secrets.py --clean
+        cmd: docker stack deploy --detach=false --resolve-image changed --compose-file {{.ITEM.file}} {{.ITEM.name}}
+      - defer: python operations/scripts/secrets.py clean
 
   status:
     desc: Show deployed Docker services
