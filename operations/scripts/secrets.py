@@ -94,6 +94,15 @@ def main():
         match = re.fullmatch(r"([A-Z][A-Z0-9_]*)=(ENC\[.+\])", line)
         if match:
             encrypted[match[1]] = match[2]
+    fields = tomllib.loads((ROOT / "secretspec.toml").read_text())["profiles"][
+        "production"
+    ]
+    for name in values:
+        if template := fields[name].get("composed"):
+            # Version composed secrets from their template and encrypted dependencies.
+            encrypted[name] = re.sub(
+                r"\$\{([^}]+)\}", lambda match: encrypted[match[1]], template
+            )
     missing = values.keys() - encrypted.keys()
     if missing:
         raise RuntimeError(

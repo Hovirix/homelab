@@ -3,6 +3,11 @@ services:
     image: grafana/grafana:13.2.3@sha256:b28bae15e219c998fb0e0424ed724930cc61b1f61fb404d47c862f9a23f9e572
 
     environment:
+      GF_DATABASE_TYPE: postgres
+      GF_DATABASE_HOST: postgres:5432
+      GF_DATABASE_NAME: grafana
+      GF_DATABASE_USER: grafana
+      GF_DATABASE_PASSWORD__FILE: /run/secrets/postgres_grafana_password
       GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
@@ -27,6 +32,7 @@ services:
       GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
 
     secrets:
+      - postgres_grafana_password
       - grafana_admin_password
       - grafana_client_id
       - grafana_client_secret
@@ -58,6 +64,7 @@ services:
         target: /etc/grafana/provisioning/alerting/authentik.yml
 
     networks:
+      - postgres
       - observability
       - traefik
 
@@ -233,6 +240,9 @@ services:
         condition: on-failure
 
 networks:
+  postgres:
+    external: true
+
   observability:
     name: observability
     attachable: true
@@ -302,6 +312,10 @@ configs:
     file: ./configs/alloy/traefik.alloy
 
 secrets:
+  postgres_grafana_password:
+    external: true
+    name: "postgres_grafana_password_2201e1894f9b"
+
   grafana_admin_password:
     external: true
     name: "grafana_admin_password_01094f120f29"

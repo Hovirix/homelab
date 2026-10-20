@@ -3,6 +3,7 @@ services:
     image: vaultwarden/server:1.37.2@sha256:094b5689ed81549bd293418395c7cf495ae9d960fc2d4928cef2083ef913d912
 
     environment:
+      DATABASE_URL_FILE: /run/secrets/vaultwarden_database_url
       DOMAIN: https://vaultwarden.hovirix.dev
       SIGNUPS_ALLOWED: "false"
       INVITATIONS_ALLOWED: "false"
@@ -14,10 +15,12 @@ services:
       SSO_CLIENT_SECRET_FILE: /run/secrets/vaultwarden_client_secret
 
     secrets:
+      - vaultwarden_database_url
       - vaultwarden_client_id
       - vaultwarden_client_secret
 
     networks:
+      - postgres
       - traefik
 
     volumes:
@@ -50,10 +53,17 @@ services:
         condition: on-failure
 
 networks:
+  postgres:
+    external: true
+
   traefik:
     external: true
 
 secrets:
+  vaultwarden_database_url:
+    external: true
+    name: "vaultwarden_database_url_3b24ec701c5c"
+
   vaultwarden_client_id:
     external: true
     name: "vaultwarden_client_id_6b084351cc1c"
