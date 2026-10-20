@@ -1,0 +1,38 @@
+// METRICS — Traefik
+
+discovery.relabel "traefik" {
+	targets = discovery.docker.local.targets
+
+	rule {
+		action        = "keep"
+		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+		regex         = "traefik_proxy"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_network_ip"]
+		regex         = "(.+)"
+		replacement   = "${1}:8082"
+		target_label  = "__address__"
+	}
+}
+
+prometheus.scrape "traefik" {
+	targets         = discovery.relabel.traefik.output
+	forward_to      = [prometheus.relabel.traefik.receiver]
+	scrape_interval = "15s"
+}
+
+prometheus.relabel "traefik" {
+	forward_to = [prometheus.remote_write.default.receiver]
+
+	rule {
+		replacement  = "traefik"
+		target_label = "job"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
+}

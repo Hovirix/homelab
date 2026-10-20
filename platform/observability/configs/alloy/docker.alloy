@@ -1,0 +1,20 @@
+// LOGS — Docker / Swarm
+
+discovery.docker "local" {
+	host = "unix:///var/run/docker.sock"
+}
+
+discovery.relabel "docker_logs" {
+	targets = discovery.docker.local.targets
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+		target_label  = "service_name"
+	}
+}
+
+loki.source.docker "local" {
+	host       = "unix:///var/run/docker.sock"
+	targets    = discovery.relabel.docker_logs.output
+	forward_to = [loki.write.default.receiver]
+}

@@ -1,0 +1,68 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: containers
+    folder: Alerts
+    interval: 1m
+
+    rules:
+
+      # CONTAINER OOM
+      # Critical when cAdvisor records one or more container OOM events.
+      # The 10-minute window prevents very short-lived OOM events being missed.
+      - uid: container-oom
+        title: "Containers: OOM detected"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                sum by (node, stack, service, replica) (
+                  increase(container_oom_events_total{job="cadvisor"}[10m])
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Container OOM detected for {{ $labels.service }} on {{ $labels.node }}
+        labels:
+          severity: critical
+        isPaused: false

@@ -1,0 +1,15 @@
+// LOGS — Loki
+
+loki.write "default" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+	}
+}
+
+// METRICS — VictoriaMetrics
+
+prometheus.remote_write "default" {
+	endpoint {
+		url = "http://victoriametrics:8428/api/v1/write"
+	}
+}

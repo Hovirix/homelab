@@ -1,0 +1,72 @@
+// METRICS — Host / Unix
+
+prometheus.exporter.unix "host" {
+	rootfs_path = "/host/root"
+	procfs_path = "/host/proc"
+	sysfs_path  = "/host/sys"
+
+	set_collectors = [
+		// Compute.
+		"cpu",
+		"meminfo",
+		"loadavg",
+		"pressure",
+
+		// Storage.
+		"filesystem",
+		"diskstats",
+
+		// Network.
+		"netdev",
+		"netstat",
+		"conntrack",
+		"sockstat",
+
+		// Kernel.
+		"vmstat",
+		"stat",
+		"filefd",
+
+		// Host identity.
+		"os",
+		"uname",
+
+		// Clock.
+		"time",
+		"timex",
+	]
+
+	filesystem {
+		mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+	}
+
+	netdev {
+		device_exclude = "^(lo|veth.+|docker.+|br-.+)$"
+	}
+}
+
+prometheus.scrape "host" {
+	targets         = prometheus.exporter.unix.host.targets
+	forward_to      = [prometheus.relabel.host.receiver]
+	scrape_interval = "15s"
+}
+
+prometheus.relabel "host" {
+	forward_to = [prometheus.remote_write.default.receiver]
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "node"
+		target_label = "job"
+	}
+
+	// node is the canonical host identity.
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
+}

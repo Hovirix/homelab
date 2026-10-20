@@ -36,8 +36,26 @@ services:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
 
-      - source: grafana_alerting
-        target: /etc/grafana/provisioning/alerting/hx-lab.yml
+      - source: grafana_alerting_notifications
+        target: /etc/grafana/provisioning/alerting/notifications.yml
+
+      - source: grafana_alerting_nodes
+        target: /etc/grafana/provisioning/alerting/nodes.yml
+
+      - source: grafana_alerting_storage
+        target: /etc/grafana/provisioning/alerting/storage.yml
+
+      - source: grafana_alerting_containers
+        target: /etc/grafana/provisioning/alerting/containers.yml
+
+      - source: grafana_alerting_postgres
+        target: /etc/grafana/provisioning/alerting/postgres.yml
+
+      - source: grafana_alerting_traefik
+        target: /etc/grafana/provisioning/alerting/traefik.yml
+
+      - source: grafana_alerting_authentik
+        target: /etc/grafana/provisioning/alerting/authentik.yml
 
     networks:
       - observability
@@ -140,7 +158,7 @@ services:
       - run
       - --server.http.listen-addr=0.0.0.0:12345
       - --storage.path=/var/lib/alloy
-      - /etc/alloy/config.alloy
+      - /etc/alloy/config.d
 
     user: "0:0"
 
@@ -151,8 +169,23 @@ services:
       ALLOY_NODE: "{{.Node.Hostname}}"
 
     configs:
-      - source: alloy_config
-        target: /etc/alloy/config.alloy
+      - source: alloy_outputs
+        target: /etc/alloy/config.d/outputs.alloy
+
+      - source: alloy_docker
+        target: /etc/alloy/config.d/docker.alloy
+
+      - source: alloy_journal
+        target: /etc/alloy/config.d/journal.alloy
+
+      - source: alloy_host
+        target: /etc/alloy/config.d/host.alloy
+
+      - source: alloy_containers
+        target: /etc/alloy/config.d/containers.alloy
+
+      - source: alloy_traefik
+        target: /etc/alloy/config.d/traefik.alloy
 
     networks:
       - observability
@@ -212,17 +245,61 @@ configs:
     name: observability_grafana_datasources_v2
     file: ./configs/grafana/provisioning/datasources.yml
 
-  grafana_alerting:
-    name: observability_grafana_alerting
-    file: ./configs/grafana/provisioning/alerting/hx-lab.yml
+  grafana_alerting_notifications:
+    name: observability_grafana_alerting_notifications_v1
+    file: ./configs/grafana/provisioning/alerting/notifications.yml
+
+  grafana_alerting_nodes:
+    name: observability_grafana_alerting_nodes_v1
+    file: ./configs/grafana/provisioning/alerting/nodes.yml
+
+  grafana_alerting_storage:
+    name: observability_grafana_alerting_storage_v1
+    file: ./configs/grafana/provisioning/alerting/storage.yml
+
+  grafana_alerting_containers:
+    name: observability_grafana_alerting_containers_v1
+    file: ./configs/grafana/provisioning/alerting/containers.yml
+
+  grafana_alerting_postgres:
+    name: observability_grafana_alerting_postgres_v1
+    file: ./configs/grafana/provisioning/alerting/postgres.yml
+
+  grafana_alerting_traefik:
+    name: observability_grafana_alerting_traefik_v1
+    file: ./configs/grafana/provisioning/alerting/traefik.yml
+
+  grafana_alerting_authentik:
+    name: observability_grafana_alerting_authentik_v1
+    file: ./configs/grafana/provisioning/alerting/authentik.yml
 
   loki_config:
     name: observability_loki_config_v2
     file: ./configs/loki/config.yml
 
-  alloy_config:
-    name: observability_alloy_config_v9
-    file: ./configs/alloy/config.alloy
+  alloy_outputs:
+    name: observability_alloy_outputs_v1
+    file: ./configs/alloy/outputs.alloy
+
+  alloy_docker:
+    name: observability_alloy_docker_v1
+    file: ./configs/alloy/docker.alloy
+
+  alloy_journal:
+    name: observability_alloy_journal_v1
+    file: ./configs/alloy/journal.alloy
+
+  alloy_host:
+    name: observability_alloy_host_v1
+    file: ./configs/alloy/host.alloy
+
+  alloy_containers:
+    name: observability_alloy_containers_v1
+    file: ./configs/alloy/containers.alloy
+
+  alloy_traefik:
+    name: observability_alloy_traefik_v1
+    file: ./configs/alloy/traefik.alloy
 
 secrets:
   grafana_admin_password:
