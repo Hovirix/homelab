@@ -1,8 +1,12 @@
 version: "3"
 
+vars:
+  MENU_GROUP: INFRASTRUCTURE
+  MENU_ORDER: 3
+
 tasks:
   plan:
-    desc: Preview infrastructure changes
+    desc: Preview infrastructure changes with OpenTofu
     deps:
       - adguardhome:plan
       - proxmox:plan
@@ -10,7 +14,7 @@ tasks:
       - hetzner:plan
 
   apply:
-    desc: Apply infrastructure changes
+    desc: Apply infrastructure changes with OpenTofu
     prompt: Apply infrastructure changes?
     cmds:
       - task: adguardhome:apply

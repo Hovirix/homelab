@@ -2,19 +2,21 @@ version: "3"
 
 vars:
   PVE: root@pve.home.hovirix.dev
+  MENU_GROUP: BACKUP & RESTORE
+  MENU_ORDER: 7
 
 tasks:
   backup:
-    desc: Back up Borgmatic ZFS snapshots off-site
+    desc: Back up application ZFS snapshots to off-site Borg storage
     cmds:
       - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} systemctl start borgmatic.service
 
   restore:local:
-    desc: Interactively roll back one dataset to a Sanoid recovery point
+    desc: Roll back a selected ZFS dataset and discard newer data and snapshots
     cmds:
       - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore local
 
   restore:offsite:
-    desc: Interactively extract a Borg recovery point below /rpool/restore
+    desc: Extract a selected Borg backup into an isolated recovery directory
     cmds:
       - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore offsite

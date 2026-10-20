@@ -2,6 +2,10 @@ version: "3"
 
 silent: true
 
+vars:
+  MENU_GROUP: GENERAL
+  MENU_ORDER: 1
+
 includes:
   backup-restore:
     taskfile: operations/taskfiles/backup-restore.yml
@@ -23,16 +27,49 @@ includes:
     taskfile: operations/taskfiles/services.yml
 
 tasks:
-  check:
-    desc: Run all local validation
-    cmds:
-      - task: check:lint
-      - task: check:security
+  test:
+    cmd: ./operations/scripts/test.py
 
   deploy:
-    desc: Deploy/update all services
+    desc: Deploy or update all configured Swarm stacks
     cmds:
       - task: services:deploy
 
-  test:
-    cmd: ./operations/scripts/test.py
+  status:
+    desc: List Swarm nodes and deployed services
+    cmds:
+      - printf "\n"
+      - task: swarm:status
+      - printf "\n"
+      - task: services:status
+
+  default:
+    cmd: |
+      tab="$(printf '\t')"
+      printf 'HX Lab — Available Tasks\n'
+      task --list --json |
+        jq -r '.tasks[] | select(.desc != "") | [.name, .desc, .location.taskfile] | @tsv' |
+        while IFS="$tab" read -r name desc taskfile; do
+          group="$(yq -r '.vars.MENU_GROUP' "$taskfile")"
+          group_order="$(yq -r '.vars.MENU_ORDER' "$taskfile")"
+          task_order=0
+          while IFS= read -r source_task; do
+            task_order=$((task_order + 1))
+            case "$name" in
+              "$source_task"|*":$source_task") break ;;
+            esac
+          done <<EOF
+      $(yq -r '.tasks | keys | .[]' "$taskfile")
+      EOF
+          printf '%s\t%s\t%03d\t%s\t%s\n' "$group_order" "$group" "$task_order" "$name" "$desc"
+        done |
+        sort -t "$tab" -k1,1n -k3,3n |
+        awk -F "$tab" '
+          BEGIN { bold_white = "\033[1;37m"; cyan = "\033[36m"; reset = "\033[0m" }
+          $2 != group { print " "; print bold_white $2 reset; group = $2 }
+          { printf "  %s%-21s%s %s\n", cyan, $4, reset, $5 }
+        ' |
+        {
+          menu="$(cat)"
+          printf %s "$menu"
+        }

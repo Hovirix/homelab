@@ -1,5 +1,9 @@
 version: "3"
 
+vars:
+  MENU_GROUP: DOCKER SWARM
+  MENU_ORDER: 5
+
 env:
   PRIMARY_HOST: ssh://deploy@swarm-01.home.hovirix.dev
   MANAGER_HOSTS: >-
@@ -8,17 +12,17 @@ env:
   MANAGER_ENDPOINT: swarm-01.home.hovirix.dev:2377
 
 tasks:
-  init:
-    desc: Create the Docker Swarm and join its managers
-    cmds:
-      - operations/scripts/swarm.sh init
-
   status:
-    desc: Show Docker Swarm manager state
+    desc: List Swarm nodes and their manager status
     cmds:
       - operations/scripts/swarm.sh status
 
+  init:
+    desc: Initialize Swarm and join the remaining managers
+    cmds:
+      - operations/scripts/swarm.sh init
+
   rebuild:
-    desc: Recreate Docker Swarm
+    desc: Force all managers to leave and recreate Swarm
     cmds:
       - operations/scripts/swarm.sh rebuild

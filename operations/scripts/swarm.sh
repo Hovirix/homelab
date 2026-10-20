@@ -39,7 +39,7 @@ init() {
 }
 
 status() {
-  docker --host "$(swarm_manager_host)" node ls
+  docker --host "$(swarm_manager_host)" node ls --format 'table {{.Hostname}}\t{{.Status}}\t{{.Availability}}\t{{.ManagerStatus}}\t{{.EngineVersion}}'
 }
 
 rebuild() {

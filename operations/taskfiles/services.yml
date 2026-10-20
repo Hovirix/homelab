@@ -1,5 +1,9 @@
 version: "3"
 
+vars:
+  MENU_GROUP: SERVICES
+  MENU_ORDER: 6
+
 tasks:
 
   deploy:
@@ -20,11 +24,13 @@ tasks:
     cmds:
       - python operations/scripts/secrets.py
       - for: {var: STACKS}
-        cmd: docker stack deploy --detach=false --resolve-image changed --compose-file {{.ITEM.file}} {{.ITEM.name}}
+        cmd: |
+          printf '\nDeploying %s\n' '{{.ITEM.name | upper}}:'
+          docker stack deploy --detach=false --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
       - defer: python operations/scripts/secrets.py clean
 
   status:
-    desc: Show deployed Docker services
+    desc: List deployed services, replica counts, and images
     env: *docker-env
     cmds:
       - docker service ls --format 'table {{"{{"}}.Name{{"}}"}}\t{{"{{"}}.Replicas{{"}}"}}\t{{"{{"}}.Image{{"}}"}}'

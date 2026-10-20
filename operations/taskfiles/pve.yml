@@ -1,20 +1,24 @@
 version: "3"
 
-tasks:
-  bootstrap:
-    desc: Apply Proxmox VE host/datacenter configuration (Same as Apply just ask for password)
-    dir: infrastructure/ansible
-    cmds:
-      - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --ask-pass
+vars:
+  MENU_GROUP: PROXMOX VE
+  MENU_ORDER: 4
 
+tasks:
   plan:
-    desc: Preview Proxmox VE host/datacenter configuration
+    desc: Preview Proxmox host configuration changes with Ansible
     dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --check --diff
 
   apply:
-    desc: Apply Proxmox VE host/datacenter configuration
+    desc: Apply Proxmox host configuration with Ansible
     dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml
+
+  bootstrap:
+    desc: Configure Proxmox hosts using password-based SSH login
+    dir: infrastructure/ansible
+    cmds:
+      - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --ask-pass

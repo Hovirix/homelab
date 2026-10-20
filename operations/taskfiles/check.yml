@@ -1,11 +1,15 @@
 version: "3"
 
+vars:
+  MENU_GROUP: VALIDATION
+  MENU_ORDER: 2
+
 env:
   TRIVY_CONFIG: security/trivy.yaml
 
 tasks:
   lint:
-    desc: Run lint checks
+    desc: Check code, configuration, and formatting
     deps:
       - lint:actionlint
       - lint:nix
@@ -73,7 +77,7 @@ tasks:
     cmd: treefmt --ci --quiet
 
   security:
-    desc: Run security checks
+    desc: Scan for secrets, vulnerabilities, and security policy violations
     deps:
       - security:ci
       - security:policies
