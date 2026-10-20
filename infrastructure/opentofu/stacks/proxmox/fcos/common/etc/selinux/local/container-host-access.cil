@@ -6,6 +6,8 @@
 (allow container_t syslogd_var_run_t (file (getattr open read map)))
 (allow container_t cgroup_t (dir (getattr search open read watch watch_mount watch_sb watch_with_perm watch_reads)))
 (allow container_t init_t (file (getattr open read)))
+(allow container_t init_t (dir (search)))
+(allow container_t container_var_lib_t (file (getattr)))
 (allow container_t proc_t (dir (getattr search open read)))
 (allow container_t proc_t (file (getattr open read)))
 (allow container_t proc_t (lnk_file (getattr read)))

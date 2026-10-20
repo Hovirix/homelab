@@ -1,6 +1,9 @@
 // METRICS — Containers / cAdvisor
 
 prometheus.exporter.cadvisor "containers" {
+	containerd_host      = "/rootfs/run/containerd/containerd.sock"
+	containerd_namespace = "moby"
+
 	// Host metrics belong to exporter.unix.
 	docker_only               = true
 	disable_root_cgroup_stats = true

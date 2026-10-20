@@ -294,7 +294,7 @@ configs:
     file: ./configs/alloy/host.alloy
 
   alloy_containers:
-    name: observability_alloy_containers_v1
+    name: observability_alloy_containers_v2
     file: ./configs/alloy/containers.alloy
 
   alloy_traefik:
