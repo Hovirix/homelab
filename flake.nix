@@ -84,6 +84,7 @@
                 pyright
                 sops
                 tofu-ls
+                uv
                 yaml-language-server
               ]);
             # Small Fix for rootless docker

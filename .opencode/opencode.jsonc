@@ -11,33 +11,16 @@
   "mcp": {
     "servers": {
       "grafana": {
-        "disabled": false,
         "type": "local",
         "command": [
-          "secretspec",
-          "run",
-          "-P",
-          "production",
-          "-S",
-          "opencode",
-          "--reason",
-          "provide read-only Grafana observability access to OpenCode",
+          "secretspec", "run", "-P", "production", "-S", "opencode", "--reason", "provide read-only Grafana observability access to OpenCode",
           "--",
-          "docker",
-          "run",
-          "--rm",
-          "-i",
-          "-e",
-          "GRAFANA_URL",
-          "-e",
-          "GRAFANA_SERVICE_ACCOUNT_TOKEN",
-          "grafana/mcp-grafana:1.2.0",
-          "-t",
-          "stdio",
-          "--disable-write"
+          "uvx", "mcp-grafana", "--disable-write"
         ],
+        "cwd": ".",
         "environment": {
-          "GRAFANA_URL": "https://grafana.hovirix.dev"
+          "GRAFANA_URL": "https://grafana.hovirix.dev",
+          "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
         }
       }
     }
