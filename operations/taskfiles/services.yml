@@ -29,6 +29,14 @@ tasks:
           docker stack deploy --detach=false --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
       - defer: python operations/scripts/secrets.py clean
 
+  rm:
+    desc: 'Remove a stack and wait (usage: task services:rm -- STACK)'
+    env: *docker-env
+    preconditions:
+      - sh: test -n {{.CLI_ARGS | shellQuote}}
+        msg: 'Usage: task services:rm -- STACK'
+    cmd: operations/scripts/swarm.sh stack-rm {{.CLI_ARGS | shellQuote}}
+
   status:
     desc: List deployed services, replica counts, and images
     env: *docker-env

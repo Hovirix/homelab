@@ -42,6 +42,12 @@ status() {
   docker --host "$(swarm_manager_host)" node ls --format 'table {{.Hostname}}\t{{.Status}}\t{{.Availability}}\t{{.ManagerStatus}}\t{{.EngineVersion}}'
 }
 
+stack_rm() {
+  local stack="${1:?usage: swarm.sh stack-rm STACK}" manager
+  manager="$(swarm_manager_host)"
+  docker --host "$manager" stack rm --detach=false -- "$stack"
+}
+
 rebuild() {
   for host in "${manager_hosts[@]:1}" "$primary_host"; do
     if is_active "$host"; then
@@ -60,8 +66,11 @@ case "${1:-}" in
   init | status | rebuild)
     "$1"
     ;;
+  stack-rm)
+    stack_rm "${@:2}"
+    ;;
   *)
-    printf 'Usage: %s {init|status|rebuild}\n' "$0" >&2
+    printf 'Usage: %s {init|status|rebuild|stack-rm STACK}\n' "$0" >&2
     exit 1
     ;;
 esac

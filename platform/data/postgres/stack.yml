@@ -73,6 +73,11 @@ services:
       BACKUP_KEEP_WEEKS: "4"
       BACKUP_KEEP_MONTHS: "6"
 
+    configs:
+      - source: postgres_backup_wait
+        target: /hooks/01-wait-postgres
+        mode: 0555
+
     secrets:
       - postgres_superuser_password
 
@@ -125,6 +130,10 @@ networks:
     attachable: true
 
 configs:
+  postgres_backup_wait:
+    name: data_postgres_backup_wait_v1
+    file: ./configs/postgres-backup-wait.sh
+
   postgres_config:
     name: data_postgres_config
     file: ./configs/postgresql.conf

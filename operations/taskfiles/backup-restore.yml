@@ -13,10 +13,16 @@ tasks:
 
   restore:local:
     desc: Roll back a selected ZFS dataset and discard newer data and snapshots
+    prompt:
+      - '[1/2] Local rollback deletes newer data and snapshots. Continue?'
+      - '[2/2] Are affected stacks and dependencies removed, with containers fully stopped?'
     cmds:
       - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore local
 
   restore:offsite:
     desc: Extract a selected Borg backup into an isolated recovery directory
+    prompt:
+      - '[1/2] Extract backup to /rpool/restore without replacing live data. Continue?'
+      - '[2/2] Are affected stacks and dependencies removed, with containers fully stopped?'
     cmds:
       - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore offsite
