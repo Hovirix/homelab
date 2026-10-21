@@ -27,7 +27,7 @@ services:
       - --providers.swarm.exposedbydefault=false
       - --providers.swarm.network=traefik
 
-      - --certificatesresolvers.cloudflare.acme.email=hostmaster@hovirix.dev
+      - --certificatesresolvers.cloudflare.acme.email=homelab@hovirix.dev
       - --certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json
       - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
       - --certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
