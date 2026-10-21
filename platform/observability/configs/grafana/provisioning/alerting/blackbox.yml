@@ -1,0 +1,119 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: blackbox
+    folder: Alerts
+    interval: 1m
+
+    rules:
+      - uid: blackbox-service-unavailable
+        title: "Blackbox: service unavailable"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: probe_success{job="blackbox"}
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 1
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 3m
+        annotations:
+          summary: '{{ $labels.service }} HTTPS probe through Traefik is failing from {{ $labels.node }}'
+        labels:
+          severity: critical
+        isPaused: false
+
+      - uid: blackbox-probes-missing
+        title: "Blackbox: probes missing"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                (1 - up{job="blackbox"})
+                or absent_over_time(probe_success{job="blackbox",service="grafana"}[3m])
+                or absent_over_time(probe_success{job="blackbox",service="authentik"}[3m])
+                or absent_over_time(probe_success{job="blackbox",service="vaultwarden"}[3m])
+                or absent_over_time(probe_success{job="blackbox",service="paperless"}[3m])
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 3m
+        annotations:
+          summary: '{{ $labels.service }} blackbox probe metrics are missing or cannot be scraped'
+        labels:
+          severity: warning
+        isPaused: false

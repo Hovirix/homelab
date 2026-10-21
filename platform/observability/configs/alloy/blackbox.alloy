@@ -1,0 +1,70 @@
+// METRICS — HTTPS availability through internal Traefik routing
+
+prometheus.exporter.blackbox "services" {
+	config_file = "/etc/alloy/blackbox.yml"
+
+	target {
+		name    = "grafana"
+		address = "https://traefik_proxy:443/api/health"
+		module  = "http_2xx"
+		labels  = {service = "grafana"}
+	}
+
+	target {
+		name    = "authentik"
+		address = "https://traefik_proxy:443/-/health/ready/"
+		module  = "http_2xx"
+		labels  = {service = "authentik"}
+	}
+
+	target {
+		name    = "vaultwarden"
+		address = "https://traefik_proxy:443/alive"
+		module  = "http_2xx"
+		labels  = {service = "vaultwarden"}
+	}
+
+	target {
+		name    = "paperless"
+		address = "https://traefik_proxy:443/api/health/"
+		module  = "http_2xx"
+		labels  = {service = "paperless"}
+	}
+}
+
+discovery.relabel "blackbox" {
+	targets = prometheus.exporter.blackbox.services.targets
+
+	// Blackbox uses hostname for both the HTTP Host header and TLS SNI.
+	rule {
+		source_labels = ["service"]
+		replacement   = "${1}.hovirix.dev"
+		target_label  = "__param_hostname"
+	}
+}
+
+prometheus.scrape "blackbox" {
+	targets         = discovery.relabel.blackbox.output
+	forward_to      = [prometheus.relabel.blackbox.receiver]
+	scrape_interval = "30s"
+	scrape_timeout  = "10s"
+}
+
+prometheus.relabel "blackbox" {
+	forward_to = [prometheus.remote_write.default.receiver]
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "blackbox"
+		target_label = "job"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
+}
