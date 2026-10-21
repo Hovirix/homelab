@@ -20,6 +20,7 @@ loki.relabel "journal" {
 }
 
 loki.source.journal "system" {
+	path          = "/var/log/journal"
 	max_age       = "24h"
 	relabel_rules = loki.relabel.journal.rules
 	labels        = { job = "systemd-journal" }

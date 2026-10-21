@@ -309,7 +309,7 @@ configs:
     file: ./configs/alloy/docker.alloy
 
   alloy_journal:
-    name: observability_alloy_journal_v1
+    name: observability_alloy_journal_v2
     file: ./configs/alloy/journal.alloy
 
   alloy_host:
