@@ -34,3 +34,11 @@ tasks:
     env: *docker-env
     cmds:
       - docker service ls --format 'table {{"{{"}}.Name{{"}}"}}\t{{"{{"}}.Replicas{{"}}"}}\t{{"{{"}}.Image{{"}}"}}'
+
+  logs:
+    desc: 'Follow service logs (usage: task services:logs -- authentik_server)'
+    env: *docker-env
+    preconditions:
+      - sh: test -n {{.CLI_ARGS | shellQuote}}
+        msg: 'Usage: task services:logs -- authentik_server'
+    cmd: docker service logs --follow {{.CLI_ARGS | shellQuote}}
