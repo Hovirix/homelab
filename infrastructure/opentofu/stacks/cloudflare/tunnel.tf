@@ -28,7 +28,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
         hostname = "*.${local.domain}"
         service  = "https://traefik_proxy:443"
         origin_request = {
-          match_sni_to_host = true
+          origin_server_name = local.domain
         }
       },
       {
