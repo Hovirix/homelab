@@ -325,7 +325,7 @@ configs:
     file: ./configs/alloy/traefik.alloy
 
   alloy_blackbox:
-    name: observability_alloy_blackbox_v2
+    name: observability_alloy_blackbox_v3
     file: ./configs/alloy/blackbox.alloy
 
   alloy_blackbox_modules:

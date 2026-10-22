@@ -91,7 +91,7 @@ def test_services():
         "grafana": "https://grafana.hovirix.dev/api/health",
         "authentik": "https://authentik.hovirix.dev/",
         "vaultwarden": "https://vaultwarden.hovirix.dev/alive",
-        "paperless": "https://paperless.hovirix.dev/api/health/",
+        "paperless": "https://paperless.hovirix.dev/accounts/login/",
     }
 
     results = []
