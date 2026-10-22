@@ -68,7 +68,7 @@ services:
       POSTGRES_EXTRA_OPTS: ""
       SCHEDULE: "@daily"
       TZ: UTC
-      BACKUP_ON_START: "TRUE"
+      BACKUP_ON_START: "FALSE"
       BACKUP_KEEP_DAYS: "7"
       BACKUP_KEEP_WEEKS: "4"
       BACKUP_KEEP_MONTHS: "6"
