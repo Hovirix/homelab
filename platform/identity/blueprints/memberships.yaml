@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+
+version: 1
+
+metadata:
+  name: Application memberships
+
+entries:
+  - model: authentik_blueprints.metaapplyblueprint
+    attrs:
+      identifiers:
+        name: Grafana
+
+  - model: authentik_blueprints.metaapplyblueprint
+    attrs:
+      identifiers:
+        name: Paperless
+
+  - model: authentik_blueprints.metaapplyblueprint
+    attrs:
+      identifiers:
+        name: Vaultwarden
+
+  - model: authentik_core.user
+    identifiers:
+      username: akadmin
+    attrs:
+      groups:
+        - !Find [authentik_core.group, [name, authentik Admins]]
+        - !Find [authentik_core.group, [name, paperless-admins]]
+        - !Find [authentik_core.group, [name, grafana-admins]]
+        - !Find [authentik_core.group, [name, vaultwarden-users]]

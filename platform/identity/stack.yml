@@ -92,6 +92,8 @@ services:
         target: /blueprints/provider_paperless.yaml
       - source: authentik_provider_vaultwarden
         target: /blueprints/provider_vaultwarden.yaml
+      - source: authentik_memberships
+        target: /blueprints/memberships.yaml
 
     secrets:
       - authentik_secret_key
@@ -144,16 +146,20 @@ configs:
     file: ./blueprints/stages.yaml
 
   authentik_provider_grafana:
-    name: identity_authentik_provider_grafana_20261005
+    name: identity_authentik_provider_grafana_20261022
     file: ./blueprints/provider_grafana.yaml
 
   authentik_provider_paperless:
-    name: identity_authentik_provider_paperless_20261005
+    name: identity_authentik_provider_paperless_20261022
     file: ./blueprints/provider_paperless.yaml
 
   authentik_provider_vaultwarden:
     name: identity_authentik_provider_vaultwarden_20261005
     file: ./blueprints/provider_vaultwarden.yaml
+
+  authentik_memberships:
+    name: identity_authentik_memberships_20261022
+    file: ./blueprints/memberships.yaml
 
 secrets:
   authentik_secret_key:

@@ -37,6 +37,7 @@ entries:
     attrs:
       name: Grafana
       provider: !KeyOf grafana-provider
+      policy_engine_mode: any
 
   - model: authentik_core.group
     id: grafana-admins
@@ -49,3 +50,15 @@ entries:
       order: 0
     attrs:
       group: !KeyOf grafana-admins
+
+  - model: authentik_core.group
+    id: grafana-users
+    identifiers:
+      name: grafana-users
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf grafana-application
+      order: 1
+    attrs:
+      group: !KeyOf grafana-users

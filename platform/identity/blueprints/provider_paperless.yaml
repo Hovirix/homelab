@@ -35,6 +35,7 @@ entries:
     attrs:
       name: Paperless
       provider: !KeyOf paperless-provider
+      policy_engine_mode: any
 
   - model: authentik_core.group
     id: paperless-users
@@ -47,3 +48,15 @@ entries:
       order: 0
     attrs:
       group: !KeyOf paperless-users
+
+  - model: authentik_core.group
+    id: paperless-admins
+    identifiers:
+      name: paperless-admins
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf paperless-application
+      order: 1
+    attrs:
+      group: !KeyOf paperless-admins
