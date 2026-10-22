@@ -17,6 +17,7 @@ services:
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
 
       - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.forwardedheaders.trustedips=10.254.0.0/24
       - --entrypoints.websecure.http.tls.certresolver=cloudflare
       - --entrypoints.websecure.http.tls.domains[0].main=hovirix.dev
       - --entrypoints.websecure.http.tls.domains[0].sans=*.hovirix.dev
@@ -42,6 +43,7 @@ services:
 
     networks:
       - traefik
+      - cloudflared
       - socket-proxy
 
     ports:
@@ -115,6 +117,12 @@ networks:
   traefik:
     name: traefik
     attachable: true
+
+  cloudflared:
+    name: cloudflared
+    ipam:
+      config:
+        - subnet: 10.254.0.0/24
 
   socket-proxy:
     internal: true

@@ -15,7 +15,7 @@ services:
       - cloudflared_tunnel_token
 
     networks:
-      - traefik
+      - cloudflared
 
     healthcheck:
       test:
@@ -37,7 +37,7 @@ services:
         condition: on-failure
 
 networks:
-  traefik:
+  cloudflared:
     external: true
 
 secrets:
