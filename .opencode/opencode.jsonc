@@ -4,8 +4,6 @@
   "permissions": [
     { "action": "shell", "resource": "sops", "effect": "deny" },
     { "action": "shell", "resource": "sops *", "effect": "deny" },
-    { "action": "shell", "resource": "task services:secret:sync*", "effect": "deny" },
-    { "action": "shell", "resource": "*operations/scripts/secrets.py*", "effect": "deny" },
   ],
 
   "mcp": {

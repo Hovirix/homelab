@@ -1,40 +1,47 @@
-# HX Lab
+# Context
 
-HX Lab is a desired-state homelab repository. Repository configuration describes intended state; runtime state requires runtime evidence.
+HX Lab is a desired-state homelab repository treated as production.
 
 ## Map
 
 - `infrastructure/opentofu/` manages infrastructure.
 - `infrastructure/ansible/` configures Proxmox VE.
 - `platform/` contains Docker Swarm desired state.
-- `operations/` contains Task workflows and supporting scripts.
+- `operations/` contains Task workflows and worker scripts.
 - `secrets/` contains encrypted production secrets.
-- `operations/taskfiles/services.yml` owns service deployment order and stack naming.
 
-Fedora CoreOS is authored in `infrastructure/opentofu/stacks/proxmox/fcos/swarm-*.bu`; generated `build/*.ign` must not be edited directly.
+- Infra = PVE, Fedora CoreOS, Cloudflare, Hetzner (backups)
+- Platform = Docker Swarm
+- Operations = Taskfile
 
-Persistent application data is independent from disposable Swarm state.
+Storage is shared between swarm nodes (Virtiofs under ZFS).
+Networking is managed separately at `https://github.com/hovirix/netlab`.
 
-Observability is intentionally `Alloy -> VictoriaMetrics/Loki -> Grafana -> mcp-grafana -> OpenCode`. Do not redesign it unless explicitly requested.
+## Philosophy
 
-## Boundaries
+- GitOps
+- KISS
+- DRY
+- Minimal dependencies
+- No unnecessary documentation
 
-Prefer Task entrypoints when they encapsulate credentials, ordering, host selection, secrets, or generated artifacts.
+## Code constraints
 
-Remote mutation, deployment, restore, destructive storage operations, secret rotation, and infrastructure apply/destroy require explicit user authorization.
-
-Never decrypt or print secret values for inspection.
-
-Do not infer runtime health, placement, or successful deployment from repository configuration.
-
-Use `task check:lint` for normal local validation. Run `task check` or `task check:security` only when explicitly requested.
+- Strictly minimal code
+- Repetition and clarity > abstraction
+- Upstream implementations > custom glue code
+- Taskfiles call the script directly no need for bash python prefix before or path fidings in worker scripts.
 
 ## Git
 
-Use `type(scope): lowercase description` for commits, issues, and pull requests. Allowed types: `feat`, `fix`, `refactor`, `chore`. Allowed scopes: `infrastructure`, `platform`, `operations`, `security`, `secrets`, `tools`, `deps`.
-Issues: body uses `Goal`, `Context`, `Done when`.
-Pull requests: body uses `What`, `Checks`.
+Prefix every git commands with rtk.
 
-## Documentation
+Use `type(scope): lowercase description` for commits, issues, and pull requests.
 
-Keep documentation minimal. Executable configuration is the operational source of truth.
+Allowed types: `feat`, `fix`, `refactor`, `chore`.
+
+Allowed scopes: `infrastructure`, `platform`, `operations`, `security`, `secrets`, `tools`, `deps`.
+
+Issues: use `Goal`, `Context`, and `Done when` headings.
+
+Pull requests: use `What` and `Checks` headings in the body.
