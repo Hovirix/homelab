@@ -34,7 +34,7 @@ services:
       mode: global
 
       restart_policy:
-        condition: on-failure
+        condition: any
 
 networks:
   cloudflared:
