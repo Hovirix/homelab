@@ -31,6 +31,7 @@ Networking is managed separately at `https://github.com/hovirix/netlab`.
 - Repetition and clarity > abstraction
 - Upstream implementations > custom glue code
 - Taskfiles call the script directly no need for bash python prefix before or path fidings in worker scripts.
+- Task should orchestrate workers; workers should not call each other.
 
 ## Git
 

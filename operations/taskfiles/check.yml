@@ -79,11 +79,16 @@ tasks:
   security:
     desc: Scan for secrets, vulnerabilities, and security policy violations
     deps:
+      - security:static
+      - security:vuln
+
+  security:static:
+    desc: Audit workflows, policies, IaC, and secrets
+    deps:
       - security:ci
       - security:policies
       - security:iac
       - security:secrets
-      - security:vuln
 
   security:prepare:
     internal: true
@@ -111,5 +116,18 @@ tasks:
     cmd: trivy fs --scanners secret --exit-code 1 --format sarif --output .artifacts/security/sarif/secrets.sarif .
 
   security:vuln:
+    desc: Scan all current images and show vulnerabilities at a glance
+    cmd: |
+      scan_status=0
+      operations/scripts/security-scan.py || scan_status=$?
+      operations/scripts/security-report.py || exit $?
+      exit "$scan_status"
+
+  security:scan:
+    desc: Collect image scans using a single database snapshot
     deps: ['security:prepare']
-    cmd: operations/scripts/security-vuln.sh
+    cmd: operations/scripts/security-scan.py
+
+  security:report:
+    desc: Validate scan results, report changes, and apply the security gate
+    cmd: operations/scripts/security-report.py

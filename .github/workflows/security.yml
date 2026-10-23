@@ -18,10 +18,16 @@ jobs:
     permissions:
       contents: read
       security-events: write
+      pull-requests: write
     env:
       TRIVY_CACHE_DIR: /home/runner/.cache/trivy
       SECURITY_MODE: ${{ github.event_name == 'pull_request' && 'pr' || 'full' }}
       SECURITY_BASE_REF: ${{ github.event.pull_request.base.sha }}
+      REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      PUBLISH_SECURITY: >-
+        ${{ github.actor != 'dependabot[bot]' &&
+            (github.event_name != 'pull_request' ||
+             github.event.pull_request.head.repo.full_name == github.repository) }}
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -47,48 +53,59 @@ jobs:
         id: tools
         run: nix develop .#ci --command true
 
-      - name: Audit Actions
+      - name: Validate workflows, policies, IaC, and secrets
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:ci
+        run: nix develop .#ci --command task check:security:static
 
-      - name: Check policies
+      - name: Scan images
+        id: scan
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:policies
+        run: nix develop .#ci --command task check:security:scan
 
-      - name: Scan IaC
-        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:iac
+      - name: Report image changes and apply security gate
+        id: report
+        if: ${{ !cancelled() && steps.scan.outcome != 'skipped' }}
+        run: nix develop .#ci --command task check:security:report
 
-      - name: Scan secrets
-        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:secrets
-
-      - name: Compare and scan images
-        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:vuln
+      - name: Comment image security results
+        if: >-
+          ${{ !cancelled() && github.event_name == 'pull_request' &&
+              env.PUBLISH_SECURITY == 'true' && steps.report.outcome != 'skipped' &&
+              hashFiles('.artifacts/security/comment.md') != '' }}
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # v2
+        with:
+          header: image-security
+          path: .artifacts/security/comment.md
+          skip_unchanged: true
 
       - name: Upload Actions findings
-        if: ${{ !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && hashFiles('.artifacts/security/sarif/ci.sarif') != '' }}
+        if: >-
+          ${{ !cancelled() && env.PUBLISH_SECURITY == 'true' &&
+              hashFiles('.artifacts/security/sarif/ci.sarif') != '' }}
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: .artifacts/security/sarif/ci.sarif
           category: zizmor
 
       - name: Upload IaC findings
-        if: ${{ !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && hashFiles('.artifacts/security/sarif/iac.sarif') != '' }}
+        if: >-
+          ${{ !cancelled() && env.PUBLISH_SECURITY == 'true' &&
+              hashFiles('.artifacts/security/sarif/iac.sarif') != '' }}
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: .artifacts/security/sarif/iac.sarif
           category: trivy-iac
 
       - name: Upload image findings
-        if: ${{ !cancelled() && github.actor != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) && hashFiles('.artifacts/security/sarif/images/*.sarif') != '' }}
+        if: >-
+          ${{ !cancelled() && env.PUBLISH_SECURITY == 'true' &&
+              hashFiles('.artifacts/security/sarif/images/*.sarif') != '' }}
         uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: .artifacts/security/sarif/images
 
       - name: Upload image reports
-        if: ${{ !cancelled() && hashFiles('.artifacts/security/json/images/*.json') != '' }}
+        if: ${{ !cancelled() && steps.report.outcome != 'skipped' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: image-security
@@ -96,5 +113,8 @@ jobs:
             .artifacts/security/json/images
             .artifacts/security/sarif/images
             .artifacts/security/summary.md
+            .artifacts/security/manifest.json
+            .artifacts/security/database.json
+            .artifacts/security/comment.md
           include-hidden-files: true
           retention-days: 14
