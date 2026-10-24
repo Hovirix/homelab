@@ -77,7 +77,7 @@ services:
         failure_action: rollback
 
       restart_policy:
-        condition: on-failure
+        condition: any
 
 networks:
   postgres:
