@@ -6,6 +6,9 @@ vars:
   MENU_GROUP: GENERAL
   MENU_ORDER: 1
 
+env:
+  MANAGER_HOSTS: ssh://deploy@swarm-01.home.hovirix.dev ssh://deploy@swarm-02.home.hovirix.dev ssh://deploy@swarm-03.home.hovirix.dev
+
 includes:
   backup-restore:
     taskfile: operations/taskfiles/backup-restore.yml

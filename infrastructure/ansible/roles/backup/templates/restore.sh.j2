@@ -3,7 +3,7 @@
 set -euo pipefail
 umask 077
 
-mode="${1:?usage: restore local|offsite}"
+mode="${1:?usage: restore local|offsite DATASET...|extract}"
 parent='rpool/swarm'
 
 pick() {
@@ -46,8 +46,27 @@ restore_local() {
   zfs rollback -r "$snapshot"
 }
 
+validate_target() {
+  local dataset="$1"
+  [[ $dataset =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]] &&
+    [[ $(zfs get -H -o value mounted "$parent/$dataset") == yes ]] &&
+    [[ $(zfs get -H -o value mountpoint "$parent/$dataset") == "/$parent/$dataset" ]] &&
+    [[ $(realpath -e "/$parent/$dataset") == "/$parent/$dataset" ]] || {
+      printf 'Invalid or unmounted target dataset: %s\n' "$dataset" >&2
+      return 1
+    }
+}
+
 restore_offsite() {
-  local archive archive_listing dataset dataset_listing destination
+  local archive archive_listing dataset dataset_listing destination confirmation index
+  local -a datasets available destinations=()
+  datasets=("$@")
+  if [[ $mode == offsite ]]; then
+    (( ${#datasets[@]} )) || { printf 'Pass at least one dataset.\n' >&2; return 1; }
+    for dataset in "${datasets[@]}"; do
+      validate_target "$dataset"
+    done
+  fi
 
   archive_listing="$(mktemp)"
   if ! borgmatic --no-color -l --short >"$archive_listing"; then
@@ -63,32 +82,60 @@ restore_offsite() {
     rm -f "$dataset_listing"
     return 1
   fi
-  mapfile -t datasets < <(awk -F/ '$1 == "rpool" && $2 == "swarm" && NF >= 3 { print $3 }' "$dataset_listing" | sort -u)
+  mapfile -t available < <(awk -F/ '$1 == "rpool" && $2 == "swarm" && NF >= 3 { print $3 }' "$dataset_listing" | sort -u)
   rm -f "$dataset_listing"
-  pick 'Select dataset:' dataset "${datasets[@]}"
+  if [[ $mode == extract ]]; then
+    pick 'Select dataset:' dataset "${available[@]}"
+    datasets=("$dataset")
+  fi
+  for dataset in "${datasets[@]}"; do
+    [[ $dataset =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]] || return 1
+    if ! printf '%s\n' "${available[@]}" | grep -Fxq -- "$dataset"; then
+      printf 'Dataset %s is absent from archive %s.\n' "$dataset" "$archive" >&2
+      return 1
+    fi
+  done
 
   borgmatic check --only data --match-archives "$archive" --force
-  destination="$(mktemp -d "/rpool/restore/$dataset-$(date -u +%Y-%m-%d_%H-%M-%S)-XXXXXX")"
-  if ! borgmatic extract \
-    --archive "$archive" \
-    --path "$parent/$dataset" \
-    --destination "$destination" \
-    --strip-components 3; then
-    printf 'Extraction failed; inspect partial data at %s\n' "$destination" >&2
-    return 1
-  fi
-  if [[ -z $(find "$destination" -mindepth 1 -print -quit) ]]; then
-    printf 'Extraction produced no files at %s\n' "$destination" >&2
-    return 1
-  fi
-  printf 'Extracted archive to %s\n' "$destination"
+  for dataset in "${datasets[@]}"; do
+    destination="$(mktemp -d "/rpool/restore/$dataset-$(date -u +%Y-%m-%d_%H-%M-%S)-XXXXXX")"
+    if ! borgmatic extract \
+      --archive "$archive" \
+      --path "$parent/$dataset" \
+      --destination "$destination" \
+      --strip-components 2; then
+      printf 'Extraction failed; inspect partial data at %s\n' "$destination" >&2
+      return 1
+    fi
+    destination="$destination/$dataset"
+    if [[ ! -d $destination || -L $destination || -z $(find "$destination" -mindepth 1 -print -quit) ]]; then
+      printf 'Extraction produced no files at %s\n' "$destination" >&2
+      return 1
+    fi
+    destinations+=("$destination")
+    printf 'Extracted archive to %s\n' "$destination"
+  done
+  [[ $mode == offsite ]] || return 0
+
+  for index in "${!datasets[@]}"; do
+    printf '%s/ -> /%s/%s/\n' "${destinations[index]}" "$parent" "${datasets[index]}"
+  done
+  printf 'This overwrites live data and deletes files absent from the backup. Multi-dataset restores are not atomic.\n'
+  printf 'Keep affected workloads stopped and deployments paused until recovery is verified.\n'
+  read -r -p 'Type RESTORE to continue: ' confirmation
+  [[ $confirmation == RESTORE ]] || return 1
+  for index in "${!datasets[@]}"; do
+    dataset="${datasets[index]}"
+    validate_target "$dataset"
+    rsync -aHAX --checksum --numeric-ids --delete --exclude=/.zfs/ -- "${destinations[index]}/" "/$parent/$dataset/"
+  done
 }
 
 case "$mode" in
   local) restore_local ;;
-  offsite) restore_offsite ;;
+  offsite | extract) restore_offsite "${@:2}" ;;
   *)
-    printf 'usage: %s local|offsite\n' "$0" >&2
+    printf 'usage: %s local|offsite DATASET...|extract\n' "$0" >&2
     exit 2
     ;;
 esac

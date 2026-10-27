@@ -14,15 +14,20 @@ tasks:
   restore:local:
     desc: Roll back a selected ZFS dataset and discard newer data and snapshots
     prompt:
-      - '[1/2] Local rollback deletes newer data and snapshots. Continue?'
-      - '[2/2] Are affected stacks and dependencies removed, with containers fully stopped?'
+      - 'WARNING: Rollback permanently deletes newer data and snapshots !'
+      - 'Did you stop all affected workloads ?'
     cmds:
       - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore local
 
   restore:offsite:
-    desc: Extract a selected Borg backup into an isolated recovery directory
+    desc: 'Restore datasets from one Borg archive (usage: task restore:offsite -- paperless postgres)'
     prompt:
-      - '[1/2] Extract backup to /rpool/restore without replacing live data. Continue?'
-      - '[2/2] Are affected stacks and dependencies removed, with containers fully stopped?'
+      - 'Remove affected stacks and dependencies, and pause deployments until recovery finishes. Continue?'
     cmds:
-      - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore offsite
+      - operations/scripts/swarm.sh assert-unused {{range .CLI_ARGS_LIST}}{{. | shellQuote}} {{end}}
+      - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore offsite {{range .CLI_ARGS_LIST}}{{. | shellQuote}} {{end}}
+
+  restore:extract:
+    desc: Extract a Borg backup without replacing live data
+    cmds:
+      - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore extract
