@@ -211,3 +211,54 @@ groups:
         labels:
           severity: critical
         isPaused: false
+
+      - uid: postgres-dump-validation-failed
+        title: "PostgreSQL backup: dump validation failed"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: logs
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: loki
+                uid: logs
+              editorMode: code
+              expr: sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |~ `^postgres_dump_validation_failed$` [15m])) or vector(0)
+              instant: true
+              queryType: instant
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: PostgreSQL dump is missing, empty, stale, or invalid; Borgmatic continued
+        labels:
+          severity: critical
+        isPaused: false

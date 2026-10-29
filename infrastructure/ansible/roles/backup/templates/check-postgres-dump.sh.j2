@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+dump=$1
+
+if [[ ! -s "$dump" ]]; then
+  printf 'PostgreSQL dump missing or empty: %s\n' "$dump" >&2
+  exit 1
+fi
+
+modified=$(stat -L -c %Y -- "$dump")
+age=$(( $(date +%s) - modified ))
+if (( age < 0 || age > 108000 )); then
+  printf 'PostgreSQL dump timestamp outside the last 30 hours: %s\n' "$dump" >&2
+  exit 1
+fi
+
+gzip -t -- "$dump"

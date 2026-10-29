@@ -131,7 +131,7 @@ networks:
 
 configs:
   postgres_backup_wait:
-    name: data_postgres_backup_wait_v1
+    name: data_postgres_backup_wait_v2
     file: ./configs/postgres-backup-wait.sh
 
   postgres_config:

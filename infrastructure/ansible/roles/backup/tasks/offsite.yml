@@ -87,6 +87,8 @@
   loop:
     - src: restore.sh.j2
       dest: /usr/local/sbin/restore
+    - src: check-postgres-dump.sh.j2
+      dest: /usr/local/sbin/check-postgres-dump
 
 - name: Create isolated off-site restore directory
   ansible.builtin.file:
