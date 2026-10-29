@@ -33,6 +33,12 @@
     mode: "0600"
   no_log: true
 
+- name: Read Borgmatic version
+  ansible.builtin.command: borgmatic --version
+  register: backup_borgmatic_version
+  changed_when: false
+  check_mode: false
+
 - name: Write Borgmatic configuration
   ansible.builtin.template:
     src: borgmatic.yaml.j2

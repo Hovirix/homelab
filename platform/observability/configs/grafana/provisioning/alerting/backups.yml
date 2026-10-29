@@ -1,0 +1,110 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: backups
+    folder: Alerts
+    interval: 1m
+
+    rules:
+      - uid: backup-failed
+        title: "Backup: failed"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: logs
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: loki
+                uid: logs
+              editorMode: code
+              expr: sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |~ `^Failed backup$` [15m])) or vector(0)
+              instant: true
+              queryType: instant
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: PVE borgmatic reported a backup failure
+        labels:
+          severity: critical
+        isPaused: false
+
+      - uid: backup-success-missing
+        title: "Backup: successful archive overdue"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: logs
+            relativeTimeRange:
+              from: 108000
+              to: 0
+            model:
+              datasource:
+                type: loki
+                uid: logs
+              editorMode: code
+              expr: sum(absent_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |~ `^borgmatic_archive_created$` [30h])) or vector(0)
+              instant: true
+              queryType: instant
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: PVE has not reported a successfully created backup archive in 30 hours
+        labels:
+          severity: critical
+        isPaused: false
