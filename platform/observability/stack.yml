@@ -308,7 +308,7 @@ configs:
     file: ./configs/grafana/provisioning/alerting/blackbox.yml
 
   grafana_alerting_backups:
-    name: observability_grafana_alerting_backups_v2
+    name: observability_grafana_alerting_backups_v3
     file: ./configs/grafana/provisioning/alerting/backups.yml
 
   loki_config:

@@ -32,12 +32,18 @@ loki:
 # Generic monitoring success also covers prune/check, not just archive creation.
 {% if backup_borgmatic_version.stdout is version('2.0.3', '>=') %}
 commands:
+  - before: action
+    when: [create]
+    run:
+      - /usr/local/sbin/check-postgres-dump /rpool/swarm/postgres/backups/daily/postgres-latest.sql.gz || echo postgres_dump_validation_failed
   - after: action
     when: [create]
     states: [finish]
     run:
       - echo borgmatic_archive_created
 {% else %}
+before_backup:
+  - /usr/local/sbin/check-postgres-dump /rpool/swarm/postgres/backups/daily/postgres-latest.sql.gz || echo postgres_dump_validation_failed
 after_backup:
   - echo borgmatic_archive_created
 {% endif %}
