@@ -1,6 +1,8 @@
-resource "cloudflare_dns_record" "wildcard" {
+resource "cloudflare_dns_record" "apps" {
+  for_each = local.hostnames
+
   zone_id = local.zone_id
-  name    = "*"
+  name    = each.key
   type    = "CNAME"
   content = "${cloudflare_zero_trust_tunnel_cloudflared.homelab.id}.cfargotunnel.com"
   proxied = true
@@ -23,17 +25,18 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "homelab" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.homelab.id
 
   config = {
-    ingress = [
-      {
-        hostname = "*.${local.domain}"
+    ingress = concat([
+      for hostname in local.hostnames : {
+        hostname = hostname
         service  = "https://traefik_proxy:443"
         origin_request = {
           origin_server_name = local.domain
         }
-      },
+      }
+      ], [
       {
         service = "http_status:404"
       },
-    ]
+    ])
   }
 }
