@@ -66,6 +66,9 @@ services:
       - source: grafana_alerting_blackbox
         target: /etc/grafana/provisioning/alerting/blackbox.yml
 
+      - source: grafana_alerting_backups
+        target: /etc/grafana/provisioning/alerting/backups.yml
+
     networks:
       - postgres
       - observability
@@ -146,6 +149,7 @@ services:
 
     networks:
       - observability
+      - traefik
 
     volumes:
       - type: bind
@@ -154,6 +158,13 @@ services:
 
     deploy:
       replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.loki-push.rule=Host(`loki.hovirix.dev`) && Path(`/loki/api/v1/push`) && Method(`POST`)
+        - traefik.http.routers.loki-push.entrypoints=websecure
+        - traefik.http.routers.loki-push.service=loki-ingest
+        - traefik.http.services.loki-ingest.loadbalancer.server.port=3100
 
       update_config:
         failure_action: rollback
@@ -295,6 +306,10 @@ configs:
   grafana_alerting_blackbox:
     name: observability_grafana_alerting_blackbox_v1
     file: ./configs/grafana/provisioning/alerting/blackbox.yml
+
+  grafana_alerting_backups:
+    name: observability_grafana_alerting_backups_v1
+    file: ./configs/grafana/provisioning/alerting/backups.yml
 
   loki_config:
     name: observability_loki_config_v2

@@ -18,3 +18,26 @@ keep_weekly: 4
 keep_monthly: 12
 
 zfs:
+
+loki:
+  url: https://loki.hovirix.dev/loki/api/v1/push
+  labels:
+    app: borgmatic
+    hostname: "{{ inventory_hostname }}"
+    config: __config
+{% if backup_borgmatic_version.stdout is version('2.1.0', '>=') %}
+  send_logs: true
+{% endif %}
+
+# Generic monitoring success also covers prune/check, not just archive creation.
+{% if backup_borgmatic_version.stdout is version('2.0.3', '>=') %}
+commands:
+  - after: action
+    when: [create]
+    states: [finish]
+    run:
+      - echo borgmatic_archive_created
+{% else %}
+after_backup:
+  - echo borgmatic_archive_created
+{% endif %}
