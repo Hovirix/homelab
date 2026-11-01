@@ -21,6 +21,84 @@ entries:
       identifiers:
         name: Vaultwarden
 
+  - model: authentik_providers_oauth2.scopemapping
+    id: openclaw-scopes
+    identifiers:
+      name: OpenClaw scope ceiling
+    attrs:
+      scope_name: openclaw_scopes
+      expression: |
+        if request.user.all_groups().filter(name="openclaw-admins").exists():
+            scopes = "operator.admin,operator.read,operator.write,operator.approvals,operator.questions"
+        elif request.user.all_groups().filter(name="openclaw-users").exists():
+            scopes = "operator.read,operator.write,operator.questions"
+        else:
+            scopes = ""
+
+        return {
+            "ak_proxy": {
+                "user_attributes": {
+                    "additionalHeaders": {
+                        "X-OpenClaw-Scopes": scopes
+                    }
+                }
+            }
+        }
+
+  - model: authentik_providers_proxy.proxyprovider
+    id: openclaw-provider
+    identifiers:
+      name: OpenClaw
+    attrs:
+      mode: forward_single
+      external_host: https://openclaw.hovirix.dev
+      authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+      invalidation_flow: !Find [authentik_flows.flow, [slug, default-provider-invalidation-flow]]
+      property_mappings:
+        - !KeyOf openclaw-scopes
+
+  - model: authentik_core.application
+    id: openclaw-application
+    identifiers:
+      slug: openclaw
+    attrs:
+      name: OpenClaw
+      provider: !KeyOf openclaw-provider
+      policy_engine_mode: any
+
+  - model: authentik_core.group
+    id: openclaw-admins
+    identifiers:
+      name: openclaw-admins
+
+  - model: authentik_core.group
+    id: openclaw-users
+    identifiers:
+      name: openclaw-users
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf openclaw-application
+      order: 0
+    attrs:
+      group: !KeyOf openclaw-users
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf openclaw-application
+      order: 1
+    attrs:
+      group: !KeyOf openclaw-admins
+
+  - model: authentik_outposts.outpost
+    identifiers:
+      managed: goauthentik.io/outposts/embedded
+    attrs:
+      providers:
+        - !KeyOf openclaw-provider
+      config:
+        authentik_host: https://authentik.hovirix.dev
+
   - model: authentik_core.user
     identifiers:
       username: akadmin
@@ -30,3 +108,4 @@ entries:
         - !Find [authentik_core.group, [name, paperless-admins]]
         - !Find [authentik_core.group, [name, grafana-admins]]
         - !Find [authentik_core.group, [name, vaultwarden-users]]
+        - !Find [authentik_core.group, [name, openclaw-admins]]

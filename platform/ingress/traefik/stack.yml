@@ -45,6 +45,7 @@ services:
       - traefik
       - cloudflared
       - socket-proxy
+      - openclaw
 
     ports:
       - target: 80
@@ -114,6 +115,12 @@ services:
         condition: any
 
 networks:
+  openclaw:
+    name: openclaw
+    ipam:
+      config:
+        - subnet: 10.254.1.0/24
+
   traefik:
     name: traefik
     attachable: true
