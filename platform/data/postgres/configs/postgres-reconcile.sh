@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+export PGHOST="${PGHOST:-postgres}" PGUSER="${PGUSER:-postgres}" PGDATABASE=postgres
+
 export PGPASSWORD
 PGPASSWORD="$(</run/secrets/postgres_superuser_password)"
 
@@ -10,21 +12,20 @@ grafana_password="$(</run/secrets/postgres_grafana_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 vaultwarden_password="$(</run/secrets/postgres_vaultwarden_password)"
 
-if ! timeout 300 bash -c 'until pg_isready --host=postgres --port=5432 --username=postgres >/dev/null 2>&1; do sleep 2; done'; then
+if ! timeout 300 bash -c 'until pg_isready >/dev/null 2>&1; do sleep 2; done'; then
   printf 'PostgreSQL did not become ready within five minutes.\n' >&2
   exit 1
 fi
 
-psql \
-  --host=postgres \
-  --port=5432 \
-  --username=postgres \
-  --dbname=postgres \
+psql -X \
   --set=ON_ERROR_STOP=1 \
+  --set=superuser_password="$PGPASSWORD" \
   --set=authentik_password="$authentik_password" \
   --set=grafana_password="$grafana_password" \
   --set=paperless_password="$paperless_password" \
   --set=vaultwarden_password="$vaultwarden_password" <<'SQL'
+
+ALTER ROLE postgres PASSWORD :'superuser_password';
 
 SELECT 'CREATE ROLE authentik LOGIN'
 WHERE NOT EXISTS (
