@@ -37,6 +37,11 @@ tasks:
         msg: 'Usage: task services:rm -- STACK'
     cmd: operations/scripts/swarm.sh stack-rm {{.CLI_ARGS | shellQuote}}
 
+  stop:
+    desc: Interactively select deployed stacks to remove
+    interactive: true
+    cmd: operations/scripts/swarm.sh services-stop
+
   status:
     desc: List deployed services, replica counts, and images
     env: *docker-env

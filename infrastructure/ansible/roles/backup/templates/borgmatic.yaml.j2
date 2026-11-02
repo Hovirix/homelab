@@ -17,6 +17,9 @@ keep_daily: 7
 keep_weekly: 4
 keep_monthly: 12
 
+# forensic-* archives are evidence, not part of scheduled retention.
+match_archives: sh:{hostname}-*
+
 zfs:
 
 loki:

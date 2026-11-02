@@ -143,7 +143,7 @@ configs:
     file: ./configs/pg_hba.conf
 
   postgres_reconcile:
-    name: data_postgres_reconcile_v4
+    name: data_postgres_reconcile_v6
     file: ./configs/postgres-reconcile.sh
 
 secrets:
