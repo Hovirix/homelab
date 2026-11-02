@@ -18,8 +18,8 @@ description: Investigates HX Lab backup health, Borgmatic and PostgreSQL dump fa
 - Proxmox owns `rpool/swarm/DATASET`; the three Swarm VMs see it as `/var/mnt/swarm/DATASET` via VirtioFS. Data persists independently of Swarm.
 - Sanoid on Proxmox: recursive ZFS snapshots configured for 24 hourly points; existence is not guaranteed.
 - Borgmatic on Proxmox: ZFS-snapshot-backed off-site archives of `paperless`, `postgres`, and `vaultwarden` in encrypted Borg storage on Hetzner Storage Box. Retention configured for 7 daily, 4 weekly, 12 monthly archives.
-- Swarm `postgres_backup`: `postgres-backup-local` runs `pg_dumpall` daily (`POSTGRES_CLUSTER=TRUE`), including roles, into `/var/mnt/swarm/postgres/backups` (PVE: `/rpool/swarm/postgres/backups`). Logical retention configured for 7 daily, 4 weekly, 6 monthly. Backup and Borgmatic schedules are independent; `BACKUP_ON_START=FALSE`.
-- Borgmatic's pre-create check targets `backups/daily/postgres-latest.sql.gz` and checks nonempty file, age <= 30 h, and gzip integrity. **Current hook uses `|| echo postgres_dump_validation_failed`: a failed check is logged but does not block the off-site archive.** Confirm this in deployed config before relying on it.
+- Swarm `postgres_backup`: `postgres-backup-local` runs `pg_dumpall` daily at midnight UTC (`POSTGRES_CLUSTER=TRUE`), including roles, into `/var/mnt/swarm/postgres/backups` (PVE: `/rpool/swarm/postgres/backups`). Logical retention configured for 7 daily, 4 weekly, 6 monthly. Borgmatic is scheduled at 02:00 UTC with up to 15 minutes of randomized delay; `BACKUP_ON_START=FALSE`.
+- Borgmatic's pre-create check targets `backups/daily/postgres-latest.sql.gz` and requires a nonempty file, age <= 6 h, and gzip integrity. A failed check logs a specific `ERROR: PostgreSQL dump ...` message to stderr and exits nonzero, aborting archive creation. Confirm the deployed configuration and timer match before relying on this guarantee.
 - A successful archive does not prove it contains a recent usable SQL dump. ZFS snapshots do not substitute for database-aware restore testing; no PostgreSQL PITR/WAL recovery workflow is established here.
 
 Read authoritative files when the question depends on exact behavior:
@@ -35,7 +35,7 @@ Read authoritative files when the question depends on exact behavior:
 1. Establish the affected service/data, incident start and detection time, last known good state, and timezone. Convert comparisons to explicit timestamps.
 2. Check available read-only Grafana MCP tools. Discover the Loki datasource (configured UID `logs`) and available alert-reading tools; use `query_loki_logs` if exposed. Do not invent tool names or query outputs.
 3. Search a bounded interval around the incident, then look back far enough to capture the last expected backup (usually 36-72 h). Verify live label values if a selector yields nothing.
-   - Borgmatic selector: `{app="borgmatic",hostname="pve",config="config.yaml"}`. Look for `Failed backup`, `borgmatic_archive_created`, `postgres_dump_validation_failed`, and relevant errors.
+   - Borgmatic selector: `{app="borgmatic",hostname="pve",config="config.yaml"}`. Look for `Failed backup`, `borgmatic_archive_created`, `ERROR: PostgreSQL dump `, and relevant errors.
    - PostgreSQL dump selector: `{service_name="postgres_backup"}`. Look for `SQL backup created successfully`, `Exit Status:` and startup/connection errors.
    - Inspect the configured backup alert rules and their *actual state*, if the MCP exposes it. The rules in Git are not proof they fired or delivered notifications.
 4. Correlate events by timestamp; distinguish **dump created**, **archive created**, **dump present in a specific archive**, and **restore tested**. None proves the next. A missing log line may indicate missing ingestion or monitoring rather than a failed backup.
