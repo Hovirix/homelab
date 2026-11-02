@@ -58,6 +58,61 @@ groups:
           severity: critical
         isPaused: false
 
+      - uid: backup-destination-capacity
+        title: "Backup: Storage Box capacity low"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: logs
+            relativeTimeRange:
+              from: 108000
+              to: 0
+            model:
+              datasource:
+                type: loki
+                uid: logs
+              editorMode: code
+              expr: >-
+                max(last_over_time({app="borgmatic",hostname="pve",config="config.yaml"}
+                |= "Storage Box capacity:"
+                | regexp "used_percent=(?P<used_percent>[0-9]+)"
+                | unwrap used_percent | __error__="" [30h]))
+              instant: true
+              queryType: instant
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B >= 80
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: Storage Box is at least 80% full, or capacity data is missing for 30 hours
+        labels:
+          severity: warning
+        isPaused: false
+
       - uid: backup-success-missing
         title: "Backup: successful archive overdue"
         condition: C
@@ -226,7 +281,9 @@ groups:
                 type: loki
                 uid: logs
               editorMode: code
-              expr: sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |~ `^postgres_dump_validation_failed$` [15m])) or vector(0)
+              expr: >-
+                sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"}
+                |= "ERROR: PostgreSQL dump " [15m])) or vector(0)
               instant: true
               queryType: instant
               refId: A
@@ -258,7 +315,7 @@ groups:
         execErrState: Error
         for: 1m
         annotations:
-          summary: PostgreSQL dump is missing, empty, stale, or invalid; Borgmatic continued
+          summary: PostgreSQL dump is missing, empty, older than 6 hours, or invalid; Borgmatic backup aborted
         labels:
           severity: critical
         isPaused: false
