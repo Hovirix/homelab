@@ -31,3 +31,14 @@ tasks:
     desc: Extract a Borg backup without replacing live data
     cmds:
       - ssh -tt -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} /usr/local/sbin/restore extract
+
+  restore:postgres:
+    desc: Back up current state and restore PostgreSQL into fresh production storage
+    interactive: true
+    env:
+      PVE: '{{.PVE}}'
+      DOCKER_HOST:
+        sh: operations/scripts/swarm.sh
+    cmds:
+      - operations/scripts/swarm.sh assert-unused postgres
+      - secretspec run --profile production --scope swarm -- operations/scripts/restore-postgres.py
