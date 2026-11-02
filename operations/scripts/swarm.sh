@@ -48,6 +48,42 @@ stack_rm() {
   docker --host "$manager" stack rm --detach=false -- "$stack"
 }
 
+services_stop() {
+  local manager listing name count answer number
+  local -a stacks=() selected=() numbers=()
+  manager="$(swarm_manager_host)"
+  listing="$(docker --host "$manager" stack ls --format '{{.Name}}\t{{.Services}}')"
+  if [[ -z $listing ]]; then
+    printf 'No deployed stacks.\n'
+    return
+  fi
+  printf 'Remove stacks\n\n'
+  while IFS=$'\t' read -r name count; do
+    stacks+=("$name")
+    printf '  %d) %-24s services: %s\n' "${#stacks[@]}" "$name" "$count"
+  done <<<"$listing"
+  printf '\n'
+  read -r -p 'Choose numbers separated by spaces (e.g. 1 3), or Enter to cancel: ' answer || return 0
+  read -r -a numbers <<<"$answer"
+  ((${#numbers[@]})) || return 0
+  count=${#stacks[@]}
+  for number in "${numbers[@]}"; do
+    if [[ ! $number =~ ^[1-9][0-9]*$ ]] || ((${#number} > ${#count})) || ((number > count)); then
+      printf 'Invalid selection: %s\n' "$number" >&2
+      return 1
+    fi
+    name=${stacks[number - 1]}
+    [[ " ${selected[*]} " == *" $name "* ]] || selected+=("$name")
+  done
+  printf '\nRemove these stacks:\n'
+  printf '  %s\n' "${selected[@]}"
+  printf '\nAll their services will be removed. Persistent volumes are kept.\n'
+  read -r -p 'Remove selected stacks? [y/N] ' answer || return 0
+  [[ $answer =~ ^[yY]([eE][sS])?$ ]] || return 0
+  docker --host "$manager" stack rm --detach=false -- "${selected[@]}"
+  printf 'Removed %d stacks.\n' "${#selected[@]}"
+}
+
 assert_mounts_unused() {
   local mounts="$1" dataset mount target
   shift
@@ -113,11 +149,14 @@ case "${1:-}" in
   stack-rm)
     stack_rm "${@:2}"
     ;;
+  services-stop)
+    services_stop
+    ;;
   assert-unused)
     assert_unused "${@:2}"
     ;;
   *)
-    printf 'Usage: %s {init|status|rebuild|stack-rm STACK|assert-unused DATASET...}\n' "$0" >&2
+    printf 'Usage: %s {init|status|rebuild|stack-rm STACK|services-stop|assert-unused DATASET...}\n' "$0" >&2
     exit 1
     ;;
 esac
