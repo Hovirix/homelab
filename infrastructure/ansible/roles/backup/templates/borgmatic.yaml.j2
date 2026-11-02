@@ -38,7 +38,8 @@ commands:
   - before: action
     when: [create]
     run:
-      - /usr/local/sbin/check-postgres-dump /rpool/swarm/postgres/backups/daily/postgres-latest.sql.gz || echo postgres_dump_validation_failed
+      - /usr/local/sbin/check-storagebox-capacity
+      - /usr/local/sbin/check-postgres-dump /rpool/swarm/postgres/backups/daily/postgres-latest.sql.gz
   - after: action
     when: [create]
     states: [finish]
@@ -46,7 +47,8 @@ commands:
       - echo borgmatic_archive_created
 {% else %}
 before_backup:
-  - /usr/local/sbin/check-postgres-dump /rpool/swarm/postgres/backups/daily/postgres-latest.sql.gz || echo postgres_dump_validation_failed
+  - /usr/local/sbin/check-storagebox-capacity
+  - /usr/local/sbin/check-postgres-dump /rpool/swarm/postgres/backups/daily/postgres-latest.sql.gz
 after_backup:
   - echo borgmatic_archive_created
 {% endif %}
