@@ -22,8 +22,7 @@ groups:
                 uid: metrics
               editorMode: code
               expr: >-
-                absent_over_time(container_memory_usage_bytes{
-                job="cadvisor",service="cloudflared_tunnel"}[3m])
+                absent_over_time(container_memory_usage_bytes{ job="cadvisor",service="cloudflared_tunnel"}[3m])
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200

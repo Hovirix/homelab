@@ -73,10 +73,7 @@ groups:
                 uid: logs
               editorMode: code
               expr: >-
-                max(last_over_time({app="borgmatic",hostname="pve",config="config.yaml"}
-                |= "Storage Box capacity:"
-                | regexp "used_percent=(?P<used_percent>[0-9]+)"
-                | unwrap used_percent | __error__="" [30h]))
+                max(last_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |= "Storage Box capacity:" | regexp "used_percent=(?P<used_percent>[0-9]+)" | unwrap used_percent | __error__="" [30h]))
               instant: true
               queryType: instant
               refId: A
@@ -282,8 +279,7 @@ groups:
                 uid: logs
               editorMode: code
               expr: >-
-                sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"}
-                |= "ERROR: PostgreSQL dump " [15m])) or vector(0)
+                sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |= "ERROR: PostgreSQL dump " [15m])) or vector(0)
               instant: true
               queryType: instant
               refId: A
