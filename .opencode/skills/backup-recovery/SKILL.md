@@ -26,7 +26,7 @@ Read authoritative files when the question depends on exact behavior:
 
 - `.opencode/opencode.jsonc` (Grafana MCP connection; `--disable-write`)
 - `infrastructure/ansible/roles/backup/templates/{borgmatic.yaml.j2,restore.sh.j2,sanoid.conf.j2,check-postgres-dump.sh.j2}`
-- `operations/taskfiles/backup-restore.yml`, `operations/scripts/swarm.sh`
+- `operations/taskfiles/backup-restore.yml`, `operations/scripts/restore.py`
 - `platform/data/postgres/stack.yml`, `platform/observability/configs/grafana/provisioning/alerting/backups.yml`
 - Application stack files for exact mounts, databases, and dependent services.
 
@@ -54,10 +54,10 @@ Read authoritative files when the question depends on exact behavior:
 
 1. Identify the smallest affected scope: file, directory, database object, database, service, dataset, or entire host. Identify every writer/dependent service.
 2. Find the newest **verified available** point *before* the suspected damage; use read-only evidence (e.g. operator-provided `zfs list -t snapshot -r rpool/swarm`, Borg archive listings, SQL dump files/timestamps). Logs alone do not establish recovery-point availability or archive contents.
-3. Prefer selective file extraction (`task restore:extract`) or application/SQL-level recovery to full-dataset replacement. Never choose an archive simply because it is newest.
+3. Prefer selective file extraction (`task restore` → Extract backup only) or application/SQL-level recovery to full-dataset replacement. Never choose an archive simply because it is newest.
 4. For any destructive proposal, first explain the exact source and target, all dependent workloads to stop, deployment pause, expected data loss, and whether the procedure can be reversed. Require explicit operator decision before presenting the next action.
-5. `task restore:local` uses `zfs rollback -r`: destroys newer snapshots and later writes. It has operator prompts but **no automatic Swarm mount-safety check**.
-6. `task restore:offsite -- DATASET...` stages archives, then uses `rsync --delete` into live datasets after confirmation; multiple datasets are **not atomic**. Its `assert-unused` check is a one-time preflight, not a lock against later writes. Never suggest `task restore:offsite -- postgres` for one application's incident without warning that it replaces **all** databases.
+5. `task restore` → Local snapshot uses `zfs rollback -r`: destroys newer snapshots and later writes. The restore worker checks the selected dataset with `assert_unused` before invoking host recovery.
+6. `task restore` → Off-site backup selects an archive first, offers only its datasets, then stages files and uses `rsync --delete` after confirmation; multiple datasets are **not atomic**. Local, off-site, and PostgreSQL restores use a one-time `assert_unused` preflight, not a lock against later writes. Never suggest restoring the PostgreSQL dataset for one application's incident without warning that it replaces **all** databases.
 7. Check that the deployed `/usr/local/sbin/restore` matches repository changes (`task pve:apply` deploys PVE changes). A failed or interrupted copy may leave partial live state; keep writers stopped and inspect staging rather than blindly retrying.
 8. After user-executed recovery, verify real application function and representative recovered records/files, database consistency, appropriate secrets, and service health. Do not declare success before those checks.
 
