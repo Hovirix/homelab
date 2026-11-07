@@ -23,6 +23,10 @@ init() {
   local primary_host="${PRIMARY_HOST:?required}"
   local advertise_addr="${ADVERTISE_ADDR:?required}"
   local manager_endpoint="${MANAGER_ENDPOINT:?required}"
+  for host in "${manager_hosts[@]}"; do
+    ssh -o StrictHostKeyChecking=accept-new "${host#ssh://}" true
+  done
+
   if ! is_active "$primary_host"; then
     printf 'Initializing swarm on %s\n' "$primary_host"
     docker --host "$primary_host" swarm init --advertise-addr "$advertise_addr"
