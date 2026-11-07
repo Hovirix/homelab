@@ -34,6 +34,9 @@ storage:
 
 systemd:
   units:
+    - name: docker.service
+      enabled: true
+
     - name: var-mnt-swarm.mount
       enabled: true
 
