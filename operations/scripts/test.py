@@ -53,7 +53,6 @@ def test_pve():
 
 def test_infrastructure():
     stacks = [
-        "adguardhome",
         "proxmox",
         "cloudflare",
         "hetzner",

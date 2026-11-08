@@ -8,7 +8,6 @@ tasks:
   plan:
     desc: Preview infrastructure changes
     deps:
-      - adguardhome:plan
       - proxmox:plan
       - cloudflare:plan
       - hetzner:plan
@@ -17,25 +16,9 @@ tasks:
     desc: Apply infrastructure changes
     prompt: Apply infrastructure changes?
     cmds:
-      - task: adguardhome:apply
       - task: proxmox:apply
       - task: cloudflare:apply
       - task: hetzner:apply
-
-  adguardhome:plan:
-    cmds:
-      - task: stack:run
-        vars: {STACK: adguardhome, ARGS: plan}
-
-  adguardhome:apply:
-    cmds:
-      - task: stack:run
-        vars: {STACK: adguardhome, ARGS: apply -auto-approve}
-
-  adguardhome:destroy:
-    cmds:
-      - task: stack:run
-        vars: {STACK: adguardhome, ARGS: destroy -auto-approve}
 
   proxmox:plan:
     deps: [fcos-render]
