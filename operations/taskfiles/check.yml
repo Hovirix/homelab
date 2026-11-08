@@ -8,8 +8,12 @@ env:
   TRIVY_CONFIG: security/trivy.yaml
 
 tasks:
+  test:
+    desc: Check infrastructure drift and service health
+    cmd: ./operations/scripts/test.py
+
   lint:
-    desc: Check code, configuration, and formatting
+    desc: Check code and configuration
     deps:
       - lint:actionlint
       - lint:nix
@@ -77,13 +81,13 @@ tasks:
     cmd: treefmt --ci --quiet
 
   security:
-    desc: Scan for secrets, vulnerabilities, and security policy violations
+    desc: Run all security checks
     deps:
       - security:static
-      - security:vuln
+      - security:images
 
   security:static:
-    desc: Audit workflows, policies, IaC, and secrets
+    desc: Scan configuration, policies, and secrets
     deps:
       - security:ci
       - security:policies
@@ -115,8 +119,8 @@ tasks:
     deps: ['security:prepare']
     cmd: trivy fs --scanners secret --exit-code 1 --format sarif --output .artifacts/security/sarif/secrets.sarif .
 
-  security:vuln:
-    desc: Scan all current images and show vulnerabilities at a glance
+  security:images:
+    desc: Scan container images for vulnerabilities
     cmd: |
       scan_status=0
       operations/scripts/security-scan.py || scan_status=$?
@@ -124,10 +128,8 @@ tasks:
       exit "$scan_status"
 
   security:scan:
-    desc: Collect image scans using a single database snapshot
     deps: ['security:prepare']
     cmd: operations/scripts/security-scan.py
 
   security:report:
-    desc: Validate scan results, report changes, and apply the security gate
     cmd: operations/scripts/security-report.py

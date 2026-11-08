@@ -7,12 +7,12 @@ vars:
 
 tasks:
   backup:
-    desc: Back up application ZFS snapshots to off-site Borg storage
+    desc: Run an off-site backup
     cmds:
       - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} systemctl start borgmatic.service
 
   restore:
-    desc: Restore snapshots, off-site backups, or PostgreSQL
+    desc: Restore snapshots, backups, or PostgreSQL
     interactive: true
     env:
       PVE: '{{.PVE}}'

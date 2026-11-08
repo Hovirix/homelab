@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  MENU_GROUP: DOCKER SWARM
+  MENU_GROUP: SWARM
   MENU_ORDER: 5
 
 env:
@@ -11,16 +11,17 @@ env:
 
 tasks:
   status:
-    desc: List Swarm nodes and their manager status
+    desc: Show nodes and manager status
     cmds:
       - operations/scripts/swarm.sh status
 
   init:
-    desc: Initialize Swarm and join the remaining managers
+    desc: Initialize the cluster
     cmds:
       - operations/scripts/swarm.sh init
 
   rebuild:
-    desc: Force all managers to leave and recreate Swarm
+    desc: Recreate the cluster — destructive
+    prompt: This forces all managers to leave Swarm and removes deployed services. Recreate the cluster?
     cmds:
       - operations/scripts/swarm.sh rebuild

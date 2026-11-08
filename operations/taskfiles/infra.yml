@@ -6,7 +6,7 @@ vars:
 
 tasks:
   plan:
-    desc: Preview infrastructure changes with OpenTofu
+    desc: Preview infrastructure changes
     deps:
       - adguardhome:plan
       - proxmox:plan
@@ -14,7 +14,7 @@ tasks:
       - hetzner:plan
 
   apply:
-    desc: Apply infrastructure changes with OpenTofu
+    desc: Apply infrastructure changes
     prompt: Apply infrastructure changes?
     cmds:
       - task: adguardhome:apply

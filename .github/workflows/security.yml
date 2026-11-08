@@ -55,17 +55,17 @@ jobs:
 
       - name: Validate workflows, policies, IaC, and secrets
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:static
+        run: nix develop .#ci --command task security:static
 
       - name: Scan images
         id: scan
         if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
-        run: nix develop .#ci --command task check:security:scan
+        run: nix develop .#ci --command task security:scan
 
       - name: Report image changes and apply security gate
         id: report
         if: ${{ !cancelled() && steps.scan.outcome != 'skipped' }}
-        run: nix develop .#ci --command task check:security:report
+        run: nix develop .#ci --command task security:report
 
       - name: Comment image security results
         if: >-

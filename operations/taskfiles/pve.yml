@@ -1,24 +1,24 @@
 version: "3"
 
 vars:
-  MENU_GROUP: PROXMOX VE
+  MENU_GROUP: PROXMOX
   MENU_ORDER: 4
 
 tasks:
   plan:
-    desc: Preview Proxmox host configuration changes with Ansible
+    desc: Preview host configuration changes
     dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --check --diff
 
   apply:
-    desc: Apply Proxmox host configuration with Ansible
+    desc: Apply host configuration changes
     dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml
 
   bootstrap:
-    desc: Configure Proxmox hosts using password-based SSH login
+    desc: Configure initial host access
     dir: infrastructure/ansible
     cmds:
       - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --ask-pass

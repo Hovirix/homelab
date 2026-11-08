@@ -16,6 +16,7 @@ includes:
 
   check:
     taskfile: operations/taskfiles/check.yml
+    flatten: true
 
   infra:
     taskfile: operations/taskfiles/infra.yml
@@ -30,21 +31,18 @@ includes:
     taskfile: operations/taskfiles/services.yml
 
 tasks:
-  test:
-    cmd: ./operations/scripts/test.py
-
-  deploy:
-    desc: Deploy or update all configured Swarm stacks
-    cmds:
-      - task: services:deploy
-
   status:
-    desc: List Swarm nodes and deployed services
+    desc: Show cluster and service status
     cmds:
       - printf "\n"
       - task: swarm:status
       - printf "\n"
       - task: services:status
+
+  deploy:
+    desc: Deploy all application stacks
+    cmds:
+      - task: services:deploy
 
   default:
     cmd: |

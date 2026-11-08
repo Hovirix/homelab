@@ -29,29 +29,26 @@ tasks:
           docker stack deploy --detach=false --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
       - defer: python operations/scripts/secrets.py clean
 
-  rm:
-    desc: 'Remove a stack and wait (usage: task services:rm -- STACK)'
-    env: *docker-env
-    preconditions:
-      - sh: test -n {{.CLI_ARGS | shellQuote}}
-        msg: 'Usage: task services:rm -- STACK'
-    cmd: operations/scripts/swarm.sh stack-rm {{.CLI_ARGS | shellQuote}}
-
-  stop:
-    desc: Interactively select deployed stacks to remove
-    interactive: true
-    cmd: operations/scripts/swarm.sh services-stop
-
   status:
-    desc: List deployed services, replica counts, and images
+    desc: Show replicas and images
     env: *docker-env
     cmds:
       - docker service ls --format 'table {{"{{"}}.Name{{"}}"}}\t{{"{{"}}.Replicas{{"}}"}}\t{{"{{"}}.Image{{"}}"}}'
 
   logs:
-    desc: 'Follow service logs (usage: task services:logs -- authentik_server)'
+    desc: Follow service logs
+    summary: 'Usage: task services:logs -- authentik_server'
     env: *docker-env
     preconditions:
       - sh: test -n {{.CLI_ARGS | shellQuote}}
         msg: 'Usage: task services:logs -- authentik_server'
     cmd: docker service logs --follow {{.CLI_ARGS | shellQuote}}
+
+  remove:
+    desc: Remove stacks — stops their services
+    summary: |
+      Remove a named stack, or select stacks interactively when no name is given.
+      Usage: task services:remove -- STACK
+      Usage: task services:remove
+    interactive: true
+    cmd: operations/scripts/swarm.sh services-remove {{.CLI_ARGS | shellQuote}}
