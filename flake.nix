@@ -10,8 +10,6 @@
     let
       systems = [
         "x86_64-linux"
-        "aarch64-linux"
-        "x86_64-darwin"
         "aarch64-darwin"
       ];
     in
@@ -20,15 +18,32 @@
         system:
         let
           pkgs = import nixpkgs { inherit system; };
-          secretspec-python = pkgs.python3Packages.buildPythonPackage {
+          secretspec-python = pkgs.python3Packages.buildPythonPackage (finalAttrs: {
             pname = "secretspec";
-            version = "0.21.1";
+            inherit (pkgs.secretspec) version;
             format = "wheel";
-            src = pkgs.fetchurl {
-              url = "https://files.pythonhosted.org/packages/a2/5b/5cbaceaf5028568fe359897d069b0dcb583442d70ea0b7d53b62c0f06b47/secretspec-0.21.1-cp39-abi3-manylinux_2_28_x86_64.whl";
-              hash = "sha256-lGr0t8CMz124BarE8Vk3lIdLCmbhKFToQlOfiuitLoE=";
-            };
-          };
+            src = pkgs.fetchPypi (
+              {
+                inherit (finalAttrs) pname version;
+                format = "wheel";
+                dist = "cp39";
+                python = "cp39";
+                abi = "abi3";
+              }
+              // {
+                x86_64-linux = {
+                  platform = "manylinux_2_28_x86_64";
+                  hash = "sha256-lGr0t8CMz124BarE8Vk3lIdLCmbhKFToQlOfiuitLoE=";
+                };
+                aarch64-darwin = {
+                  platform = "macosx_11_0_arm64";
+                  hash = "sha256-9nFs/fTLbs8sPgTmEy7G5e6sT6tMEkoBq8IPXX67Rv8=";
+                };
+              }
+              .${system}
+            );
+            pythonImportsCheck = [ "secretspec" ];
+          });
 
           validation = with pkgs; [
             actionlint
@@ -61,6 +76,7 @@
 
           utilities = with pkgs; [
             go-task
+            jq
             yq-go
           ];
         in
