@@ -1,105 +1,73 @@
 <div align="center">
 
-# HX Lab
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/hx-lab-logo-dark.svg">
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/hx-lab-logo-light.svg">
+    <img src=".github/assets/hx-lab-logo-light.svg" alt="HX Lab logo" width="240">
+  </picture>
 
-**A declarative, rebuildable self-hosted platform built on [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment/overview) and [Docker Swarm](https://docs.docker.com/engine/swarm/).**
+  # Homelab
 
-[![CI](https://github.com/Hovirix/homelab/actions/workflows/checks.yml/badge.svg)](https://github.com/Hovirix/homelab/actions/workflows/checks.yml)
-[![Security](https://github.com/Hovirix/homelab/actions/workflows/security.yml/badge.svg)](https://github.com/Hovirix/homelab/actions/workflows/security.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+  **The Self-Hosted DevSecOps Platform**
+
+  [![CI](https://img.shields.io/github/actions/workflow/status/Hovirix/homelab/checks.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=CI&labelColor=151C28&color=005577)](https://github.com/Hovirix/homelab/actions/workflows/checks.yml)
+  [![Security](https://img.shields.io/github/actions/workflow/status/Hovirix/homelab/security.yml?style=for-the-badge&logo=githubactions&logoColor=white&label=Security&labelColor=151C28&color=005577)](https://github.com/Hovirix/homelab/actions/workflows/security.yml)
+  [![Release](https://img.shields.io/github/v/release/Hovirix/homelab?style=for-the-badge&logo=github&logoColor=white&labelColor=151C28&color=005577)](https://github.com/Hovirix/homelab/releases/latest)
 
 </div>
 
-HX Lab manages my homelab infrastructure and application platform as code. Compute is reproducible, persistent state is independent from the Swarm lifecycle, and [Task](https://taskfile.dev/) provides the main operational interface.
+---
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    internet[Internet] --> cloudflare[Cloudflare]
-    cloudflare --> cloudflared[Cloudflared]
-    lan[LAN / WireGuard] --> traefik[Traefik]
-    cloudflared --> traefik
-
-    subgraph proxmox[Proxmox VE]
-        subgraph swarm[Docker Swarm]
-            traefik --> authentik[Authentik]
-            authentik --> services[Platform Services]
-
-            services --> data[Data]
-            services --> observability[Observability]
-        end
-
-        storage[ZFS / VirtioFS]
-    end
-
-    services --> storage
-    data --> storage
-    observability --> storage
-
-    storage -. Backup .-> storagebox[Hetzner Storage Box]
-```
-
-## Design Principles
-
-Configuration is versioned, compute is rebuildable, persistent state is independent, and Task provides repeatable operations.
+![Homelab architecture](.github/assets/diagram.png)
 
 ## Infrastructure
 
-| Layer         | Technology                                                                    | Role                           |
-| ------------- | ----------------------------------------------------------------------------- | ------------------------------ |
-| Compute       | [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment/overview) | Hypervisor                     |
-| Guest OS      | [Fedora CoreOS](https://fedoraproject.org/coreos/)                            | Swarm nodes                    |
-| Provisioning  | [OpenTofu](https://opentofu.org/)                                             | Infrastructure resources       |
-| Configuration | [Ansible](https://docs.ansible.com/)                                          | Proxmox configuration          |
-| Network       | [OpenWrt](https://openwrt.org/)                                               | Routing, DHCP, firewall, VPN   |
-| DNS           | [AdGuard Home](https://adguard.com/en/adguard-home/overview.html)             | Internal DNS                   |
-| Storage       | [OpenZFS](https://openzfs.org/) + [VirtioFS](https://virtio-fs.gitlab.io/)    | Persistent application storage |
-| Backup        | [Borg](https://www.borgbackup.org/) + [borgmatic](https://torsion.org/borgmatic/) + [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/) | Off-site application backup |
+The homelab runs on a Minisforum A2 powered by [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment/overview).
 
-Network infrastructure is managed separately in [`hovirix/netlab`](https://github.com/Hovirix/netlab).
+[OpenTofu](https://opentofu.org/) provisions infrastructure, while [Ansible](https://docs.ansible.com/) configures the host. Network infrastructure is managed separately in [Netlab](https://github.com/Hovirix/netlab).
+
+[Cloudflare](https://www.cloudflare.com/) provides public edge services, [Resend](https://resend.com/) delivers email through SMTP, and [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/) stores off-site backups.
 
 ## Platform
 
-| Layer          | Technology                                                                                                                                                                               | Role                           |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
-| Orchestration  | [Docker Swarm](https://docs.docker.com/engine/swarm/)                                                                                                                                    | Runs platform services         |
-| Ingress        | [Traefik](https://traefik.io/traefik/)                                                                                                                                                   | Routes application traffic     |
-| Edge Connector | [Cloudflared](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/)                                                                                   | Connects Cloudflare to Traefik |
-| Identity       | [Authentik](https://goauthentik.io/)                                                                                                                                                     | Authentication and SSO         |
-| Data           | [PostgreSQL](https://www.postgresql.org/), [Valkey](https://valkey.io/)                                                                                                                  | Shared data services           |
-| Observability  | [Grafana](https://grafana.com/), [VictoriaMetrics](https://victoriametrics.com/), [Loki](https://grafana.com/oss/loki/), [Alloy](https://grafana.com/oss/alloy-opentelemetry-collector/) | Metrics and logs               |
-| Applications   | [`platform/applications`](platform/applications)                                                                                                                                         | Application stacks             |
+Three [Fedora CoreOS](https://fedoraproject.org/coreos/) virtual machines form a [Docker Swarm](https://docs.docker.com/engine/swarm/) cluster. The platform hosts self-hosted applications, shared data services, identity management, and observability. Services are defined declaratively as Swarm stacks.
 
-## Repository
+All three VMs run on one physical host. The cluster does not provide host-level high availability.
 
-See [`AGENTS.md`](AGENTS.md) for the repository map and operational boundaries.
+## Storage
 
-## Operations
+[OpenZFS](https://openzfs.org/) provides persistent storage, shared with Swarm nodes through [VirtioFS](https://virtio-fs.gitlab.io/). Persistent application data lives outside the VMs and survives their recreation, provided the host datasets remain intact.
 
-Run `task --list` to see the operational workflows.
-
-## Documentation
-
-Executable configuration is the source of truth; `AGENTS.md` and `.opencode/skills/` cover project rules and procedures.
+[Sanoid](https://github.com/jimsalterjrs/sanoid) manages local snapshots. [borgmatic](https://torsion.org/borgmatic/) backs up Paperless, PostgreSQL, and Vaultwarden data to Hetzner Storage Box using [Borg](https://www.borgbackup.org/) over SSH. These off-site backups do not cover every persistent dataset.
 
 ## Security
 
-- External exposure is default-deny.
-- Public traffic enters through [Cloudflare](https://www.cloudflare.com/) and Traefik.
-- Authentik provides application authentication and SSO.
-- [SecretSpec](https://secretspec.dev) declares secrets, with [SOPS](https://github.com/getsops/sops) as encrypted storage and Docker Swarm secrets for delivery.
-- Administrative access remains on trusted networks or VPN.
+Security takes priority over convenience. The approach favors minimal exposure and simple, explicit controls.
 
-## Recovery
+[Traefik](https://traefik.io/traefik/) routes application traffic, with public access through Cloudflare. [WireGuard](https://www.wireguard.com/) provides remote access to internal services and management interfaces. [Authentik](https://goauthentik.io/) provides application single sign-on; applications and infrastructure retain their own permission controls.
 
-- Infrastructure and Swarm configuration are rebuildable from Git.
-- Recovery workflows are automated through Task.
-- Persistent application data is independent from the Swarm lifecycle.
-- Sanoid provides 24 hourly local recovery points for all Swarm datasets.
-- Borgmatic takes temporary ZFS snapshots of Paperless, PostgreSQL, and Vaultwarden and backs them up to Hetzner Storage Box with Borg.
-- PostgreSQL recovery uses the physical ZFS-backed recovery points; logical backups, WAL archiving, and PITR remain separate future work.
+Secrets are declared through [SecretSpec](https://secretspec.dev/), stored encrypted with [SOPS](https://getsops.io/), and delivered to services as [Docker secrets](https://docs.docker.com/engine/swarm/secrets/).
+
+The development workflow follows a [SecOps](https://www.microsoft.com/en-us/security/business/security-101/what-is-security-operations-secops) approach. CI checks workflows, infrastructure code, secrets, and container images for security issues.
+
+## Development
+
+Git stores the desired state, and deployments are triggered manually. Infrastructure and services are provisioned through code and Task workflows. Rebuilding still requires bootstrap access, secrets, infrastructure state, and intact data or usable backups.
+
+## Operations
+
+Operational workflows use [Task](https://taskfile.dev/) to orchestrate Bash and Python workers from the command line.
+
+Run `task` to see available operations.
+
+## Documentation
+
+Documentation is intentionally minimal. Configuration and executable workflows are the primary reference, with project rules in [AGENTS.md](AGENTS.md).
+
+Open an [issue](https://github.com/Hovirix/homelab/issues) for questions or discussion.
 
 ## License
 
-Distributed under the [MIT License](LICENSE).
+Licensed under the [MIT License](LICENSE).
