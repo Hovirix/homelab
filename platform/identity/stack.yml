@@ -51,6 +51,10 @@ services:
         - traefik.http.routers.authentik.rule=Host(`authentik.hovirix.dev`)
         - traefik.http.routers.authentik.entrypoints=websecure
         - traefik.http.services.authentik.loadbalancer.server.port=9000
+        - traefik.http.routers.openclaw-outpost.rule=Host(`openclaw.hovirix.dev`) && PathPrefix(`/outpost.goauthentik.io/`)
+        - traefik.http.routers.openclaw-outpost.entrypoints=websecure
+        - traefik.http.routers.openclaw-outpost.service=authentik
+        - traefik.http.routers.openclaw-outpost.priority=100
 
       update_config:
         failure_action: rollback
@@ -158,7 +162,7 @@ configs:
     file: ./blueprints/provider_vaultwarden.yaml
 
   authentik_memberships:
-    name: identity_authentik_memberships_20261022
+    name: identity_authentik_memberships_20261031_2
     file: ./blueprints/memberships.yaml
 
 secrets:

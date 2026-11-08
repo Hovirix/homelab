@@ -1,0 +1,73 @@
+services:
+  gateway:
+    image: ghcr.io/openclaw/openclaw:2026.11.1-browser@sha256:38628855e519f2da413fea9a4907e9ae767c383de0621e735777bee0ebdb9af0
+
+    command: /etc/openclaw/openclaw-start.sh
+
+    environment:
+      OPENCLAW_INCLUDE_ROOTS: /etc/openclaw
+
+    configs:
+      - source: openclaw_start
+        target: /etc/openclaw/openclaw-start.sh
+        mode: 0555
+      - source: openclaw_config
+        target: /etc/openclaw/openclaw.json
+      - source: openclaw_gateway
+        target: /etc/openclaw/gateway.json
+
+    networks:
+      - openclaw
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/openclaw
+        target: /home/node/.openclaw
+
+    cap_drop:
+      - ALL
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=openclaw
+        - traefik.http.routers.openclaw.rule=Host(`openclaw.hovirix.dev`)
+        - traefik.http.routers.openclaw.entrypoints=websecure
+        - traefik.http.routers.openclaw.middlewares=openclaw-headers,openclaw-auth
+        - traefik.http.services.openclaw.loadbalancer.server.port=18789
+        - traefik.http.middlewares.openclaw-headers.headers.customrequestheaders.X-authentik-username=
+        - traefik.http.middlewares.openclaw-headers.headers.customrequestheaders.X-OpenClaw-Scopes=
+        - traefik.http.middlewares.openclaw-headers.headers.stsseconds=31536000
+        - traefik.http.middlewares.openclaw-auth.forwardauth.address=http://authentik_server:9000/outpost.goauthentik.io/auth/traefik
+        - traefik.http.middlewares.openclaw-auth.forwardauth.trustforwardheader=true
+        - traefik.http.middlewares.openclaw-auth.forwardauth.authresponseheaders=X-authentik-username,X-OpenClaw-Scopes
+
+      update_config:
+        order: stop-first
+        # An image rollback cannot undo SQLite migrations.
+        failure_action: pause
+
+      rollback_config:
+        order: stop-first
+
+networks:
+  openclaw:
+    name: openclaw
+    ipam:
+      config:
+        - subnet: 10.254.1.0/24
+
+configs:
+  openclaw_start:
+    name: openclaw_start_20261108
+    file: ./configs/openclaw-start.sh
+
+  openclaw_config:
+    name: openclaw_config_20261031
+    file: ./configs/openclaw.json
+
+  openclaw_gateway:
+    name: openclaw_gateway_20261031
+    file: ./configs/gateway.json

@@ -13,6 +13,7 @@ tasks:
         sh: operations/scripts/swarm.sh
     vars:
       STACKS:
+        - {name: openclaw, file: platform/applications/openclaw/stack.yml}
         - {name: traefik, file: platform/ingress/traefik/stack.yml}
         - {name: cloudflared, file: platform/ingress/cloudflared/stack.yml}
         - {name: postgres, file: platform/data/postgres/stack.yml}

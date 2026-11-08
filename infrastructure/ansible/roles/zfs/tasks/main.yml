@@ -81,6 +81,9 @@
   loop:
     - name: grafana
     - name: loki
+    - name: openclaw
+      properties:
+        "org.torsion.borgmatic:backup": auto
     - name: paperless
       properties:
         "org.torsion.borgmatic:backup": auto
