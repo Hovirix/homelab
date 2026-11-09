@@ -4,6 +4,13 @@ prometheus.exporter.blackbox "services" {
 	config_file = "/etc/alloy/blackbox.yml"
 
 	target {
+		name    = "immich"
+		address = "https://traefik_proxy:443/api/server/ping"
+		module  = "http_2xx"
+		labels  = {service = "immich"}
+	}
+
+	target {
 		name    = "grafana"
 		address = "https://traefik_proxy:443/api/health"
 		module  = "http_2xx"

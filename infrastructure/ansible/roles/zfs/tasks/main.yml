@@ -80,6 +80,9 @@
     extra_zfs_properties: "{{ item.properties | default({}) }}"
   loop:
     - name: grafana
+    - name: immich
+      properties:
+        "org.torsion.borgmatic:backup": auto
     - name: loki
     - name: openclaw
       properties:

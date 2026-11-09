@@ -92,6 +92,7 @@ def test_services():
         "vaultwarden": "https://vaultwarden.hovirix.dev/alive",
         "paperless": "https://paperless.hovirix.dev/accounts/login/",
         "miniflux": "https://miniflux.hovirix.dev/healthcheck",
+        "immich": "https://immich.hovirix.dev/api/server/ping",
     }
 
     results = []

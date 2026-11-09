@@ -1,0 +1,319 @@
+vulnerabilities:
+  - id: CVE-2025-47273
+    owner: Hovirix
+    statement: &internal-risk >-
+      Accepted temporarily for internal-only Immich v3.3.6 (PR #184), contingent on applying Cloudflare DNS/tunnel removal and keeping ML off public ingress. Malicious media and internal requests may still cause denial of service, data exposure or code execution; outbound TLS risks remain. Reassess before public access or image changes.
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/setuptools@70.3.0
+
+  - id: CVE-2026-0994
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/protobuf@6.33.2
+
+  - id: CVE-2026-104851
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/fsspec@2023.12.2
+
+  - id: CVE-2026-109518
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:deb/debian/apt@3.0.3?arch=amd64&distro=debian-13.7
+      - pkg:deb/debian/libapt-pkg7.0@3.0.3?arch=amd64&distro=debian-13.7
+
+  - id: CVE-2026-112390
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112392
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112393
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112397
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112398
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112399
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112400
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112402
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112403
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112404
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112405
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112406
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112892
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112893
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112894
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112895
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112896
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112897
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112900
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-112902
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-114613
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/msgpack@1.1.2
+
+  - id: CVE-2026-21441
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/urllib3@2.6.2
+
+  - id: CVE-2026-44431
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/urllib3@2.6.2
+
+  - id: CVE-2026-44432
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/urllib3@2.6.2
+
+  - id: CVE-2026-48818
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/starlette@0.50.0
+
+  - id: CVE-2026-54283
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/starlette@0.50.0
+
+  - id: CVE-2026-63374
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/anyio@4.2.0
+
+  - id: CVE-2026-76844
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:deb/debian/zlib1g@1.3.dfsg%2Breally1.3.1-1%2Bb1?arch=amd64&distro=debian-13.7&epoch=1
+
+  - id: CVE-2026-85091
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:deb/debian/zlib1g@1.3.dfsg%2Breally1.3.1-1%2Bb1?arch=amd64&distro=debian-13.7&epoch=1
+
+  - id: CVE-2026-96637
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-96639
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-96640
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-96642
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-96643
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-96644
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-96778
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0
+
+  - id: CVE-2026-97687
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/urllib3@2.6.2
+      - pkg:pypi/urllib3@2.7.0
+
+  - id: CVE-2026-97689
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/urllib3@2.6.2
+      - pkg:pypi/urllib3@2.7.0
+
+  - id: GHSA-6q48-6c7w-9gw2
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/certifi@2026.6.17
+
+  - id: GHSA-6v7p-g79w-8964
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/msgpack@1.1.2
+
+  - id: GHSA-78g4-xqwv-q3g8
+    owner: Hovirix
+    statement: *internal-risk
+    expired_at: 2026-12-09
+    purls:
+      - pkg:pypi/pillow@12.3.0

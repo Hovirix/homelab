@@ -9,6 +9,7 @@ PGPASSWORD="$(</run/secrets/postgres_superuser_password)"
 
 authentik_password="$(</run/secrets/postgres_authentik_password)"
 grafana_password="$(</run/secrets/postgres_grafana_password)"
+immich_password="$(</run/secrets/postgres_immich_password)"
 miniflux_password="$(</run/secrets/postgres_miniflux_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 vaultwarden_password="$(</run/secrets/postgres_vaultwarden_password)"
@@ -23,6 +24,7 @@ psql -X \
   --set=superuser_password="$PGPASSWORD" \
   --set=authentik_password="$authentik_password" \
   --set=grafana_password="$grafana_password" \
+  --set=immich_password="$immich_password" \
   --set=miniflux_password="$miniflux_password" \
   --set=paperless_password="$paperless_password" \
   --set=vaultwarden_password="$vaultwarden_password" <<'SQL'
@@ -61,8 +63,14 @@ WHERE NOT EXISTS (
   SELECT FROM pg_roles WHERE rolname = 'vaultwarden'
 )\gexec
 
+SELECT 'CREATE ROLE immich LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'immich'
+)\gexec
+
 ALTER ROLE authentik PASSWORD :'authentik_password';
 ALTER ROLE grafana PASSWORD :'grafana_password';
+ALTER ROLE immich PASSWORD :'immich_password';
 ALTER ROLE paperless PASSWORD :'paperless_password';
 ALTER ROLE vaultwarden PASSWORD :'vaultwarden_password';
 
@@ -85,4 +93,13 @@ SELECT 'CREATE DATABASE vaultwarden OWNER vaultwarden'
 WHERE NOT EXISTS (
   SELECT FROM pg_database WHERE datname = 'vaultwarden'
 )\gexec
+
+SELECT 'CREATE DATABASE immich OWNER immich'
+WHERE NOT EXISTS (
+  SELECT FROM pg_database WHERE datname = 'immich'
+)\gexec
+
+\connect immich
+CREATE EXTENSION IF NOT EXISTS vchord CASCADE;
+CREATE EXTENSION IF NOT EXISTS earthdistance CASCADE;
 SQL
