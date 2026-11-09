@@ -4,6 +4,13 @@ locals {
   domain     = "hovirix.dev"
 
   hostnames = toset([
-    for app in ["authentik", "grafana", "immich", "miniflux", "paperless", "vaultwarden"] : "${app}.${local.domain}"
+    for app in [
+      "authentik",
+      "grafana",
+      # "immich", # Internal-only until upstream images are patched.
+      "miniflux",
+      "paperless",
+      "vaultwarden",
+    ] : "${app}.${local.domain}"
   ])
 }
