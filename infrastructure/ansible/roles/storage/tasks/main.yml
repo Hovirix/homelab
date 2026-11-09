@@ -1,0 +1,41 @@
+- name: Read Proxmox storage status
+  ansible.builtin.command:
+    argv:
+      - pvesm
+      - status
+  register: storage_status
+  changed_when: false
+  check_mode: false
+
+- name: Verify expected Proxmox storages exist
+  ansible.builtin.assert:
+    that:
+      - storage_status.stdout | regex_search('(?m)^local\s+dir\s+active\s+') is not none
+      - storage_status.stdout | regex_search('(?m)^local-zfs\s+zfspool\s+active\s+') is not none
+    fail_msg: Expected Proxmox storages local and local-zfs were not reported as active.
+- name: Read local storage configuration
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - get
+      - /storage/local
+      - --output-format
+      - json
+  register: storage_local
+  changed_when: false
+  check_mode: false
+
+- name: Configure local storage content types
+  ansible.builtin.command:
+    argv:
+      - pvesh
+      - set
+      - /storage/local
+      - --content
+      - >-
+        {{ ((storage_local.stdout | from_json).content | split(',') + ['snippets']) |
+           unique | sort | join(',') }}
+  when: >-
+    'snippets' not in ((storage_local.stdout | from_json).content | split(','))
+  changed_when: >-
+    'snippets' not in ((storage_local.stdout | from_json).content | split(','))

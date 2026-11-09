@@ -1,0 +1,137 @@
+services:
+  proxy:
+    image: traefik:v3.7@sha256:f4bb143d1135a579b630ed491e17ec50f6f7c9c6a30585ff3d385471d2a86f5a
+
+    command:
+      - --global.checknewversion=false
+      - --global.sendanonymoususage=false
+
+      - --accesslog=true
+
+      - --ping=true
+      - --metrics.prometheus=true
+      - --metrics.prometheus.entrypoint=metrics
+
+      - --entrypoints.web.address=:80
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.forwardedheaders.trustedips=10.254.0.0/24
+      - --entrypoints.websecure.http.tls.certresolver=cloudflare
+      - --entrypoints.websecure.http.tls.domains[0].main=hovirix.dev
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.hovirix.dev
+      - --entrypoints.metrics.address=:8082
+
+      - --providers.swarm=true
+      - --providers.swarm.endpoint=tcp://socket-proxy:2375
+      - --providers.swarm.exposedbydefault=false
+      - --providers.swarm.network=traefik
+
+      - --certificatesresolvers.cloudflare.acme.email=homelab@hovirix.dev
+      - --certificatesresolvers.cloudflare.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.provider=cloudflare
+      - --certificatesresolvers.cloudflare.acme.dnschallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+
+    environment:
+      CF_DNS_API_TOKEN_FILE: /run/secrets/traefik_cf_dns_api_token
+
+    user: "0:984"
+
+    secrets:
+      - traefik_cf_dns_api_token
+
+    networks:
+      - traefik
+      - cloudflared
+      - socket-proxy
+      - openclaw
+
+    ports:
+      - target: 80
+        published: 80
+
+      - target: 443
+        published: 443
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/traefik
+        target: /letsencrypt
+
+    healthcheck:
+      test:
+        - CMD
+        - traefik
+        - healthcheck
+        - --ping
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        order: start-first
+        failure_action: rollback
+
+      restart_policy:
+        condition: any
+
+  socket-proxy:
+    image: tecnativa/docker-socket-proxy:v0.5.0@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459
+
+    environment:
+      EVENTS: "1"
+      INFO: "1"
+      NETWORKS: "1"
+      NODES: "1"
+      SERVICES: "1"
+      SWARM: "1"
+      TASKS: "1"
+      LOG_LEVEL: "warning"
+
+    networks:
+      - socket-proxy
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://localhost:2375/_ping || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    deploy:
+      replicas: 1
+
+      restart_policy:
+        condition: any
+
+networks:
+  openclaw:
+    external: true
+
+  traefik:
+    name: traefik
+    attachable: true
+
+  cloudflared:
+    name: cloudflared
+    ipam:
+      config:
+        - subnet: 10.254.0.0/24
+
+  socket-proxy:
+    internal: true
+
+secrets:
+  traefik_cf_dns_api_token:
+    external: true
+    name: "traefik_cf_dns_api_token_f97cf50f949d"

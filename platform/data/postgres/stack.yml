@@ -1,0 +1,178 @@
+services:
+  server:
+    image: ghcr.io/hovirix/postgres:18.6@sha256:b1bec06f46990ad5b8794705d0b1bae184a5497cc845b564d303011dd01449a5
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_superuser_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+    secrets:
+      - postgres_superuser_password
+
+    configs:
+      - source: postgres_config
+        target: /etc/postgresql/postgresql.conf
+
+      - source: postgres_hba
+        target: /etc/postgresql/pg_hba.conf
+
+    command:
+      - postgres
+      - -c
+      - config_file=/etc/postgresql/postgresql.conf
+
+    networks:
+      postgres:
+        aliases:
+          - postgres
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/postgres
+        target: /var/lib/postgresql/data
+
+    # PostgreSQL needs time to checkpoint and stop cleanly during Swarm updates.
+    stop_grace_period: 2m
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready --username=postgres --dbname=postgres
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        failure_action: rollback
+        monitor: 2m
+
+      restart_policy:
+        condition: any
+
+  backup:
+    image: prodrigestivill/postgres-backup-local:18@sha256:f70742ebe42b2277689b028d1fd15aa80f77cffa01da163cc9f85a6ff1866e7f
+    user: "999:999"
+
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_superuser_password
+      POSTGRES_CLUSTER: "TRUE"
+      POSTGRES_EXTRA_OPTS: ""
+      SCHEDULE: "@daily"
+      TZ: UTC
+      BACKUP_ON_START: "FALSE"
+      BACKUP_KEEP_DAYS: "7"
+      BACKUP_KEEP_WEEKS: "4"
+      BACKUP_KEEP_MONTHS: "6"
+
+    configs:
+      - source: postgres_backup_wait
+        target: /hooks/01-wait-postgres
+        mode: 0555
+
+    secrets:
+      - postgres_superuser_password
+
+    networks:
+      - postgres
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/postgres/backups
+        target: /backups
+
+    deploy:
+      replicas: 1
+
+      restart_policy:
+        condition: any
+
+  reconcile:
+    image: ghcr.io/hovirix/postgres:18.6@sha256:b1bec06f46990ad5b8794705d0b1bae184a5497cc845b564d303011dd01449a5
+
+    command:
+      - bash
+      - /usr/local/bin/postgres-reconcile.sh
+
+    configs:
+      - source: postgres_reconcile
+        target: /usr/local/bin/postgres-reconcile.sh
+        mode: 0555
+
+    secrets:
+      - postgres_superuser_password
+      - postgres_authentik_password
+      - postgres_grafana_password
+      - postgres_immich_password
+      - postgres_miniflux_password
+      - postgres_paperless_password
+      - postgres_vaultwarden_password
+
+    networks:
+      - postgres
+
+    deploy:
+      mode: replicated-job
+      replicas: 1
+
+      restart_policy:
+        condition: on-failure
+
+networks:
+  postgres:
+    name: postgres
+    attachable: true
+
+configs:
+  postgres_backup_wait:
+    name: data_postgres_backup_wait_v2
+    file: ./configs/postgres-backup-wait.sh
+
+  postgres_config:
+    name: data_postgres_config_v2
+    file: ./configs/postgresql.conf
+
+  postgres_hba:
+    name: data_postgres_hba_v7
+    file: ./configs/pg_hba.conf
+
+  postgres_reconcile:
+    name: data_postgres_reconcile_v8
+    file: ./configs/postgres-reconcile.sh
+
+secrets:
+  postgres_immich_password:
+    external: true
+    name: "postgres_immich_password_b93fe97af2b2"
+
+  postgres_miniflux_password:
+    external: true
+    name: "postgres_miniflux_password_7bff94cb1e08"
+
+  postgres_superuser_password:
+    external: true
+    name: "postgres_superuser_password_3efce0f89928"
+
+  postgres_authentik_password:
+    external: true
+    name: "postgres_authentik_password_7b6c7b2d278e"
+
+  postgres_paperless_password:
+    external: true
+    name: "postgres_paperless_password_cdd4621df825"
+
+  postgres_grafana_password:
+    external: true
+    name: "postgres_grafana_password_2201e1894f9b"
+
+  postgres_vaultwarden_password:
+    external: true
+    name: "postgres_vaultwarden_password_9e5d202044cd"

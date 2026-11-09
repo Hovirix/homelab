@@ -1,0 +1,11 @@
+[Unit]
+Description=Docker Swarm persistent data
+
+[Mount]
+What=swarm
+Where=/var/mnt/swarm
+Type=virtiofs
+Options=rw,context=system_u:object_r:container_file_t:s0
+
+[Install]
+WantedBy=local-fs.target

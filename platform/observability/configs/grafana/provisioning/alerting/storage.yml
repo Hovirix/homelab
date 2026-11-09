@@ -1,0 +1,199 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: storage
+    folder: Alerts
+    interval: 1m
+
+    rules:
+
+      # FILESYSTEM LOW SPACE
+      # Warning when an actual filesystem has less than 15% available space.
+      # Temporary and container overlay filesystems are excluded.
+      - uid: low-disk-space
+        title: "Storage: disk space low"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 *
+                node_filesystem_avail_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+                /
+                node_filesystem_size_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 15
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Less than 15% disk space remains on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: warning
+        isPaused: false
+
+      # FILESYSTEM CRITICAL SPACE
+      # Critical when an actual filesystem has less than 5% available space.
+      - uid: critical-disk-space
+        title: "Storage: disk space critical"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 *
+                node_filesystem_avail_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+                /
+                node_filesystem_size_bytes{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 5
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Less than 5% disk space remains on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: critical
+        isPaused: false
+
+      # FILESYSTEM READ ONLY
+      # Critical when a real filesystem is reported read-only.
+      - uid: filesystem-read-only
+        title: "Storage: filesystem read-only"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                node_filesystem_readonly{
+                  job="node",
+                  fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"
+                }
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: Filesystem is read-only on {{ $labels.node }} {{ $labels.mountpoint }}
+        labels:
+          severity: critical
+        isPaused: false

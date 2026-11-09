@@ -1,0 +1,24 @@
+version: "3"
+
+vars:
+  MENU_GROUP: PROXMOX
+  MENU_ORDER: 4
+
+tasks:
+  plan:
+    desc: Preview host configuration changes
+    dir: infrastructure/ansible
+    cmds:
+      - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --check --diff
+
+  apply:
+    desc: Apply host configuration changes
+    dir: infrastructure/ansible
+    cmds:
+      - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml
+
+  bootstrap:
+    desc: Configure initial host access
+    dir: infrastructure/ansible
+    cmds:
+      - secretspec run --profile production --scope pve -- ansible-playbook playbooks/pve.yml --ask-pass

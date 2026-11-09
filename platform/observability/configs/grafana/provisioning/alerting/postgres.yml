@@ -1,0 +1,71 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: postgres
+    folder: Alerts
+    interval: 1m
+
+    rules:
+
+      # POSTGRESQL MISSING
+      # Critical when cAdvisor has not seen postgres_server for 3 minutes.
+      # This checks container presence, not whether PostgreSQL accepts queries.
+      - uid: postgres-missing
+        title: "Postgres: container missing"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                absent_over_time(
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service="postgres_server"
+                  }[3m]
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: PostgreSQL container has been missing for at least 3 minutes
+        labels:
+          severity: critical
+        isPaused: false

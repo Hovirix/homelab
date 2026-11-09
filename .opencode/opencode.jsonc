@@ -1,0 +1,26 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  "permissions": [
+    { "action": "shell", "resource": "sops", "effect": "deny" },
+    { "action": "shell", "resource": "sops *", "effect": "deny" },
+  ],
+
+  "mcp": {
+    "servers": {
+      "grafana": {
+        "type": "local",
+        "command": [
+          "secretspec", "run", "-P", "production", "-S", "opencode", "--reason", "provide read-only Grafana observability access to OpenCode",
+          "--",
+          "uvx", "mcp-grafana", "--disable-write"
+        ],
+        "cwd": ".",
+        "environment": {
+          "GRAFANA_URL": "https://grafana.hovirix.dev",
+          "GRAFANA_SERVICE_ACCOUNT_TOKEN": "{env:GRAFANA_SERVICE_ACCOUNT_TOKEN}"
+        }
+      }
+    }
+  }
+}

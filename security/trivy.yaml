@@ -1,0 +1,14 @@
+quiet: true
+
+image:
+  source:
+    - remote
+
+scan:
+  skip-version-check: true
+  disable-telemetry: true
+  skip-dirs:
+    - .artifacts
+    - .direnv
+    - .git
+    - .opencode

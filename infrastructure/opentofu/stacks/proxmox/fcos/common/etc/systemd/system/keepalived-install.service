@@ -1,0 +1,14 @@
+[Unit]
+Description=Install keepalived
+Wants=network-online.target
+After=network-online.target
+ConditionPathExists=!/var/lib/keepalived-installed
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/rpm-ostree install keepalived
+ExecStart=/usr/bin/touch /var/lib/keepalived-installed
+ExecStart=/usr/bin/systemctl reboot
+
+[Install]
+WantedBy=multi-user.target

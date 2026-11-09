@@ -1,0 +1,11 @@
+opentofu_access_role_privileges:
+  - Sys.AccessNetwork
+  - Sys.Modify
+
+opentofu_access_acls:
+  - {path: /, role: PVEVMAdmin}
+  - {path: /storage/local, role: PVEDatastoreAdmin}
+  - {path: /storage/local-zfs, role: PVEDatastoreAdmin}
+  - {path: /mapping, role: PVEMappingAdmin}
+  - {path: /sdn/zones/localnetwork, role: PVESDNUser}
+  - {path: "/nodes/{{ inventory_hostname }}", role: OpenTofuDownload}

@@ -1,0 +1,11 @@
+[Unit]
+Description=Enable Wake-on-LAN for nic0
+After=network.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/ethtool -s nic0 wol g
+
+[Install]
+WantedBy=multi-user.target

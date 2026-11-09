@@ -1,0 +1,13 @@
+smtp: hxlab-smtp
+        mailto homelab@hovirix.dev
+        from-address proxmox@hovirix.dev
+        username resend
+        server smtp.resend.com
+        port 587
+        mode starttls
+        comment Managed by Ansible
+
+matcher: hxlab-alerts
+        match-severity warning,error
+        target hxlab-smtp
+        comment Managed by Ansible

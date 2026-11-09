@@ -1,0 +1,48 @@
+- name: Check Docker Swarm ZFS dataset
+  ansible.builtin.command:
+    argv:
+      - zfs
+      - list
+      - -H
+      - -o
+      - name
+      - rpool/swarm
+  register: backup_swarm_zfs_dataset
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Verify Docker Swarm ZFS dataset exists
+  ansible.builtin.assert:
+    that:
+      - backup_swarm_zfs_dataset.rc == 0
+      - backup_swarm_zfs_dataset.stdout == "rpool/swarm"
+    fail_msg: Expected ZFS dataset rpool/swarm is missing or could not be queried on {{ inventory_hostname }}; refusing to configure snapshots.
+
+- name: Install Sanoid
+  ansible.builtin.apt:
+    name: sanoid
+    state: present
+
+- name: Create Sanoid configuration directory
+  ansible.builtin.file:
+    path: /etc/sanoid
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Configure Sanoid
+  ansible.builtin.template:
+    src: sanoid.conf.j2
+    dest: /etc/sanoid/sanoid.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Enable Sanoid timer
+  ansible.builtin.systemd_service:
+    name: sanoid.timer
+    enabled: true
+    state: started
+    daemon_reload: true

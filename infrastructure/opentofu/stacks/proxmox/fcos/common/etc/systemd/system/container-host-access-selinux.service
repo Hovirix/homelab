@@ -1,0 +1,10 @@
+[Unit]
+Description=Allow containers to access required host interfaces
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/semodule -i /etc/selinux/local/container-host-access.cil
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

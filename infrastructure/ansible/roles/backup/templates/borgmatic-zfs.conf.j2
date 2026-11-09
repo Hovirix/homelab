@@ -1,0 +1,6 @@
+[Service]
+# Borgmatic's ZFS hook mounts read-only snapshots under /run/borgmatic.
+PrivateDevices=no
+CapabilityBoundingSet=CAP_DAC_READ_SEARCH CAP_NET_RAW CAP_SYS_ADMIN
+SystemCallFilter=
+SystemCallFilter=@system-service @mount

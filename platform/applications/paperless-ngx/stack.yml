@@ -1,0 +1,123 @@
+services:
+  web:
+    image: ghcr.io/paperless-ngx/paperless-ngx:3.4.2@sha256:d704e84f88300eb6ab001ab15720a2330ff99169cf9f94d6b8fcc44b63a84c84
+
+    entrypoint:
+      - /usr/local/bin/paperless-start.sh
+
+    environment:
+      PAPERLESS_URL: https://paperless.hovirix.dev
+      PAPERLESS_SECRET_KEY_FILE: /run/secrets/paperless_secret_key
+      PAPERLESS_REDIS: redis://valkey:6379
+      PAPERLESS_DBENGINE: postgresql
+      PAPERLESS_DBHOST: postgres
+      PAPERLESS_DBPASS_FILE: /run/secrets/postgres_paperless_password
+      PAPERLESS_APPS: allauth.socialaccount.providers.openid_connect
+      PAPERLESS_SOCIAL_AUTO_SIGNUP: "true"
+      PAPERLESS_SOCIAL_ACCOUNT_SYNC_GROUPS: "true"
+      PAPERLESS_SOCIAL_ACCOUNT_SYNC_SUPERUSER_GROUP: paperless-admins
+      PAPERLESS_DISABLE_REGULAR_LOGIN: "true"
+      PAPERLESS_REDIRECT_LOGIN_TO_SSO: "true"
+
+    configs:
+      - source: paperless_start
+        target: /usr/local/bin/paperless-start.sh
+        mode: 0555
+
+    secrets:
+      - paperless_secret_key
+      - paperless_admin_user
+      - paperless_admin_email
+      - paperless_admin_password
+      - postgres_paperless_password
+      - paperless_client_id
+      - paperless_client_secret
+
+    networks:
+      - postgres
+      - valkey
+      - traefik
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/paperless/data
+        target: /usr/src/paperless/data
+
+      - type: bind
+        source: /var/mnt/swarm/paperless/media
+        target: /usr/src/paperless/media
+
+      - type: bind
+        source: /var/mnt/swarm/paperless/export
+        target: /usr/src/paperless/export
+
+      - type: bind
+        source: /var/mnt/swarm/paperless/consume
+        target: /usr/src/paperless/consume
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - curl -fsS http://localhost:8000/accounts/login/ >/dev/null || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 120s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.paperless.rule=Host(`paperless.hovirix.dev`)
+        - traefik.http.routers.paperless.entrypoints=websecure
+        - traefik.http.services.paperless.loadbalancer.server.port=8000
+
+      update_config:
+        failure_action: rollback
+
+      restart_policy:
+        condition: any
+
+networks:
+  postgres:
+    external: true
+
+  valkey:
+    external: true
+
+  traefik:
+    external: true
+
+configs:
+  paperless_start:
+    file: ./configs/paperless-start.sh
+
+secrets:
+  paperless_admin_user:
+    external: true
+    name: "paperless_admin_user_bea51e926437"
+
+  paperless_admin_email:
+    external: true
+    name: "paperless_admin_email_d1a2701b3297"
+
+  paperless_admin_password:
+    external: true
+    name: "paperless_admin_password_f3702b993355"
+
+  paperless_secret_key:
+    external: true
+    name: "paperless_secret_key_b472757e6fa9"
+
+  postgres_paperless_password:
+    external: true
+    name: "postgres_paperless_password_cdd4621df825"
+
+  paperless_client_id:
+    external: true
+    name: "paperless_client_id_46fc0dcd55ee"
+
+  paperless_client_secret:
+    external: true
+    name: "paperless_client_secret_5d0f250afbf7"

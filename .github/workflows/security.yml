@@ -1,0 +1,120 @@
+name: security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      pull-requests: write
+    env:
+      TRIVY_CACHE_DIR: /home/runner/.cache/trivy
+      SECURITY_MODE: ${{ github.event_name == 'pull_request' && 'pr' || 'full' }}
+      SECURITY_BASE_REF: ${{ github.event.pull_request.base.sha }}
+      REPORT_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      PUBLISH_SECURITY: >-
+        ${{ github.actor != 'dependabot[bot]' &&
+            (github.event_name != 'pull_request' ||
+             github.event.pull_request.head.repo.full_name == github.repository) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
+
+      - name: Cache Nix
+        uses: DeterminateSystems/magic-nix-cache-action@84c0677f58dcedf3b91f8223ce36a9ea5b3c84b7 # v15
+
+      - name: Cache Trivy DBs
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: /home/runner/.cache/trivy
+          key: trivy-${{ runner.os }}-${{ hashFiles('security/trivy.yaml', 'flake.lock') }}-${{ github.run_id }}
+          restore-keys: |
+            trivy-${{ runner.os }}-${{ hashFiles('security/trivy.yaml', 'flake.lock') }}-
+
+      - name: Prepare security tools
+        id: tools
+        run: nix develop .#ci --command true
+
+      - name: Validate workflows, policies, IaC, and secrets
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: nix develop .#ci --command task security:static
+
+      - name: Scan images
+        id: scan
+        if: ${{ !cancelled() && steps.tools.outcome == 'success' }}
+        run: nix develop .#ci --command task security:scan
+
+      - name: Report image changes and apply security gate
+        id: report
+        if: ${{ !cancelled() && steps.scan.outcome != 'skipped' }}
+        run: nix develop .#ci --command task security:report
+
+      - name: Comment image security results
+        if: >-
+          ${{ !cancelled() && github.event_name == 'pull_request' &&
+              env.PUBLISH_SECURITY == 'true' && steps.report.outcome != 'skipped' &&
+              hashFiles('.artifacts/security/comment.md') != '' }}
+        uses: marocchino/sticky-pull-request-comment@5770ad5eb8f42dd2c4f34da00c94c5381e49af88 # v3.0.5
+        with:
+          header: image-security
+          path: .artifacts/security/comment.md
+          skip_unchanged: true
+
+      - name: Upload Actions findings
+        if: >-
+          ${{ !cancelled() && env.PUBLISH_SECURITY == 'true' &&
+              hashFiles('.artifacts/security/sarif/ci.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          sarif_file: .artifacts/security/sarif/ci.sarif
+          category: zizmor
+
+      - name: Upload IaC findings
+        if: >-
+          ${{ !cancelled() && env.PUBLISH_SECURITY == 'true' &&
+              hashFiles('.artifacts/security/sarif/iac.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          sarif_file: .artifacts/security/sarif/iac.sarif
+          category: trivy-iac
+
+      - name: Upload image findings
+        if: >-
+          ${{ !cancelled() && env.PUBLISH_SECURITY == 'true' &&
+              hashFiles('.artifacts/security/sarif/images/*.sarif') != '' }}
+        uses: github/codeql-action/upload-sarif@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          sarif_file: .artifacts/security/sarif/images
+
+      - name: Upload image reports
+        if: ${{ !cancelled() && steps.report.outcome != 'skipped' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: image-security
+          path: |
+            .artifacts/security/json/images
+            .artifacts/security/sarif/images
+            .artifacts/security/summary.md
+            .artifacts/security/manifest.json
+            .artifacts/security/database.json
+            .artifacts/security/comment.md
+          include-hidden-files: true
+          retention-days: 14

@@ -1,0 +1,244 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: nodes
+    folder: Alerts
+    interval: 1m
+
+    rules:
+
+      # SWARM NODE MISSING
+      # Warning when fewer than 3 node exporters are reporting.
+      # This detects a missing Swarm VM/node from the monitoring point of view.
+      # It does NOT prove Docker Swarm manager quorum state.
+      - uid: node-missing
+        title: "Nodes: node missing"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                count(up{job="node"} == 1)
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 3
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Fewer than 3 Swarm nodes are reporting metrics
+        labels:
+          severity: warning
+        isPaused: false
+
+      # MULTIPLE SWARM NODES MISSING
+      # Critical when fewer than 2 node exporters are reporting.
+      # With a 3-node setup this means at least two monitored nodes disappeared.
+      - uid: multiple-nodes-missing
+        title: "Nodes: multiple nodes missing"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                count(up{job="node"} == 1)
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B < 2
+              refId: C
+              type: math
+
+        noDataState: Alerting
+        execErrState: Error
+        for: 2m
+        annotations:
+          summary: Fewer than 2 Swarm nodes are reporting metrics
+        labels:
+          severity: critical
+        isPaused: false
+
+      # HIGH CPU
+      # Warning when a node remains above 90% CPU usage for 15 minutes.
+      - uid: high-cpu
+        title: "Nodes: CPU usage high"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 - avg by (node) (
+                  rate(node_cpu_seconds_total{job="node", mode="idle"}[5m])
+                ) * 100
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 90
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 15m
+        annotations:
+          summary: CPU usage is above 90% on {{ $labels.node }}
+        labels:
+          severity: warning
+        isPaused: false
+
+      # HIGH MEMORY
+      # Warning when a node remains above 90% memory usage for 10 minutes.
+      # Uses MemAvailable rather than MemFree so Linux cache is handled properly.
+      - uid: high-memory
+        title: "Nodes: memory usage high"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                100 * (
+                  1 -
+                  node_memory_MemAvailable_bytes{job="node"}
+                  /
+                  node_memory_MemTotal_bytes{job="node"}
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 90
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Memory usage is above 90% on {{ $labels.node }}
+        labels:
+          severity: warning
+        isPaused: false

@@ -1,0 +1,44 @@
+- name: Render Proxmox notification configuration
+  ansible.builtin.set_fact:
+    notifications_config: "{{ lookup('template', 'notifications.cfg.j2') }}"
+    notifications_private_config: "{{ lookup('template', 'notifications.priv.cfg.j2') }}"
+  no_log: true
+  run_once: true
+
+- name: Read Proxmox notification settings
+  ansible.builtin.slurp:
+    path: /etc/pve/notifications.cfg
+  register: notifications_settings
+  failed_when: false
+  changed_when: false
+  run_once: true
+
+- name: Configure Proxmox notification settings # noqa no-changed-when
+  ansible.builtin.command:
+    argv:
+      - tee
+      - /etc/pve/notifications.cfg
+    stdin: "{{ notifications_config }}"
+    stdin_add_newline: false
+  when: notifications_settings.failed or (notifications_settings.content | default('') | b64decode) != notifications_config
+  run_once: true
+
+- name: Read Proxmox notification credentials
+  ansible.builtin.slurp:
+    path: /etc/pve/priv/notifications.cfg
+  register: notifications_credentials
+  failed_when: false
+  changed_when: false
+  no_log: true
+  run_once: true
+
+- name: Configure Proxmox notification credentials # noqa no-changed-when
+  ansible.builtin.command:
+    argv:
+      - tee
+      - /etc/pve/priv/notifications.cfg
+    stdin: "{{ notifications_private_config }}"
+    stdin_add_newline: false
+  when: notifications_credentials.failed or (notifications_credentials.content | default('') | b64decode) != notifications_private_config
+  no_log: true
+  run_once: true

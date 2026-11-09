@@ -1,0 +1,19 @@
+version: "3"
+
+vars:
+  PVE: root@pve.home.hovirix.dev
+  MENU_GROUP: BACKUP & RESTORE
+  MENU_ORDER: 7
+
+tasks:
+  backup:
+    desc: Run an off-site backup
+    cmds:
+      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} systemctl start borgmatic.service
+
+  restore:
+    desc: Restore snapshots, backups, or PostgreSQL
+    interactive: true
+    env:
+      PVE: '{{.PVE}}'
+    cmd: operations/scripts/restore.py

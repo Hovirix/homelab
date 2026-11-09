@@ -1,0 +1,142 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: traefik
+    folder: Alerts
+    interval: 1m
+
+    rules:
+
+      # TRAEFIK MISSING
+      # Critical when cAdvisor has not seen traefik_proxy for 3 minutes.
+      - uid: traefik-missing
+        title: "Traefik: container missing"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                absent_over_time(
+                  container_memory_usage_bytes{
+                    job="cadvisor",
+                    service="traefik_proxy"
+                  }[3m]
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: Traefik container has been missing for at least 3 minutes
+        labels:
+          severity: critical
+        isPaused: false
+
+      # TRAEFIK HIGH 5XX RATE
+      # Warning when BOTH are true over 10 minutes:
+      #   - at least 5 HTTP 5xx responses occurred
+      #   - more than 10% of all Traefik service requests were 5xx
+      #
+      # The minimum error count avoids noisy alerts on very low traffic.
+      - uid: traefik-high-5xx
+        title: "Traefik: HTTP 5xx rate high"
+        condition: C
+        data:
+          - refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 900
+              to: 0
+            model:
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: |
+                (
+                  sum(increase(traefik_service_requests_total{code=~"5.."}[10m])) >= 5
+                )
+                and
+                (
+                  sum(increase(traefik_service_requests_total{code=~"5.."}[10m]))
+                  /
+                  clamp_min(
+                    sum(increase(traefik_service_requests_total[10m])),
+                    1
+                  )
+                  > 0.10
+                )
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Traefik 5xx responses are above 10% with at least 5 errors
+        labels:
+          severity: warning
+        isPaused: false

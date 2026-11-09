@@ -1,0 +1,46 @@
+# OpenTofu
+**/.[t]erraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfplan
+*.plan
+plan.out
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Butane / Ignition
+*.ign
+build/
+dist/
+
+# direnv
+.direnv/
+.envrc.local
+.env
+.env.local
+
+# Secrets
+*.tfvars
+*.tfvars.json
+*.pem
+*.key
+id_rsa
+id_ed25519
+*.dec
+secrets.yaml
+secrets.yml
+
+# Editor / OS
+.helix/
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+.artifacts/
+.task/
+/operations/scripts/__pycache__
