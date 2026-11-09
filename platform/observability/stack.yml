@@ -108,7 +108,7 @@ services:
         condition: any
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.154.1@sha256:c7884f32920dd45a9d86542a717227e63af03e060e53bbf8031e6e6fd0e1e05d
+    image: victoriametrics/victoria-metrics:v1.156.0@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970
 
     command:
       - -storageDataPath=/victoria-metrics-data
