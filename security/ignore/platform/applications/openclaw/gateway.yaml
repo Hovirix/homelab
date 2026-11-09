@@ -2,9 +2,7 @@ vulnerabilities:
   - id: CVE-2026-102276
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is
-      npm tooling; crafted brace patterns can crash npm subprocesses.
-      Reassess when updating the image or enabling untrusted package operations.
+      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is npm tooling; crafted brace patterns can crash npm subprocesses. Reassess when updating the image or enabling untrusted package operations.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/brace-expansion@5.0.9
@@ -12,9 +10,7 @@ vulnerabilities:
   - id: CVE-2026-102278
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is
-      npm tooling; deeply nested brace patterns can crash npm subprocesses.
-      Reassess when updating the image or enabling untrusted package operations.
+      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is npm tooling; deeply nested brace patterns can crash npm subprocesses. Reassess when updating the image or enabling untrusted package operations.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/brace-expansion@5.0.9
@@ -22,10 +18,7 @@ vulnerabilities:
   - id: GHSA-cg2g-xh64-v4q7
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Inspected UI
-      sanitizer does not enable SAFE_FOR_TEMPLATES or DOM-returning modes required
-      by this bypass. Reassess on sanitizer, plugin, or image changes; XSS remains
-      possible if another path enables the vulnerable configuration.
+      Accepted for single-user OpenClaw deployment (PR #181). Inspected UI sanitizer does not enable SAFE_FOR_TEMPLATES or DOM-returning modes required by this bypass. Reassess on sanitizer, plugin, or image changes; XSS remains possible if another path enables the vulnerable configuration.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/dompurify@3.4.16
@@ -33,10 +26,7 @@ vulnerabilities:
   - id: GHSA-mrv2-3pqr-j5jr
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Inspected UI
-      sanitizer does not enable IN_PLACE or hooks that detach subtrees required
-      by this XSS. Reassess on sanitizer, plugin, or image changes; other paths
-      have not been exhaustively audited.
+      Accepted for single-user OpenClaw deployment (PR #181). Inspected UI sanitizer does not enable IN_PLACE or hooks that detach subtrees required by this XSS. Reassess on sanitizer, plugin, or image changes; other paths have not been exhaustively audited.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/dompurify@3.4.16
@@ -44,10 +34,7 @@ vulnerabilities:
   - id: CVE-2026-118772
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Joi is a mailauth
-      dependency and IMAP is not configured. Email validation can exhaust CPU
-      if vulnerable multiple-address validation receives untrusted input.
-      Reassess before enabling IMAP or changing the image.
+      Accepted for single-user OpenClaw deployment (PR #181). Joi is a mailauth dependency and IMAP is not configured. Email validation can exhaust CPU if vulnerable multiple-address validation receives untrusted input. Reassess before enabling IMAP or changing the image.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/joi@18.2.9
@@ -55,10 +42,7 @@ vulnerabilities:
   - id: CVE-2026-111758
     owner: Hovirix
     statement: >-
-      Accepted availability risk for single-user OpenClaw deployment (PR #181).
-      The Markdown parser is actively used; malicious model, tool, or channel
-      output can freeze the UI or block gateway work. Authentik does not prevent
-      this input path. Reassess on the next image update.
+      Accepted availability risk for single-user OpenClaw deployment (PR #181). The Markdown parser is actively used; malicious model, tool, or channel output can freeze the UI or block gateway work. Authentik does not prevent this input path. Reassess on the next image update.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/markdown-it@15.0.2
@@ -66,11 +50,7 @@ vulnerabilities:
   - id: CVE-2026-109383
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Vulnerable copies
-      are npm/mailauth dependencies; core selects patched Undici 8.12.2 and IMAP
-      is not configured. Custom tls.checkServerIdentity callbacks can be dropped,
-      bypassing pinning but not default CA/hostname checks. Reassess before
-      enabling IMAP, custom TLS pinning, or changing the image.
+      Accepted for single-user OpenClaw deployment (PR #181). Vulnerable copies are npm/mailauth dependencies; core selects patched Undici 8.12.2 and IMAP is not configured. Custom tls.checkServerIdentity callbacks can be dropped, bypassing pinning but not default CA/hostname checks. Reassess before enabling IMAP, custom TLS pinning, or changing the image.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/undici@6.28.0
@@ -79,11 +59,7 @@ vulnerabilities:
   - id: CVE-2026-109869
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Vulnerable copies
-      are npm/mailauth dependencies; core selects patched Undici 8.12.2 and IMAP
-      is not configured. A malicious HTTP response can crash a process using
-      the affected fetch implementation. Reassess before enabling IMAP or
-      changing the image; Authentik does not protect outbound requests.
+      Accepted for single-user OpenClaw deployment (PR #181). Vulnerable copies are npm/mailauth dependencies; core selects patched Undici 8.12.2 and IMAP is not configured. A malicious HTTP response can crash a process using the affected fetch implementation. Reassess before enabling IMAP or changing the image; Authentik does not protect outbound requests.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/undici@6.28.0
@@ -92,10 +68,7 @@ vulnerabilities:
   - id: CVE-2026-19534
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is
-      npm tooling; a malicious WebSocket server can crash a process using that
-      copy. Core selects patched Undici 8.12.2. Reassess on image changes or
-      use of the npm-bundled WebSocket client.
+      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is npm tooling; a malicious WebSocket server can crash a process using that copy. Core selects patched Undici 8.12.2. Reassess on image changes or use of the npm-bundled WebSocket client.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/undici@6.28.0
@@ -103,11 +76,7 @@ vulnerabilities:
   - id: CVE-2026-87018
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Vulnerable copies
-      are npm/mailauth dependencies; core selects patched Undici 8.12.2 and IMAP
-      is not configured. A malicious TLS 1.2 endpoint can crash a client process
-      during renegotiation. Reassess before enabling IMAP or changing the image;
-      Authentik does not protect outbound requests.
+      Accepted for single-user OpenClaw deployment (PR #181). Vulnerable copies are npm/mailauth dependencies; core selects patched Undici 8.12.2 and IMAP is not configured. A malicious TLS 1.2 endpoint can crash a client process during renegotiation. Reassess before enabling IMAP or changing the image; Authentik does not protect outbound requests.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/undici@6.28.0
@@ -116,11 +85,7 @@ vulnerabilities:
   - id: CVE-2026-109829
     owner: Hovirix
     statement: >-
-      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is
-      under mailauth and IMAP is not configured; core selects patched Undici
-      8.12.2. Exploitation requires a shared cache with redirect-then-cache
-      interceptors, risking cache poisoning or private-data disclosure.
-      Reassess before enabling IMAP, shared HTTP caching, or changing the image.
+      Accepted for single-user OpenClaw deployment (PR #181). Affected copy is under mailauth and IMAP is not configured; core selects patched Undici 8.12.2. Exploitation requires a shared cache with redirect-then-cache interceptors, risking cache poisoning or private-data disclosure. Reassess before enabling IMAP, shared HTTP caching, or changing the image.
     expired_at: 2026-12-09
     purls:
       - pkg:npm/undici@8.11.2
