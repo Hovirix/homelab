@@ -42,6 +42,12 @@ services:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
 
+      - source: grafana_dashboard_provider
+        target: /etc/grafana/provisioning/dashboards/hx-lab.yml
+
+      - source: grafana_dashboard_platform
+        target: /var/lib/grafana/dashboards/platform.json
+
       - source: grafana_alerting_notifications
         target: /etc/grafana/provisioning/alerting/notifications.yml
 
@@ -274,6 +280,14 @@ networks:
     external: true
 
 configs:
+  grafana_dashboard_provider:
+    name: observability_grafana_dashboard_provider_v1
+    file: ./configs/grafana/provisioning/dashboards.yml
+
+  grafana_dashboard_platform:
+    name: observability_grafana_dashboard_platform_v1
+    file: ./configs/grafana/dashboards/platform.json
+
   grafana_datasources:
     name: observability_grafana_datasources_v2
     file: ./configs/grafana/provisioning/datasources.yml

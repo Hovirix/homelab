@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: HX Lab
+    orgId: 1
+    folder: HX Lab
+    folderUid: hx-lab
+    type: file
+    disableDeletion: false
+    editable: false
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
