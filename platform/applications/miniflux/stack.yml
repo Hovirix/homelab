@@ -1,0 +1,75 @@
+services:
+  web:
+    image: ghcr.io/miniflux/miniflux:2.3.5@sha256:8fd6c3c434ecc3d4083306f83e03c0bb74c632e0f8378da5ead7e1773b0b89c9
+
+    environment:
+      BASE_URL: https://miniflux.hovirix.dev
+      LISTEN_ADDR: 0.0.0.0:8080
+      HTTPS: "true"
+      DATABASE_URL_FILE: /run/secrets/miniflux_database_url
+      RUN_MIGRATIONS: "1"
+      DISABLE_LOCAL_AUTH: "true"
+      OAUTH2_PROVIDER: oidc
+      OAUTH2_OIDC_PROVIDER_NAME: Authentik
+      OAUTH2_OIDC_DISCOVERY_ENDPOINT: https://authentik.hovirix.dev/application/o/miniflux/
+      OAUTH2_REDIRECT_URL: https://miniflux.hovirix.dev/oauth2/oidc/callback
+      OAUTH2_CLIENT_ID_FILE: /run/secrets/miniflux_client_id
+      OAUTH2_CLIENT_SECRET_FILE: /run/secrets/miniflux_client_secret
+      OAUTH2_USER_CREATION: "1"
+      OAUTH2_GROUP_CLAIM: groups
+      OAUTH2_ADMIN_GROUP: miniflux-admins
+
+    secrets:
+      - miniflux_database_url
+      - miniflux_client_id
+      - miniflux_client_secret
+
+    networks:
+      - postgres
+      - traefik
+
+    healthcheck:
+      test:
+        - CMD
+        - /usr/bin/miniflux
+        - -healthcheck
+        - auto
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.miniflux.rule=Host(`miniflux.hovirix.dev`)
+        - traefik.http.routers.miniflux.entrypoints=websecure
+        - traefik.http.services.miniflux.loadbalancer.server.port=8080
+
+      update_config:
+        failure_action: rollback
+
+      restart_policy:
+        condition: any
+
+networks:
+  postgres:
+    external: true
+
+  traefik:
+    external: true
+
+secrets:
+  miniflux_database_url:
+    external: true
+    name: "miniflux_database_url_5dd11e17d46c"
+
+  miniflux_client_id:
+    external: true
+    name: "miniflux_client_id_aa45d114b40f"
+
+  miniflux_client_secret:
+    external: true
+    name: "miniflux_client_secret_d3eedc563c30"

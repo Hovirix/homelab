@@ -92,6 +92,8 @@ services:
         target: /blueprints/stages.yaml
       - source: authentik_provider_grafana
         target: /blueprints/provider_grafana.yaml
+      - source: authentik_provider_miniflux
+        target: /blueprints/provider_miniflux.yaml
       - source: authentik_provider_paperless
         target: /blueprints/provider_paperless.yaml
       - source: authentik_provider_vaultwarden
@@ -105,6 +107,8 @@ services:
       - authentik_smtp_api_key
       - grafana_client_id
       - grafana_client_secret
+      - miniflux_client_id
+      - miniflux_client_secret
       - paperless_client_id
       - paperless_client_secret
       - vaultwarden_client_id
@@ -157,15 +161,27 @@ configs:
     name: identity_authentik_provider_paperless_20261022
     file: ./blueprints/provider_paperless.yaml
 
+  authentik_provider_miniflux:
+    name: identity_authentik_provider_miniflux_20261109_2
+    file: ./blueprints/provider_miniflux.yaml
+
   authentik_provider_vaultwarden:
     name: identity_authentik_provider_vaultwarden_20261005
     file: ./blueprints/provider_vaultwarden.yaml
 
   authentik_memberships:
-    name: identity_authentik_memberships_20261031_2
+    name: identity_authentik_memberships_20261109
     file: ./blueprints/memberships.yaml
 
 secrets:
+  miniflux_client_id:
+    external: true
+    name: "miniflux_client_id_aa45d114b40f"
+
+  miniflux_client_secret:
+    external: true
+    name: "miniflux_client_secret_d3eedc563c30"
+
   authentik_secret_key:
     external: true
     name: "authentik_secret_key_23a93a635d23"

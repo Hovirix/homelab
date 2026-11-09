@@ -25,6 +25,13 @@ prometheus.exporter.blackbox "services" {
 	}
 
 	target {
+		name    = "miniflux"
+		address = "https://traefik_proxy:443/healthcheck"
+		module  = "http_2xx"
+		labels  = {service = "miniflux"}
+	}
+
+	target {
 		name    = "paperless"
 		address = "https://traefik_proxy:443/accounts/login/"
 		module  = "http_2xx"

@@ -9,6 +9,7 @@ PGPASSWORD="$(</run/secrets/postgres_superuser_password)"
 
 authentik_password="$(</run/secrets/postgres_authentik_password)"
 grafana_password="$(</run/secrets/postgres_grafana_password)"
+miniflux_password="$(</run/secrets/postgres_miniflux_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 vaultwarden_password="$(</run/secrets/postgres_vaultwarden_password)"
 
@@ -22,10 +23,23 @@ psql -X \
   --set=superuser_password="$PGPASSWORD" \
   --set=authentik_password="$authentik_password" \
   --set=grafana_password="$grafana_password" \
+  --set=miniflux_password="$miniflux_password" \
   --set=paperless_password="$paperless_password" \
   --set=vaultwarden_password="$vaultwarden_password" <<'SQL'
 
 ALTER ROLE postgres PASSWORD :'superuser_password';
+
+SELECT 'CREATE ROLE miniflux LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'miniflux'
+)\gexec
+
+ALTER ROLE miniflux PASSWORD :'miniflux_password';
+
+SELECT 'CREATE DATABASE miniflux OWNER miniflux'
+WHERE NOT EXISTS (
+  SELECT FROM pg_database WHERE datname = 'miniflux'
+)\gexec
 
 SELECT 'CREATE ROLE authentik LOGIN'
 WHERE NOT EXISTS (

@@ -80,6 +80,7 @@ groups:
                 or absent_over_time(probe_success{job="blackbox",service="authentik"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="vaultwarden"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="paperless"}[3m])
+                or absent_over_time(probe_success{job="blackbox",service="miniflux"}[3m])
               instant: true
               intervalMs: 1000
               maxDataPoints: 43200
