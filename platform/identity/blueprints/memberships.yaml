@@ -9,6 +9,11 @@ entries:
   - model: authentik_blueprints.metaapplyblueprint
     attrs:
       identifiers:
+        name: Immich
+
+  - model: authentik_blueprints.metaapplyblueprint
+    attrs:
+      identifiers:
         name: Miniflux
 
   - model: authentik_blueprints.metaapplyblueprint
@@ -113,5 +118,6 @@ entries:
         - !Find [authentik_core.group, [name, paperless-admins]]
         - !Find [authentik_core.group, [name, grafana-admins]]
         - !Find [authentik_core.group, [name, miniflux-admins]]
+        - !Find [authentik_core.group, [name, immich-admins]]
         - !Find [authentik_core.group, [name, vaultwarden-users]]
         - !Find [authentik_core.group, [name, openclaw-admins]]

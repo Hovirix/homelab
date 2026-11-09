@@ -4,6 +4,6 @@ locals {
   domain     = "hovirix.dev"
 
   hostnames = toset([
-    for app in ["authentik", "grafana", "miniflux", "paperless", "vaultwarden"] : "${app}.${local.domain}"
+    for app in ["authentik", "grafana", "immich", "miniflux", "paperless", "vaultwarden"] : "${app}.${local.domain}"
   ])
 }

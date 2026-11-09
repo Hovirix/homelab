@@ -94,6 +94,8 @@ services:
         target: /blueprints/provider_grafana.yaml
       - source: authentik_provider_miniflux
         target: /blueprints/provider_miniflux.yaml
+      - source: authentik_provider_immich
+        target: /blueprints/provider_immich.yaml
       - source: authentik_provider_paperless
         target: /blueprints/provider_paperless.yaml
       - source: authentik_provider_vaultwarden
@@ -109,6 +111,8 @@ services:
       - grafana_client_secret
       - miniflux_client_id
       - miniflux_client_secret
+      - immich_client_id
+      - immich_client_secret
       - paperless_client_id
       - paperless_client_secret
       - vaultwarden_client_id
@@ -170,10 +174,22 @@ configs:
     file: ./blueprints/provider_vaultwarden.yaml
 
   authentik_memberships:
-    name: identity_authentik_memberships_20261109
+    name: identity_authentik_memberships_20261109_2
     file: ./blueprints/memberships.yaml
 
+  authentik_provider_immich:
+    name: identity_authentik_provider_immich_20261109
+    file: ./blueprints/provider_immich.yaml
+
 secrets:
+  immich_client_id:
+    external: true
+    name: "immich_client_id_670a4a97a907"
+
+  immich_client_secret:
+    external: true
+    name: "immich_client_secret_effa26d81689"
+
   miniflux_client_id:
     external: true
     name: "miniflux_client_id_aa45d114b40f"
