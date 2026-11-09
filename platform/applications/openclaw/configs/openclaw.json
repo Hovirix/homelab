@@ -1,0 +1,5 @@
+{
+  "gateway": {
+    "$include": "/etc/openclaw/gateway.json"
+  }
+}
