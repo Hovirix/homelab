@@ -91,6 +91,7 @@ def test_services():
         "authentik": "https://authentik.hovirix.dev/",
         "vaultwarden": "https://vaultwarden.hovirix.dev/alive",
         "paperless": "https://paperless.hovirix.dev/accounts/login/",
+        "miniflux": "https://miniflux.hovirix.dev/healthcheck",
     }
 
     results = []

@@ -22,6 +22,7 @@ tasks:
         - {name: observability, file: platform/observability/stack.yml}
         - {name: vaultwarden, file: platform/applications/vaultwarden/stack.yml}
         - {name: paperless, file: platform/applications/paperless-ngx/stack.yml}
+        - {name: miniflux, file: platform/applications/miniflux/stack.yml}
     cmds:
       - python operations/scripts/secrets.py
       - for: {var: STACKS}
