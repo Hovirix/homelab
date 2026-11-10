@@ -1,8 +1,8 @@
 // METRICS — Containers / cAdvisor
 
 prometheus.exporter.cadvisor "containers" {
-	containerd_host      = "/rootfs/run/containerd/containerd.sock"
-	containerd_namespace = "moby"
+	// Leave the generic namespace at its default so Docker supplies Swarm labels.
+	containerd_host = "/rootfs/run/containerd/containerd.sock"
 
 	// Host metrics belong to exporter.unix.
 	docker_only               = true
@@ -14,11 +14,11 @@ prometheus.exporter.cadvisor "containers" {
 		"com.docker.swarm.task.name",
 	]
 
+	// Disk-usage directory scans cross Swarm secret mounts; diskIO needs no scan.
 	enabled_metrics = [
 		"cpu",
 		"memory",
 		"network",
-		"disk",
 		"diskIO",
 		"oom_event",
 	]
