@@ -1,0 +1,46 @@
+modules:
+  nodes:
+    metrics:
+      - name: swarm_node
+        type: object
+        help: Swarm node state from the manager API.
+        path: '{ [*] }'
+        labels:
+          node: '{ .Description.Hostname }'
+          role: '{ .Spec.Role }'
+          status: '{ .Status.State }'
+          availability: '{ .Spec.Availability }'
+        values:
+          info: 1
+
+      - name: swarm_manager
+        type: object
+        help: Swarm manager reachability.
+        path: '{ [?(@.Spec.Role == "manager")] }'
+        labels:
+          node: '{ .Description.Hostname }'
+          reachability: '{ .ManagerStatus.Reachability }'
+        values:
+          info: 1
+
+      - name: swarm_manager
+        type: object
+        help: Swarm manager leadership.
+        path: '{ [?(@.ManagerStatus.Leader == true)] }'
+        allow_missing_key: true
+        labels:
+          node: '{ .Description.Hostname }'
+        values:
+          leader: 1
+
+  services:
+    metrics:
+      - name: swarm_service
+        type: object
+        help: Swarm service restart policy from the manager API.
+        path: '{ [*] }'
+        labels:
+          service: '{ .Spec.Name }'
+          restart_policy: '{ .Spec.TaskTemplate.RestartPolicy.Condition }'
+        values:
+          info: 1
