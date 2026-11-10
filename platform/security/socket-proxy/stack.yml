@@ -1,0 +1,44 @@
+services:
+  socket-proxy:
+    image: tecnativa/docker-socket-proxy:v0.5.0@sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459
+
+    environment:
+      EVENTS: "1"
+      INFO: "1"
+      NETWORKS: "1"
+      NODES: "1"
+      SERVICES: "1"
+      SWARM: "1"
+      TASKS: "1"
+      POST: "0"
+      LOG_LEVEL: "warning"
+
+    networks:
+      - socket-proxy
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget -q -O /dev/null http://localhost:2375/_ping || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    deploy:
+      replicas: 1
+
+      placement:
+        constraints:
+          - node.role == manager
+
+      restart_policy:
+        condition: any
+
+networks:
+  socket-proxy:
+    name: socket-proxy
+    internal: true
