@@ -8,10 +8,6 @@ env:
   TRIVY_CONFIG: security/trivy.yaml
 
 tasks:
-  test:
-    desc: Check infrastructure drift and service health
-    cmd: ./operations/scripts/test.py
-
   lint:
     desc: Check code and configuration
     deps:
