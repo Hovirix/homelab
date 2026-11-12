@@ -25,12 +25,12 @@ tasks:
         - {name: miniflux, file: platform/applications/miniflux/stack.yml}
         - {name: immich, file: platform/applications/immich/stack.yml}
     cmds:
-      - python operations/scripts/secrets.py
+      - operations/scripts/secrets.py
       - for: {var: STACKS}
         cmd: |
           printf '\nDeploying %s\n' '{{.ITEM.name | upper}}:'
           docker stack deploy --detach=false --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
-      - defer: python operations/scripts/secrets.py clean
+      - operations/scripts/secrets.py clean
 
   status:
     desc: Show replicas and images
