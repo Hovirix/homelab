@@ -16,66 +16,6 @@ discovery.relabel "swarm" {
 	}
 }
 
-discovery.relabel "swarm_inventory" {
-	targets = discovery.docker.local.targets
-
-	rule {
-		action        = "keep"
-		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
-		regex         = "observability_swarm-inventory"
-	}
-
-	rule {
-		replacement  = "observability_swarm-inventory:7979"
-		target_label = "__address__"
-	}
-}
-
-prometheus.scrape "swarm_nodes" {
-	job_name        = "swarm_nodes"
-	targets         = discovery.relabel.swarm_inventory.output
-	forward_to      = [prometheus.relabel.swarm_inventory.receiver]
-	scrape_interval = "15s"
-	metrics_path    = "/probe"
-	params          = {
-		module = ["nodes"],
-		target = ["http://socket-proxy:2375/nodes"],
-	}
-}
-
-prometheus.scrape "swarm_services" {
-	job_name        = "swarm_services"
-	targets         = discovery.relabel.swarm_inventory.output
-	forward_to      = [prometheus.relabel.swarm_inventory.receiver]
-	scrape_interval = "15s"
-	metrics_path    = "/probe"
-	params          = {
-		module = ["services"],
-		target = ["http://socket-proxy:2375/services"],
-	}
-}
-
-prometheus.relabel "swarm_inventory" {
-	forward_to = [prometheus.remote_write.default.receiver]
-
-	rule {
-		source_labels = ["job"]
-		regex         = "swarm_(nodes|services)"
-		replacement   = "${1}"
-		target_label  = "inventory"
-	}
-
-	rule {
-		replacement  = "swarm-inventory"
-		target_label = "job"
-	}
-
-	rule {
-		action = "labeldrop"
-		regex  = "instance"
-	}
-}
-
 prometheus.scrape "swarm" {
 	targets         = discovery.relabel.swarm.output
 	forward_to      = [prometheus.relabel.swarm.receiver]

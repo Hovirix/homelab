@@ -4,7 +4,7 @@
   "description": "At-a-glance Swarm overview. Headline cards and cluster averages are cluster-wide. Service resources include all replicas; the node filter applies only to node panels. Unknown is not healthy. Service status describes scheduling, not application responsiveness.",
   "tags": ["platform", "swarm"],
   "schemaVersion": 39,
-  "version": 9,
+  "version": 10,
   "editable": false,
   "style": "dark",
   "timezone": "browser",
@@ -354,7 +354,7 @@
       "id": 7,
       "title": "Nodes",
       "type": "table",
-      "description": "Docker node ls terminology: node status, scheduling availability and manager leadership/reachability. Workers show a dash in Manager. Uptime comes from the host exporter. Failed inventory collection shows Unknown.",
+      "description": "Docker node ls terminology: node status, scheduling availability and manager leadership/reachability. Workers show a dash in Manager. Uptime comes from the host exporter. Missing node metrics or unhealthy scheduler collection shows Unknown.",
       "gridPos": { "x": 0, "y": 3, "w": 8, "h": 6 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
@@ -367,14 +367,14 @@
         },
         {
           "refId": "B",
-          "expr": "(max by (node, availability, status) (swarm_node_info{job=\"swarm-inventory\",node=~\"${node:regex}\"}) and on() (min(up{job=\"swarm-inventory\",inventory=\"nodes\"}) == 1)) or on(node) label_replace(label_replace(max by (node) (up{job=\"node\",node=~\"${node:regex}\"}), \"availability\", \"unknown\", \"node\", \".+\"), \"status\", \"unknown\", \"node\", \".+\")",
+          "expr": "(max by (node, availability, status) ((swarm_node_status{job=\"swarm\",node=~\"${node:regex}\"} == 1) * on(node_id, node) group_left(availability) (swarm_node_availability{job=\"swarm\"} == 1)) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)) or on(node) label_replace(label_replace(max by (node) (up{job=\"node\",node=~\"${node:regex}\"}), \"availability\", \"unknown\", \"node\", \".+\"), \"status\", \"unknown\", \"node\", \".+\")",
           "instant": true,
           "range": false,
           "format": "table"
         },
         {
           "refId": "C",
-          "expr": "(max by (node, manager) (label_replace((swarm_manager_leader{job=\"swarm-inventory\",node=~\"${node:regex}\"} == 1), \"manager\", \"Leader\", \"node\", \".+\") or on(node) label_replace(swarm_manager_info{job=\"swarm-inventory\",node=~\"${node:regex}\"}, \"manager\", \"$1\", \"reachability\", \"(.+)\") or on(node) label_replace(swarm_node_info{job=\"swarm-inventory\",role=\"worker\",node=~\"${node:regex}\"}, \"manager\", \"—\", \"node\", \".+\")) and on() (min(up{job=\"swarm-inventory\",inventory=\"nodes\"}) == 1)) or on(node) label_replace(max by (node) (up{job=\"node\",node=~\"${node:regex}\"}), \"manager\", \"Unknown\", \"node\", \".+\")",
+          "expr": "(max by (node, manager) (label_replace((swarm_node_manager_leader{job=\"swarm\",node=~\"${node:regex}\"} == 1), \"manager\", \"Leader\", \"node\", \".+\") or on(node_id, node) label_replace((swarm_node_manager_reachability{job=\"swarm\",node=~\"${node:regex}\"} == 1), \"manager\", \"$1\", \"reachability\", \"(.+)\") or on(node_id, node) label_replace(swarm_node_info{job=\"swarm\",role=\"worker\",node=~\"${node:regex}\"}, \"manager\", \"—\", \"node\", \".+\")) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)) or on(node) label_replace(max by (node) (up{job=\"node\",node=~\"${node:regex}\"}), \"manager\", \"Unknown\", \"node\", \".+\")",
           "instant": true,
           "range": false,
           "format": "table"
@@ -787,7 +787,7 @@
       "id": 12,
       "title": "Services",
       "type": "table",
-      "description": "Failing: no expected tasks running. Degraded: replica mismatch or no eligible global nodes. Updating: rollout in progress. OK: target running (or a job executing). Completed: finished job/one-shot. Stopped: scaled to zero or idle one-shot. Unknown: missing/stale scheduler or inventory data. CPU is the latest 2-minute usage (100% = one core); RAM is current working set across all replicas. Values are at the selected range end; missing resources are Unknown. Global targets count currently eligible nodes.",
+      "description": "Failing: no expected tasks running. Degraded: replica mismatch or no eligible global nodes. Updating: rollout in progress. OK: target running (or a job executing). Completed: finished job/one-shot. Stopped: scaled to zero or idle one-shot. Unknown: missing/stale scheduler data or restart-policy metrics. CPU is the latest 2-minute usage (100% = one core); RAM is current working set across all replicas. Values are at the selected range end; missing resources are Unknown. Global targets count currently eligible nodes.",
       "gridPos": { "x": 0, "y": 16, "w": 16, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
@@ -807,7 +807,7 @@
         },
         {
           "refId": "C",
-          "expr": "max by (service) (\n  (4 + 0 * (swarm_service_at_desired{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} == 1))\n  or on(service) ((4 + 0 * (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=\"complete\"}) >= on(service) swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"})) and on(service) swarm_service_info{job=\"swarm-inventory\",restart_policy=\"none\"} and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0))\n  or on(service) (5 + 0 * ((swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"replicated\"} == 0) and on(service) (swarm_service_running_replicas{job=\"swarm\"} == 0)))\n  or on(service) (5 + 0 * (((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode!~\".*-job\"} == 0) and on(service) swarm_service_info{job=\"swarm-inventory\",restart_policy=\"none\"}) unless on(service) (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=~\"failed|rejected\"}) > 0)))\n  or on(service) (0 * ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == 0) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0)))\n  or on(service) (2 + 0 * (max by (service) (swarm_service_update_state_info{job=\"swarm\",service=~\"${service:regex}\",state=~\"updating|rollback_started\"}) == 1))\n  or on(service) (3 + 0 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} > 0))\n  or on(service) (1 + 0 * (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"global\"} == 0))\n  or on(service) ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} > bool 0) + on(service) 2 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == bool on(service) swarm_service_desired_replicas{job=\"swarm\"}))\n) and on(service) swarm_service_info{job=\"swarm-inventory\"}\nand on() (min(up{job=\"swarm-inventory\",inventory=\"services\"}) == 1)\nand on() (min(up{job=\"swarm\"}) == 1)\nand on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)\nand on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)\nor on(service) (6 + 0 * sum by (service) (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"}))",
+          "expr": "max by (service) (\n  (4 + 0 * (swarm_service_at_desired{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} == 1))\n  or on(service) ((4 + 0 * (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=\"complete\"}) >= on(service) swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"})) and on(service) (swarm_service_restart_policy{job=\"swarm\",restart_condition=\"none\"} == 1) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0))\n  or on(service) (5 + 0 * ((swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"replicated\"} == 0) and on(service) (swarm_service_running_replicas{job=\"swarm\"} == 0)))\n  or on(service) (5 + 0 * (((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode!~\".*-job\"} == 0) and on(service) (swarm_service_restart_policy{job=\"swarm\",restart_condition=\"none\"} == 1)) unless on(service) (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=~\"failed|rejected\"}) > 0)))\n  or on(service) (0 * ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == 0) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0)))\n  or on(service) (2 + 0 * (max by (service) (swarm_service_update_state_info{job=\"swarm\",service=~\"${service:regex}\",state=~\"updating|rollback_started\"}) == 1))\n  or on(service) (3 + 0 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} > 0))\n  or on(service) (1 + 0 * (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"global\"} == 0))\n  or on(service) ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} > bool 0) + on(service) 2 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == bool on(service) swarm_service_desired_replicas{job=\"swarm\"}))\n) and on(service) (swarm_service_restart_policy{job=\"swarm\"} == 1)\nand on() (min(up{job=\"swarm\"}) == 1)\nand on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)\nand on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)\nor on(service) (6 + 0 * sum by (service) (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"}))",
           "instant": true,
           "range": false,
           "format": "table"

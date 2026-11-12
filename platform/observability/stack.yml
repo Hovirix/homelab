@@ -182,6 +182,7 @@ services:
         condition: any
 
   swarm-exporter:
+    # Upgrade when an image includes upstream PR #123; v3.0.0 lacks node/restart-policy metrics.
     image: ghcr.io/leinardi/swarm-scheduler-exporter:v3.0.0@sha256:d62cc1b63e83d87a1f597c719c5191b09e6ec6c7ac9233b7f612984320577cc4
 
     environment:
@@ -205,46 +206,6 @@ services:
       timeout: 5s
       retries: 3
       start_period: 90s
-
-    deploy:
-      replicas: 1
-
-      update_config:
-        failure_action: rollback
-
-      restart_policy:
-        condition: any
-
-  swarm-inventory:
-    image: quay.io/prometheuscommunity/json-exporter:v0.8.0@sha256:3aad20d41a0b31dfaaf7ab1a091440e92a82a61ef68b76750eac0ad50a983652
-
-    command:
-      - --config.file=/etc/json_exporter/config.yml
-
-    configs:
-      - source: swarm_inventory
-        target: /etc/json_exporter/config.yml
-
-    networks:
-      - observability
-      - socket-proxy
-
-    read_only: true
-
-    cap_drop:
-      - ALL
-
-    healthcheck:
-      test:
-        - CMD
-        - wget
-        - -q
-        - -O
-        - /dev/null
-        - http://localhost:7979/metrics
-      interval: 30s
-      timeout: 5s
-      retries: 3
 
     deploy:
       replicas: 1
@@ -369,7 +330,7 @@ configs:
     file: ./configs/grafana/provisioning/dashboards/dashboards.yml
 
   grafana_dashboard_platform:
-    name: observability_grafana_dashboard_platform_v9
+    name: observability_grafana_dashboard_platform_v10
     file: ./configs/grafana/dashboards/platform.json
 
   grafana_alerting_notifications:
@@ -441,12 +402,8 @@ configs:
     file: ./configs/alloy/traefik.alloy
 
   alloy_swarm:
-    name: observability_alloy_swarm_v2
+    name: observability_alloy_swarm_v3
     file: ./configs/alloy/swarm.alloy
-
-  swarm_inventory:
-    name: observability_swarm_inventory_v2
-    file: ./configs/swarm-inventory.yml
 
   alloy_blackbox:
     name: observability_alloy_blackbox_v5
