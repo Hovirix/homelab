@@ -42,6 +42,12 @@ services:
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
 
+      - source: grafana_dashboards
+        target: /etc/grafana/provisioning/dashboards/dashboards.yml
+
+      - source: grafana_dashboard_platform
+        target: /etc/grafana/dashboards/platform.json
+
       - source: grafana_alerting_notifications
         target: /etc/grafana/provisioning/alerting/notifications.yml
 
@@ -175,6 +181,40 @@ services:
       restart_policy:
         condition: any
 
+  swarm-exporter:
+    image: ghcr.io/leinardi/swarm-scheduler-exporter:v3.1.0@sha256:9ef395c7a79edba0532323a55b2a653dc92a73f1e009321944800ec6e89b1163
+
+    environment:
+      DOCKER_HOST: tcp://socket-proxy:2375
+
+    networks:
+      - observability
+      - socket-proxy
+
+    read_only: true
+
+    cap_drop:
+      - ALL
+
+    healthcheck:
+      test:
+        - CMD
+        - /usr/local/bin/swarm-scheduler-exporter
+        - --healthcheck
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+
+    deploy:
+      replicas: 1
+
+      update_config:
+        failure_action: rollback
+
+      restart_policy:
+        condition: any
+
   alloy:
     image: grafana/alloy:v1.21.3@sha256:8ab871206bd2d8f89277f53abffee5f452a293980788d52f85fa183a87a505a4
 
@@ -210,6 +250,9 @@ services:
 
       - source: alloy_traefik
         target: /etc/alloy/config.d/traefik.alloy
+
+      - source: alloy_swarm
+        target: /etc/alloy/config.d/swarm.alloy
 
       - source: alloy_blackbox
         target: /etc/alloy/config.d/blackbox.alloy
@@ -273,10 +316,21 @@ networks:
   traefik:
     external: true
 
+  socket-proxy:
+    external: true
+
 configs:
   grafana_datasources:
     name: observability_grafana_datasources_v2
     file: ./configs/grafana/provisioning/datasources.yml
+
+  grafana_dashboards:
+    name: observability_grafana_dashboards_v1
+    file: ./configs/grafana/provisioning/dashboards/dashboards.yml
+
+  grafana_dashboard_platform:
+    name: observability_grafana_dashboard_platform_v10
+    file: ./configs/grafana/dashboards/platform.json
 
   grafana_alerting_notifications:
     name: observability_grafana_alerting_notifications_v1
@@ -339,12 +393,16 @@ configs:
     file: ./configs/alloy/host.alloy
 
   alloy_containers:
-    name: observability_alloy_containers_v2
+    name: observability_alloy_containers_v3
     file: ./configs/alloy/containers.alloy
 
   alloy_traefik:
     name: observability_alloy_traefik_v1
     file: ./configs/alloy/traefik.alloy
+
+  alloy_swarm:
+    name: observability_alloy_swarm_v3
+    file: ./configs/alloy/swarm.alloy
 
   alloy_blackbox:
     name: observability_alloy_blackbox_v5

@@ -14,6 +14,7 @@ tasks:
     vars:
       STACKS:
         - {name: openclaw, file: platform/applications/openclaw/stack.yml}
+        - {name: socket-proxy, file: platform/security/socket-proxy/stack.yml}
         - {name: traefik, file: platform/ingress/traefik/stack.yml}
         - {name: cloudflared, file: platform/ingress/cloudflared/stack.yml}
         - {name: postgres, file: platform/data/postgres/stack.yml}
@@ -29,7 +30,7 @@ tasks:
       - for: {var: STACKS}
         cmd: |
           printf '\nDeploying %s\n' '{{.ITEM.name | upper}}:'
-          docker stack deploy --detach=false --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
+          docker stack deploy --detach=false --prune --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
       - defer: python operations/scripts/secrets.py clean
 
   status:

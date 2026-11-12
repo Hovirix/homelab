@@ -1,0 +1,45 @@
+// METRICS — Swarm scheduler
+
+discovery.relabel "swarm" {
+	targets = discovery.docker.local.targets
+
+	rule {
+		action        = "keep"
+		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+		regex         = "observability_swarm-exporter"
+	}
+
+	// Discover locally to scrape once; DNS selects the shared observability network.
+	rule {
+		replacement  = "observability_swarm-exporter:8888"
+		target_label = "__address__"
+	}
+}
+
+prometheus.scrape "swarm" {
+	targets         = discovery.relabel.swarm.output
+	forward_to      = [prometheus.relabel.swarm.receiver]
+	scrape_interval = "15s"
+}
+
+prometheus.relabel "swarm" {
+	forward_to = [prometheus.remote_write.default.receiver]
+
+	// Match cAdvisor and Loki's full Swarm service names; leave standalone names intact.
+	rule {
+		source_labels = ["stack", "service"]
+		regex         = "(.+);(.+)"
+		replacement   = "${1}_${2}"
+		target_label  = "service"
+	}
+
+	rule {
+		replacement  = "swarm"
+		target_label = "job"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "instance"
+	}
+}
