@@ -182,8 +182,7 @@ services:
         condition: any
 
   swarm-exporter:
-    # Upgrade when an image includes upstream PR #123; v3.0.0 lacks node/restart-policy metrics.
-    image: ghcr.io/leinardi/swarm-scheduler-exporter:v3.0.0@sha256:d62cc1b63e83d87a1f597c719c5191b09e6ec6c7ac9233b7f612984320577cc4
+    image: ghcr.io/leinardi/swarm-scheduler-exporter:v3.1.0@sha256:9ef395c7a79edba0532323a55b2a653dc92a73f1e009321944800ec6e89b1163
 
     environment:
       DOCKER_HOST: tcp://socket-proxy:2375
