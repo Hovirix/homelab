@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/hovirix/postgres:18.6@sha256:b1bec06f46990ad5b8794705d0b1bae184a5497cc845b564d303011dd01449a5
+    image: ghcr.io/hovirix/postgres:18.7@sha256:1e27e239b6897e50bbb62a7bcae667e01f51e894dccb207cdbffae16d826d06f
 
     environment:
       POSTGRES_USER: postgres
@@ -96,7 +96,7 @@ services:
         condition: any
 
   reconcile:
-    image: ghcr.io/hovirix/postgres:18.6@sha256:b1bec06f46990ad5b8794705d0b1bae184a5497cc845b564d303011dd01449a5
+    image: ghcr.io/hovirix/postgres:18.7@sha256:1e27e239b6897e50bbb62a7bcae667e01f51e894dccb207cdbffae16d826d06f
 
     command:
       - bash
