@@ -11,8 +11,10 @@ entries:
     identifiers:
       name: Paperless
     attrs:
+      client_type: public
       client_id: !File /run/secrets/paperless_client_id
       client_secret: !File /run/secrets/paperless_client_secret
+      signing_key: !Find [authentik_crypto.certificatekeypair, [name, authentik Self-signed Certificate]]
       grant_types:
         - authorization_code
         - refresh_token
@@ -22,6 +24,9 @@ entries:
         - matching_mode: strict
           redirect_uri_type: authorization
           url: https://paperless.hovirix.dev/accounts/oidc/authentik/login/callback/
+        - matching_mode: strict
+          redirect_uri_type: authorization
+          url: x-paperless://oidc-callback
       property_mappings:
         - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-openid]]
         - !Find [authentik_providers_oauth2.scopemapping, [managed, goauthentik.io/providers/oauth2/scope-profile]]
