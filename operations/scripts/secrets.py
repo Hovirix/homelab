@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import hashlib
 import json
 import re
@@ -65,8 +67,12 @@ def clean():
     referenced = set()
     for service in run("docker", "service", "ls", "-q").splitlines():
         spec = json.loads(run("docker", "service", "inspect", service))[0]
-        secrets = spec["Spec"]["TaskTemplate"]["ContainerSpec"].get("Secrets", [])
-        referenced.update(secret["SecretName"] for secret in secrets)
+        for service_spec in (spec["Spec"], spec.get("PreviousSpec")):
+            if service_spec is not None:
+                secrets = service_spec["TaskTemplate"]["ContainerSpec"].get(
+                    "Secrets", []
+                )
+                referenced.update(secret["SecretName"] for secret in secrets)
     for stack in ROOT.glob("platform/**/stack.yml"):
         referenced.update(
             re.findall(r'^    name: "([^"\n]+)"$', stack.read_text(), re.MULTILINE)

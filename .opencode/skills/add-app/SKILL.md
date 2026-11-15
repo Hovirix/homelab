@@ -21,6 +21,8 @@ description: Use when adding a new app or service to HX Lab, such as "add Minifl
 
 8. Run only relevant checks: `docker stack config -c <new stack>` and changed stacks, `conftest test --quiet --policy security/policy <new stack>` and changed stacks, plus applicable formatting/lint checks. Do not deploy or apply infrastructure unless explicitly requested. Distinguish static checks from live verification.
 
+9. If new images introduce security blockers, load `assess-image-risk` and follow its assessment, compact table, and approval rules. Adding a service does not authorize risk acceptance or exceptions; keep the CI gate and require explicit approval for scoped exceptions. Missing scans are unverified, not clean.
+
 ## Output
 
 Always finish with these headings, in order; use `None` where appropriate:

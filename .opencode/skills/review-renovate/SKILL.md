@@ -19,32 +19,15 @@ Review only. Do not merge, approve, close or rebase PRs, trigger workflows, edit
 
 6. Preserve counts by deployment and severity: **CRITICAL, HIGH, MEDIUM, LOW, UNKNOWN**. Keep **Introduced, Inherited, Patched, Removed, No longer detected** distinct. Removed packages/deployments are not patched vulnerabilities, and unconfirmed disappearance is not proof of a fix. Summed deployment findings are not necessarily unique CVEs. Include fixable HIGH/CRITICAL counts before exceptions, gate results, relevant CVEs/packages and supporting links.
 
-7. Honor the repository gate: introduced, unexcepted, fixable HIGH/CRITICAL findings block merging; inherited findings remain backlog. A lower total does not excuse new blockers. Inspect exception scope and rationale; never invent exceptions. Assess relevant regressions even when the gate passes. Honor release-age gates and required checks; pending, skipped or neutral checks are not evidence of a clean scan. Hold unresolved compatibility, security or evidence blockers, and recommend a merge order only for eligible candidates. Merging never authorizes deployment or infrastructure applies.
+7. Honor the repository gate: introduced, unexcepted, fixable HIGH/CRITICAL findings block merging; inherited findings remain backlog. Load `assess-image-risk` for blocked images or requested risk acceptance and follow its shared assessment and exception rules; a recommendation never clears the gate. Inspect exception scope and rationale; never invent exceptions. Assess relevant regressions even when the gate passes. Honor release-age gates and required checks; pending, skipped or neutral checks are not evidence of a clean scan. Hold unresolved compatibility, security or evidence blockers, and recommend a merge order only for eligible candidates. Merging never authorizes deployment or infrastructure applies.
 
 ## Output
 
-Always return these headings in order. Use `None`, `Unknown` or `N/A` explicitly rather than omitting sections or inventing values. Link PRs, comments/reports and upstream evidence beside the corresponding claims.
+Load `assess-image-risk` and use its compact table and decision meanings by default:
 
-### Summary
+| PR | Service | Change | Fixed | New | Decision | Why | Next step |
+| --- | --- | --- | ---: | ---: | --- | --- | --- |
 
-State the goal, number of reviewed PRs and recommended merge order.
+One row per deployment; one row per PR for non-image updates, with `N/A` for image counts. Use short, plain-language cells and link evidence beside claims. Include check failures, migration prerequisites, and unresolved review requests in Why or Next step; image risk acceptance never overrides these blockers.
 
-### Decisions
-
-| PR  | Update | Decision | Reason / next step | Checks |
-| --- | ------ | -------- | ------------------ | ------ |
-
-One row per PR. Use exactly **Merge candidate**, **Hold** or **Needs migration**. Give concrete blockers/prerequisites and distinguish recommendations from approval or merge actions.
-
-### Vulnerabilities
-
-For each PR/deployment, identify the current/proposed images and source comment/report, then reproduce this table with all five severity rows:
-
-| Severity | Current | Proposed | Introduced | Inherited | Patched | Removed | No longer detected |
-| -------- | ------- | -------- | ---------- | --------- | ------- | ------- | ------------------ |
-
-Follow each table with **Fixable HIGH/CRITICAL: before → after**, **Gate: result** and material CVEs/regressions. State `Unknown` with the missing evidence when counts cannot be verified; use `N/A — no image changes` when applicable.
-
-### Unverified
-
-List material evidence gaps and runtime/recovery checks not performed. State whether any PRs were merged or systems changed; never imply static review verified production behavior.
+Show full vulnerability tables only on request or exact acceptance details when needed for approval, following `assess-image-risk`. Finish with eligible merge order, if any, and at most two short lines for missing evidence/checks and whether PRs or systems changed. Never imply static review verified production behavior.
