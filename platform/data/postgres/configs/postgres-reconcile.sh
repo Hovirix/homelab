@@ -13,6 +13,7 @@ immich_password="$(</run/secrets/postgres_immich_password)"
 miniflux_password="$(</run/secrets/postgres_miniflux_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 vaultwarden_password="$(</run/secrets/postgres_vaultwarden_password)"
+exporter_password="$(</run/secrets/postgres_exporter_password)"
 
 if ! timeout 300 bash -c 'until pg_isready >/dev/null 2>&1; do sleep 2; done'; then
   printf 'PostgreSQL did not become ready within five minutes.\n' >&2
@@ -27,9 +28,20 @@ psql -X \
   --set=immich_password="$immich_password" \
   --set=miniflux_password="$miniflux_password" \
   --set=paperless_password="$paperless_password" \
-  --set=vaultwarden_password="$vaultwarden_password" <<'SQL'
+  --set=vaultwarden_password="$vaultwarden_password" \
+  --set=exporter_password="$exporter_password" <<'SQL'
 
 ALTER ROLE postgres PASSWORD :'superuser_password';
+
+SELECT 'CREATE ROLE postgres_exporter LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'postgres_exporter'
+)\gexec
+
+ALTER ROLE postgres_exporter WITH NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD :'exporter_password';
+GRANT pg_monitor TO postgres_exporter;
+GRANT CONNECT ON DATABASE postgres TO postgres_exporter;
+CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
 SELECT 'CREATE ROLE miniflux LOGIN'
 WHERE NOT EXISTS (

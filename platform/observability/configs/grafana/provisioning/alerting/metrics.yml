@@ -1,0 +1,149 @@
+apiVersion: 1
+groups:
+  - orgId: 1
+    name: metrics
+    folder: Alerts
+    interval: 1m
+    rules:
+      - uid: metrics-scrape-failed
+        title: "Metrics: scrape failed"
+        condition: C
+        data:
+          - &query
+            refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model: &model
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: 1 - up{job=~"services|alloy"}
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - &reduce
+            refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+          - &threshold
+            refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+        noDataState: Alerting
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: '{{ $labels.service }} metrics scrape is failing on {{ $labels.node }} ({{ $labels.instance }})'
+        labels:
+          severity: warning
+        isPaused: false
+      - uid: metrics-target-missing
+        title: "Metrics: target missing"
+        condition: C
+        data:
+          - !!merge <<: *query
+            model:
+              !!merge <<: *model
+              expr: |
+                (swarm_service_desired_replicas{job="swarm",service=~"immich_server|miniflux_web|paperless_web|authentik_(server|worker)|cloudflared_tunnel|observability_(grafana|loki|victoriametrics|postgres-exporter|valkey-exporter)"} > 0)
+                unless on(service) up{job="services"}
+                or (swarm_service_desired_replicas{job="swarm"} > on(service) count by (service) (up{job="services",service!="immich_server"}))
+                or (2 * swarm_service_desired_replicas{job="swarm",service="immich_server"} > on(service) count by (service) (up{job="services",service="immich_server"}))
+                or (up{job="node"} unless on(node) up{job="alloy"})
+                or (count by (service, node) (up{job="services",service="immich_server"}) < bool 2)
+          - *reduce
+          - *threshold
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: 'Expected metrics target missing: {{ $labels.service }} {{ $labels.node }}'
+        labels:
+          severity: warning
+        isPaused: false
+      - uid: metrics-native-unhealthy
+        title: "Services: dependency or worker unhealthy"
+        condition: C
+        data:
+          - !!merge <<: *query
+            model:
+              !!merge <<: *model
+              expr: |
+                (1 - pg_up{job="services"})
+                or (1 - redis_up{job="services"})
+                or (1 - flower_worker_online{job="services"})
+                or clamp_min(1 - cloudflared_tunnel_ha_connections{job="services"}, 0)
+          - *reduce
+          - *threshold
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: '{{ $labels.service }} reports an unhealthy database, worker or tunnel connection on {{ $labels.node }}'
+        labels:
+          severity: critical
+        isPaused: false
+      - uid: metrics-native-failures
+        title: "Services: task or database failures"
+        condition: C
+        data:
+          - !!merge <<: *query
+            model:
+              !!merge <<: *model
+              expr: |
+                increase(pg_stat_database_deadlocks{job="services"}[5m])
+                or increase(redis_evicted_keys_total{job="services"}[5m])
+                or increase(authentik_tasks_errors_total{job="services"}[5m])
+                or increase(flower_events_total{job="services",type="task-failed"}[5m])
+                or increase({__name__=~"immich_jobs_.*_failed_total",job="services"}[5m])
+                or miniflux_broken_feeds{job="services"}
+          - *reduce
+          - *threshold
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: '{{ $labels.service }} reports failures; inspect application metrics and logs'
+        labels:
+          severity: warning
+        isPaused: false
+      - uid: metrics-ingestion-failed
+        title: "Observability: ingestion failures"
+        condition: C
+        data:
+          - !!merge <<: *query
+            model:
+              !!merge <<: *model
+              expr: |
+                increase(prometheus_remote_storage_samples_failed_total{job="alloy"}[5m])
+                or increase(loki_discarded_samples_total{job="services"}[5m])
+          - *reduce
+          - *threshold
+        noDataState: OK
+        execErrState: Error
+        for: 0s
+        annotations:
+          summary: '{{ $labels.service }} is losing observability data on {{ $labels.node }}'
+        labels:
+          severity: warning
+        isPaused: false
