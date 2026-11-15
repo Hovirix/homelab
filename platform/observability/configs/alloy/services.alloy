@@ -1,0 +1,173 @@
+// Scrape each local task once, on the network shared with Alloy.
+discovery.docker "metrics" {
+	host                = "unix:///var/run/docker.sock"
+	match_first_network = false
+}
+
+discovery.relabel "services" {
+	targets = discovery.docker.metrics.targets
+
+	rule {
+		action        = "keep"
+		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name", "__meta_docker_network_name"]
+		regex         = "(immich_server|miniflux_web|paperless_web|observability_(grafana|loki|victoriametrics|postgres-exporter|valkey-exporter));observability|authentik_(server|worker);authentik|cloudflared_tunnel;cloudflared"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name"]
+		target_label  = "service"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "immich_server"
+		replacement   = "8081"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "miniflux_web"
+		replacement   = "8080"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "paperless_web"
+		replacement   = "5555"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "authentik_(server|worker)"
+		replacement   = "9300"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "cloudflared_tunnel"
+		replacement   = "2000"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "observability_grafana"
+		replacement   = "3000"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "observability_loki"
+		replacement   = "3100"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "observability_victoriametrics"
+		replacement   = "8428"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "observability_postgres-exporter"
+		replacement   = "9187"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["service"]
+		regex         = "observability_valkey-exporter"
+		replacement   = "9121"
+		target_label  = "__tmp_port"
+	}
+
+	rule {
+		source_labels = ["__meta_docker_network_ip", "__tmp_port"]
+		separator     = ":"
+		target_label  = "__address__"
+	}
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "services"
+		target_label = "job"
+	}
+}
+
+prometheus.scrape "services" {
+	targets         = discovery.relabel.services.output
+	forward_to      = [prometheus.relabel.services.receiver]
+	scrape_interval = "30s"
+}
+
+discovery.relabel "immich_microservices" {
+	targets = discovery.relabel.services.output
+
+	rule {
+		action        = "keep"
+		source_labels = ["service"]
+		regex         = "immich_server"
+	}
+
+	rule {
+		source_labels = ["__address__"]
+		regex         = "(.+):8081"
+		replacement   = "${1}:8082"
+		target_label  = "__address__"
+	}
+}
+
+prometheus.scrape "immich_microservices" {
+	targets         = discovery.relabel.immich_microservices.output
+	forward_to      = [prometheus.relabel.services.receiver]
+	scrape_interval = "30s"
+}
+
+prometheus.relabel "services" {
+	forward_to = [prometheus.remote_write.default.receiver]
+
+	// Preserve the operation when rate/increase removes the dynamic metric name.
+	rule {
+		source_labels = ["__name__"]
+		regex         = "immich_jobs_(.+)_failed_total"
+		target_label  = "operation"
+	}
+}
+
+prometheus.exporter.self "alloy" {}
+
+discovery.relabel "alloy" {
+	targets = prometheus.exporter.self.alloy.targets
+
+	rule {
+		replacement  = sys.env("ALLOY_NODE")
+		target_label = "node"
+	}
+
+	rule {
+		replacement  = "alloy"
+		target_label = "job"
+	}
+
+	rule {
+		replacement  = "observability_alloy"
+		target_label = "service"
+	}
+}
+
+prometheus.scrape "alloy" {
+	targets         = discovery.relabel.alloy.output
+	forward_to      = [prometheus.remote_write.default.receiver]
+	scrape_interval = "30s"
+}

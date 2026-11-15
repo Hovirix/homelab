@@ -5,6 +5,8 @@ services:
     environment:
       BASE_URL: https://miniflux.hovirix.dev
       LISTEN_ADDR: 0.0.0.0:8080
+      METRICS_COLLECTOR: "1"
+      METRICS_ALLOWED_NETWORKS: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16
       HTTPS: "true"
       DATABASE_URL_FILE: /run/secrets/miniflux_database_url
       RUN_MIGRATIONS: "1"
@@ -27,6 +29,7 @@ services:
     networks:
       - postgres
       - traefik
+      - observability
 
     healthcheck:
       test:
@@ -44,7 +47,7 @@ services:
 
       labels:
         - traefik.enable=true
-        - traefik.http.routers.miniflux.rule=Host(`miniflux.hovirix.dev`)
+        - traefik.http.routers.miniflux.rule=Host(`miniflux.hovirix.dev`) && !PathPrefix(`/metrics`)
         - traefik.http.routers.miniflux.entrypoints=websecure
         - traefik.http.services.miniflux.loadbalancer.server.port=8080
 
@@ -55,6 +58,9 @@ services:
         condition: any
 
 networks:
+  observability:
+    external: true
+
   postgres:
     external: true
 

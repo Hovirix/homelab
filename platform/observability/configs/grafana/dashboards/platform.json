@@ -1,31 +1,29 @@
 {
   "uid": "platform",
   "title": "Platform",
-  "description": "At-a-glance Swarm overview. Headline cards and cluster averages are cluster-wide. Service resources include all replicas; the node filter applies only to node panels. Unknown is not healthy. Service status describes scheduling, not application responsiveness.",
+  "description": "Swarm node status, cluster-wide capacity, observed workload placement and HTTP performance. Node selection filters CPU/RAM history only; service selection filters the service table. Capacity always covers the full Swarm. Scheduling is not application health.",
   "tags": ["platform", "swarm"],
   "schemaVersion": 39,
-  "version": 10,
+  "version": 19,
   "editable": false,
   "style": "dark",
   "timezone": "browser",
   "refresh": "30s",
   "time": { "from": "now-24h", "to": "now" },
-  "links": [{ "title": "Explore", "type": "link", "url": "/explore" }],
+  "links": [
+    {
+      "title": "Explore metrics",
+      "type": "link",
+      "url": "/explore?schemaVersion=1&panes=%7B%22main%22%3A%7B%22datasource%22%3A%22metrics%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22up%22%7D%5D%7D%7D"
+    },
+    {
+      "title": "Explore logs",
+      "type": "link",
+      "url": "/explore?schemaVersion=1&panes=%7B%22main%22%3A%7B%22datasource%22%3A%22logs%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22%7Bservice_name%3D~%5C%22.%2B%5C%22%7D%22%7D%5D%7D%7D"
+    }
+  ],
   "templating": {
     "list": [
-      {
-        "name": "service",
-        "label": "Service",
-        "type": "query",
-        "datasource": { "type": "prometheus", "uid": "metrics" },
-        "query": "label_values(swarm_service_desired_replicas{job=\"swarm\"}, service)",
-        "refresh": 1,
-        "sort": 1,
-        "multi": true,
-        "includeAll": true,
-        "allValue": ".+",
-        "current": { "text": "All", "value": "$__all" }
-      },
       {
         "name": "node",
         "label": "Node",
@@ -38,343 +36,55 @@
         "includeAll": true,
         "allValue": ".+",
         "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "metrics" },
+        "query": "label_values(swarm_service_desired_replicas{job=\"swarm\"}, service)",
+        "refresh": 1,
+        "sort": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".+",
+        "current": { "text": "All", "value": "$__all" }
       }
     ]
   },
   "panels": [
     {
-      "id": 1,
-      "title": "Cluster",
-      "type": "stat",
-      "description": "Healthy means all known nodes are ready and the scheduler exporter is healthy and reachable. This is not a manager Raft reachability or quorum check.",
-      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 3 },
-      "datasource": { "type": "prometheus", "uid": "metrics" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "(sum(swarm_cluster_nodes_by_state{job=\"swarm\",status=\"ready\"}) == bool sum(swarm_cluster_nodes_by_state{job=\"swarm\"})) * min(swarm_exporter_health{job=\"swarm\"}) and on() (min(up{job=\"swarm\"}) == 1)",
-          "instant": true,
-          "range": false,
-          "legendFormat": "Node readiness"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Unknown",
-          "color": { "mode": "fixed", "fixedColor": "text" },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": { "text": "Check", "color": "red" },
-                "1": { "text": "Healthy", "color": "green" }
-              }
-            },
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": { "text": "Unknown", "color": "gray" }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": false,
-        "orientation": "vertical",
-        "text": { "titleSize": 11, "valueSize": 28 },
-        "reduceOptions": { "calcs": ["lastNotNull"] }
-      }
-    },
-    {
-      "id": 2,
-      "title": "Services",
-      "type": "stat",
-      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 3 },
-      "datasource": { "type": "prometheus", "uid": "metrics" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "count(swarm_service_desired_replicas{job=\"swarm\"})",
-          "instant": true,
-          "range": false,
-          "legendFormat": "Configured"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Unknown",
-          "decimals": 0,
-          "color": { "mode": "fixed", "fixedColor": "text" },
-          "mappings": [
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": { "text": "Unknown", "color": "gray" }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": false,
-        "orientation": "vertical",
-        "text": { "titleSize": 11, "valueSize": 28 },
-        "reduceOptions": { "calcs": ["lastNotNull"] }
-      }
-    },
-    {
-      "id": 3,
-      "title": "Running tasks",
-      "type": "stat",
-      "description": "Authoritative Swarm running tasks, one container per task. Not a cAdvisor container count.",
-      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 3 },
-      "datasource": { "type": "prometheus", "uid": "metrics" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(swarm_service_running_replicas{job=\"swarm\"})",
-          "instant": true,
-          "range": false,
-          "legendFormat": "Across all services"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Unknown",
-          "decimals": 0,
-          "color": { "mode": "fixed", "fixedColor": "text" },
-          "mappings": [
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": { "text": "Unknown", "color": "gray" }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": false,
-        "orientation": "vertical",
-        "text": { "titleSize": 11, "valueSize": 28 },
-        "reduceOptions": { "calcs": ["lastNotNull"] }
-      }
-    },
-    {
-      "id": 4,
-      "title": "PostgreSQL",
-      "type": "stat",
-      "description": "Scheduler state of postgres_server, not an SQL connection or database health check.",
-      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 3 },
-      "datasource": { "type": "prometheus", "uid": "metrics" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "min(swarm_service_at_desired{job=\"swarm\",service=\"postgres_server\"}) * (sum(swarm_service_running_replicas{job=\"swarm\",service=\"postgres_server\"}) > bool 0)",
-          "instant": true,
-          "range": false,
-          "legendFormat": "Scheduler state"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Unknown",
-          "color": { "mode": "fixed", "fixedColor": "text" },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "0": { "text": "Check", "color": "red" },
-                "1": { "text": "Running", "color": "green" }
-              }
-            },
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": { "text": "Unknown", "color": "gray" }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": false,
-        "orientation": "vertical",
-        "text": { "titleSize": 11, "valueSize": 28 },
-        "reduceOptions": { "calcs": ["lastNotNull"] }
-      }
-    },
-    {
-      "id": 5,
-      "title": "Storage",
-      "type": "stat",
-      "description": "Shared /var/mnt/swarm space used, deduplicated across nodes using the highest reported percentage. Unknown means filesystem telemetry is unavailable, not empty or healthy storage.",
-      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 3 },
-      "datasource": { "type": "prometheus", "uid": "metrics" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "max(100 * (1 - node_filesystem_avail_bytes{job=\"node\",mountpoint=\"/var/mnt/swarm\"} / node_filesystem_size_bytes{job=\"node\",mountpoint=\"/var/mnt/swarm\"})) or vector(-1)",
-          "instant": true,
-          "range": false,
-          "legendFormat": "Shared storage used"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Unknown",
-          "unit": "percent",
-          "decimals": 0,
-          "min": 0,
-          "max": 100,
-          "color": { "mode": "thresholds" },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 75 },
-              { "color": "red", "value": 90 }
-            ]
-          },
-          "mappings": [
-            {
-              "type": "value",
-              "options": { "-1": { "text": "Unknown", "color": "gray" } }
-            },
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": { "text": "Unknown", "color": "gray" }
-              }
-            }
-          ]
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": false,
-        "orientation": "vertical",
-        "text": { "titleSize": 11, "valueSize": 28 },
-        "reduceOptions": { "calcs": ["lastNotNull"] }
-      }
-    },
-    {
-      "id": 6,
-      "title": "Backups",
-      "type": "stat",
-      "description": "Latest Borg archive success/failure marker within 30 hours. This is archive creation, not restore verification. SQL dump results are listed below.",
-      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 3 },
-      "datasource": { "type": "loki", "uid": "logs" },
-      "timeFrom": "30h",
-      "hideTimeOverride": true,
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "{app=\"borgmatic\",hostname=\"pve\",config=\"config.yaml\"} |~ `^(borgmatic_archive_created|Failed backup)$` | line_format `{{ if eq (__line__) \"borgmatic_archive_created\" }}Successful{{ else }}Failed{{ end }}`",
-          "queryType": "range",
-          "maxLines": 1,
-          "direction": "backward"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "noValue": "Unknown",
-          "color": { "mode": "fixed", "fixedColor": "text" },
-          "mappings": [
-            {
-              "type": "value",
-              "options": {
-                "Successful": { "color": "green" },
-                "Failed": { "color": "red" }
-              }
-            },
-            {
-              "type": "special",
-              "options": {
-                "match": "null",
-                "result": { "text": "Unknown", "color": "gray" }
-              }
-            }
-          ]
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "Line" },
-            "properties": [
-              { "id": "displayName", "value": "Latest archive (30h)" }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "textMode": "value_and_name",
-        "justifyMode": "auto",
-        "wideLayout": false,
-        "orientation": "vertical",
-        "text": { "titleSize": 11, "valueSize": 28 },
-        "reduceOptions": {
-          "fields": "/^Latest archive \\(30h\\)$/",
-          "calcs": ["last"]
-        }
-      }
-    },
-    {
-      "id": 7,
-      "title": "Nodes",
+      "id": 63,
       "type": "table",
-      "description": "Docker node ls terminology: node status, scheduling availability and manager leadership/reachability. Workers show a dash in Manager. Uptime comes from the host exporter. Missing node metrics or unhealthy scheduler collection shows Unknown.",
-      "gridPos": { "x": 0, "y": 3, "w": 8, "h": 6 },
+      "title": "Swarm",
+      "description": "Docker Swarm node status, scheduling availability and manager reachability. Leader takes precedence over Reachable; workers show Worker. Missing or stale scheduler telemetry shows Unknown. Node status normally refreshes about once a minute.",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
         {
           "refId": "A",
-          "expr": "max by (node) (time() - node_boot_time_seconds{job=\"node\",node=~\"${node:regex}\"})",
+          "expr": "max by (node_id, node) (swarm_node_info{job=\"swarm\"})",
           "instant": true,
           "range": false,
           "format": "table"
         },
         {
           "refId": "B",
-          "expr": "(max by (node, availability, status) ((swarm_node_status{job=\"swarm\",node=~\"${node:regex}\"} == 1) * on(node_id, node) group_left(availability) (swarm_node_availability{job=\"swarm\"} == 1)) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)) or on(node) label_replace(label_replace(max by (node) (up{job=\"node\",node=~\"${node:regex}\"}), \"availability\", \"unknown\", \"node\", \".+\"), \"status\", \"unknown\", \"node\", \".+\")",
+          "expr": "(max by (node_id, status) (swarm_node_status{job=\"swarm\"} == 1) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1) and on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)) or on(node_id) max by (node_id, status) (label_replace(swarm_node_info{job=\"swarm\"}, \"status\", \"unknown\", \"node_id\", \".+\"))",
           "instant": true,
           "range": false,
           "format": "table"
         },
         {
           "refId": "C",
-          "expr": "(max by (node, manager) (label_replace((swarm_node_manager_leader{job=\"swarm\",node=~\"${node:regex}\"} == 1), \"manager\", \"Leader\", \"node\", \".+\") or on(node_id, node) label_replace((swarm_node_manager_reachability{job=\"swarm\",node=~\"${node:regex}\"} == 1), \"manager\", \"$1\", \"reachability\", \"(.+)\") or on(node_id, node) label_replace(swarm_node_info{job=\"swarm\",role=\"worker\",node=~\"${node:regex}\"}, \"manager\", \"—\", \"node\", \".+\")) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)) or on(node) label_replace(max by (node) (up{job=\"node\",node=~\"${node:regex}\"}), \"manager\", \"Unknown\", \"node\", \".+\")",
+          "expr": "(max by (node_id, availability) (swarm_node_availability{job=\"swarm\"} == 1) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1) and on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)) or on(node_id) max by (node_id, availability) (label_replace(swarm_node_info{job=\"swarm\"}, \"availability\", \"unknown\", \"node_id\", \".+\"))",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "D",
+          "expr": "(max by (node_id, reachability) (label_replace(swarm_node_manager_leader{job=\"swarm\"} == 1, \"reachability\", \"leader\", \"node_id\", \".+\") or on(node_id) (swarm_node_manager_reachability{job=\"swarm\"} == 1) or on(node_id) label_replace(swarm_node_info{job=\"swarm\",role=\"worker\"}, \"reachability\", \"worker\", \"node_id\", \".+\")) and on() (min(up{job=\"swarm\"}) == 1) and on() (min(swarm_exporter_health{job=\"swarm\"}) == 1) and on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)) or on(node_id) max by (node_id, reachability) (label_replace(swarm_node_info{job=\"swarm\"}, \"reachability\", \"unknown\", \"node_id\", \".+\"))",
           "instant": true,
           "range": false,
           "format": "table"
@@ -383,34 +93,40 @@
       "transformations": [
         {
           "id": "joinByField",
-          "options": { "byField": "node", "mode": "outerTabular" }
+          "options": { "byField": "node_id", "mode": "outerTabular" }
         },
         {
           "id": "organize",
           "options": {
             "excludeByName": {
+              "node_id": true,
               "Time": true,
               "Time 1": true,
               "Time 2": true,
               "Time 3": true,
+              "Time 4": true,
+              "Value #A": true,
               "Value #B": true,
-              "Value #C": true
+              "Value #C": true,
+              "Value #D": true
             },
             "indexByName": {
               "node": 0,
               "status": 1,
               "availability": 2,
-              "manager": 3,
-              "Value #A": 4
+              "reachability": 3
             },
             "renameByName": {
-              "node": "Node",
+              "node": "Hostname",
               "status": "Status",
               "availability": "Availability",
-              "manager": "Manager",
-              "Value #A": "Uptime"
+              "reachability": "Manager status"
             }
           }
+        },
+        {
+          "id": "sortBy",
+          "options": { "sort": [{ "field": "Hostname", "desc": false }] }
         }
       ],
       "fieldConfig": {
@@ -424,8 +140,13 @@
         },
         "overrides": [
           {
+            "matcher": { "id": "byName", "options": "Hostname" },
+            "properties": [{ "id": "custom.minWidth", "value": 120 }]
+          },
+          {
             "matcher": { "id": "byName", "options": "Status" },
             "properties": [
+              { "id": "custom.minWidth", "value": 125 },
               {
                 "id": "mappings",
                 "value": [
@@ -436,20 +157,27 @@
                       "down": { "text": "Down", "color": "red" },
                       "disconnected": {
                         "text": "Disconnected",
-                        "color": "orange"
+                        "color": "red"
                       },
                       "unknown": { "text": "Unknown", "color": "gray" }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "Unknown", "color": "gray" }
                     }
                   }
                 ]
               },
-              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
-              { "id": "custom.width", "value": 120 }
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
             ]
           },
           {
             "matcher": { "id": "byName", "options": "Availability" },
             "properties": [
+              { "id": "custom.minWidth", "value": 110 },
               {
                 "id": "mappings",
                 "value": [
@@ -458,45 +186,49 @@
                     "options": {
                       "active": { "text": "Active", "color": "green" },
                       "pause": { "text": "Pause", "color": "orange" },
-                      "drain": { "text": "Drain", "color": "blue" },
+                      "drain": { "text": "Drain", "color": "orange" },
                       "unknown": { "text": "Unknown", "color": "gray" }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "Unknown", "color": "gray" }
                     }
                   }
                 ]
               },
-              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
-              { "id": "custom.width", "value": 100 }
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Manager" },
+            "matcher": { "id": "byName", "options": "Manager status" },
             "properties": [
+              { "id": "custom.minWidth", "value": 145 },
               {
                 "id": "mappings",
                 "value": [
                   {
                     "type": "value",
                     "options": {
-                      "Leader": { "text": "Leader", "color": "green" },
+                      "leader": { "text": "Leader", "color": "green" },
                       "reachable": { "text": "Reachable", "color": "green" },
                       "unreachable": { "text": "Unreachable", "color": "red" },
                       "unknown": { "text": "Unknown", "color": "gray" },
-                      "Unknown": { "text": "Unknown", "color": "gray" },
-                      "—": { "text": "—", "color": "gray" }
+                      "worker": { "text": "Worker", "color": "gray" }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "Unknown", "color": "gray" }
                     }
                   }
                 ]
               },
-              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
-              { "id": "custom.width", "value": 120 }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "Uptime" },
-            "properties": [
-              { "id": "unit", "value": "dtdurations" },
-              { "id": "decimals", "value": 0 },
-              { "id": "custom.width", "value": 90 }
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } }
             ]
           }
         ]
@@ -504,27 +236,37 @@
       "options": {
         "showHeader": true,
         "cellHeight": "sm",
-        "footer": { "show": false },
-        "sortBy": [{ "displayName": "Node", "desc": false }]
+        "footer": { "show": false }
       }
     },
     {
       "id": 8,
-      "title": "Cluster CPU & memory",
-      "type": "timeseries",
-      "description": "Unweighted node averages across the cluster. Missing telemetry remains a gap, never zero usage.",
-      "gridPos": { "x": 8, "y": 3, "w": 16, "h": 6 },
+      "type": "gauge",
+      "title": "Capacity",
+      "description": "CPU and RAM show total Swarm utilization weighted by CPU capacity and memory size; the Node filter does not apply. Missing node exporters suppress CPU/RAM rather than showing a partial cluster. Shared storage is counted once. CPU/RAM: amber at 80%, red at 90%; storage: amber at 75%, red at 90%. Missing telemetry is unknown.",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
         {
           "refId": "A",
-          "expr": "100 * avg(1 - sum by (node) (rate(node_cpu_seconds_total{job=\"node\",mode=\"idle\"}[$__rate_interval])) / sum by (node) (rate(node_cpu_seconds_total{job=\"node\"}[$__rate_interval])))",
-          "legendFormat": "CPU"
+          "expr": "100 * (1 - sum(rate(node_cpu_seconds_total{job=\"node\",mode=\"idle\"}[$__rate_interval])) / sum(rate(node_cpu_seconds_total{job=\"node\"}[$__rate_interval]))) and on() (min(up{job=\"node\"}) == 1) and on() (count(count by (node) (rate(node_cpu_seconds_total{job=\"node\",mode=\"idle\"}[$__rate_interval]))) == count(swarm_node_info{job=\"swarm\"}))",
+          "legendFormat": "CPU · full Swarm",
+          "instant": true,
+          "range": false
         },
         {
           "refId": "B",
-          "expr": "100 * avg(1 - node_memory_MemAvailable_bytes{job=\"node\"} / node_memory_MemTotal_bytes{job=\"node\"})",
-          "legendFormat": "Memory"
+          "expr": "100 * (1 - sum(node_memory_MemAvailable_bytes{job=\"node\"}) / sum(node_memory_MemTotal_bytes{job=\"node\"})) and on() (min(up{job=\"node\"}) == 1) and on() (count(node_memory_MemAvailable_bytes{job=\"node\"}) == count(swarm_node_info{job=\"swarm\"})) and on() (count(node_memory_MemTotal_bytes{job=\"node\"}) == count(swarm_node_info{job=\"swarm\"}))",
+          "legendFormat": "RAM · full Swarm",
+          "instant": true,
+          "range": false
+        },
+        {
+          "refId": "C",
+          "expr": "max(100 * (1 - node_filesystem_avail_bytes{job=\"node\",mountpoint=\"/var/mnt/swarm\"} / node_filesystem_size_bytes{job=\"node\",mountpoint=\"/var/mnt/swarm\"}))",
+          "legendFormat": "Shared storage",
+          "instant": true,
+          "range": false
         }
       ],
       "fieldConfig": {
@@ -532,129 +274,119 @@
           "unit": "percent",
           "min": 0,
           "max": 100,
-          "decimals": 0,
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 3,
-            "showPoints": "never",
-            "spanNulls": false,
-            "axisBorderShow": false,
-            "axisGridShow": false
+          "decimals": 1,
+          "noValue": "?",
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": { "text": "?", "color": "gray" }
+              }
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null },
+              { "color": "orange", "value": 80 },
+              { "color": "red", "value": 90 }
+            ]
           }
         },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "CPU" },
+            "matcher": { "id": "byFrameRefID", "options": "C" },
             "properties": [
               {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "green" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "Memory" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "yellow" }
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    { "color": "blue", "value": null },
+                    { "color": "orange", "value": 75 },
+                    { "color": "red", "value": 90 }
+                  ]
+                }
               }
             ]
           }
         ]
       },
       "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "calcs": []
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
+        "orientation": "vertical",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "shape": "circle",
+        "barWidthFactor": 0.3,
+        "textMode": "value_and_name",
+        "text": { "titleSize": 14, "valueSize": 32 },
+        "sparkline": false,
+        "effects": { "barGlow": false, "centerGlow": false, "gradient": false },
+        "endpointMarker": "none",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
       }
     },
     {
-      "id": 9,
-      "title": "CPU by node",
+      "id": 64,
       "type": "timeseries",
-      "description": "FCOS VM CPU usage across all vCPUs, from Alloy's host Unix exporter. Not container or Proxmox-host usage.",
-      "gridPos": { "x": 0, "y": 9, "w": 8, "h": 7 },
+      "title": "Swarm · CPU",
+      "description": "CPU utilization per selected Swarm node. Missing samples remain gaps; 100% means all cores on that node are busy.",
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
         {
           "refId": "A",
-          "expr": "100 * (1 - sum by (node) (rate(node_cpu_seconds_total{job=\"node\",mode=\"idle\",node=~\"${node:regex}\"}[$__rate_interval])) / sum by (node) (rate(node_cpu_seconds_total{job=\"node\",node=~\"${node:regex}\"}[$__rate_interval])))",
-          "legendFormat": "{{node}}"
+          "expr": "100 * (1 - sum by (node) (rate(node_cpu_seconds_total{job=\"node\",node=~\"${node:regex}\",mode=\"idle\"}[$__rate_interval])) / sum by (node) (rate(node_cpu_seconds_total{job=\"node\",node=~\"${node:regex}\"}[$__rate_interval])))",
+          "legendFormat": "{{node}}",
+          "range": true,
+          "instant": false
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "percent",
           "min": 0,
-          "decimals": 0,
-          "color": { "mode": "palette-classic-by-name" },
+          "max": 100,
+          "decimals": 1,
+          "color": { "mode": "palette-classic" },
           "custom": {
-            "axisSoftMax": 20,
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 3,
-            "showPoints": "never",
             "spanNulls": false,
-            "axisBorderShow": false,
-            "axisGridShow": false
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "showPoints": "never"
           }
         },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "swarm-01" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "green" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "swarm-02" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "yellow" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "swarm-03" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "blue" }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "options": {
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": []
+          "showLegend": true
         },
         "tooltip": { "mode": "multi", "sort": "desc" }
       }
     },
     {
-      "id": 10,
-      "title": "Memory by node",
+      "id": 65,
       "type": "timeseries",
-      "description": "FCOS VM memory usage: (total - available) / total, accounting for reclaimable cache. Not container or Proxmox-host usage.",
-      "gridPos": { "x": 8, "y": 9, "w": 8, "h": 7 },
+      "title": "Swarm · RAM",
+      "description": "Memory utilization per selected Swarm node, excluding available memory. Missing samples remain gaps.",
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 7 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
         {
           "refId": "A",
           "expr": "100 * (1 - node_memory_MemAvailable_bytes{job=\"node\",node=~\"${node:regex}\"} / node_memory_MemTotal_bytes{job=\"node\",node=~\"${node:regex}\"})",
-          "legendFormat": "{{node}}"
+          "legendFormat": "{{node}}",
+          "range": true,
+          "instant": false
         }
       ],
       "fieldConfig": {
@@ -662,123 +394,22 @@
           "unit": "percent",
           "min": 0,
           "max": 100,
-          "decimals": 0,
-          "color": { "mode": "palette-classic-by-name" },
-          "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 3,
-            "showPoints": "never",
-            "spanNulls": false,
-            "axisBorderShow": false,
-            "axisGridShow": false
-          }
-        },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "swarm-01" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "green" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "swarm-02" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "yellow" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "swarm-03" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "blue" }
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "legend": {
-          "displayMode": "list",
-          "placement": "bottom",
-          "calcs": []
-        },
-        "tooltip": { "mode": "multi", "sort": "desc" }
-      }
-    },
-    {
-      "id": 11,
-      "title": "CPU pressure by node",
-      "type": "timeseries",
-      "description": "FCOS CPU pressure (PSI): percentage of time at least one task was waiting for CPU. Near 0% means little contention; sustained increases indicate CPU scheduling pressure. This is not CPU utilization or I/O pressure. Missing telemetry remains a gap.",
-      "gridPos": { "x": 16, "y": 9, "w": 8, "h": 7 },
-      "datasource": { "type": "prometheus", "uid": "metrics" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "100 * rate(node_pressure_cpu_waiting_seconds_total{job=\"node\",node=~\"${node:regex}\"}[$__rate_interval])",
-          "legendFormat": "{{node}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "min": 0,
-          "unit": "percent",
           "decimals": 1,
-          "color": { "mode": "palette-classic-by-name" },
+          "color": { "mode": "palette-classic" },
           "custom": {
-            "drawStyle": "line",
-            "lineWidth": 1,
-            "fillOpacity": 3,
-            "showPoints": "never",
             "spanNulls": false,
-            "axisBorderShow": false,
-            "axisGridShow": false,
-            "axisSoftMax": 5
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "showPoints": "never"
           }
         },
-        "overrides": [
-          {
-            "matcher": { "id": "byName", "options": "swarm-01" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "green" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "swarm-02" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "yellow" }
-              }
-            ]
-          },
-          {
-            "matcher": { "id": "byName", "options": "swarm-03" },
-            "properties": [
-              {
-                "id": "color",
-                "value": { "mode": "fixed", "fixedColor": "blue" }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "options": {
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
-          "calcs": []
+          "showLegend": true
         },
         "tooltip": { "mode": "multi", "sort": "desc" }
       }
@@ -787,8 +418,8 @@
       "id": 12,
       "title": "Services",
       "type": "table",
-      "description": "Failing: no expected tasks running. Degraded: replica mismatch or no eligible global nodes. Updating: rollout in progress. OK: target running (or a job executing). Completed: finished job/one-shot. Stopped: scaled to zero or idle one-shot. Unknown: missing/stale scheduler data or restart-policy metrics. CPU is the latest 2-minute usage (100% = one core); RAM is current working set across all replicas. Values are at the selected range end; missing resources are Unknown. Global targets count currently eligible nodes.",
-      "gridPos": { "x": 0, "y": 16, "w": 16, "h": 7 },
+      "description": "Swarm scheduling, not application health. Nodes list observed container locations, not placement constraints; stopped/completed workloads may have no location. CPU 100% is one core; RAM is the working set across replicas. Problems sort first, then unknown, updating, running, completed and stopped; names sort alphabetically within each state.",
+      "gridPos": { "x": 0, "y": 13, "w": 24, "h": 12 },
       "datasource": { "type": "prometheus", "uid": "metrics" },
       "targets": [
         {
@@ -807,7 +438,7 @@
         },
         {
           "refId": "C",
-          "expr": "max by (service) (\n  (4 + 0 * (swarm_service_at_desired{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} == 1))\n  or on(service) ((4 + 0 * (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=\"complete\"}) >= on(service) swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"})) and on(service) (swarm_service_restart_policy{job=\"swarm\",restart_condition=\"none\"} == 1) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0))\n  or on(service) (5 + 0 * ((swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"replicated\"} == 0) and on(service) (swarm_service_running_replicas{job=\"swarm\"} == 0)))\n  or on(service) (5 + 0 * (((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode!~\".*-job\"} == 0) and on(service) (swarm_service_restart_policy{job=\"swarm\",restart_condition=\"none\"} == 1)) unless on(service) (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=~\"failed|rejected\"}) > 0)))\n  or on(service) (0 * ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == 0) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0)))\n  or on(service) (2 + 0 * (max by (service) (swarm_service_update_state_info{job=\"swarm\",service=~\"${service:regex}\",state=~\"updating|rollback_started\"}) == 1))\n  or on(service) (3 + 0 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} > 0))\n  or on(service) (1 + 0 * (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"global\"} == 0))\n  or on(service) ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} > bool 0) + on(service) 2 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == bool on(service) swarm_service_desired_replicas{job=\"swarm\"}))\n) and on(service) (swarm_service_restart_policy{job=\"swarm\"} == 1)\nand on() (min(up{job=\"swarm\"}) == 1)\nand on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)\nand on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)\nor on(service) (6 + 0 * sum by (service) (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"}))",
+          "expr": "max by (service) (\n  (5 + 0 * (swarm_service_at_desired{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} == 1))\n  or on(service) ((5 + 0 * (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=\"complete\"}) >= on(service) swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"})) and on(service) (swarm_service_restart_policy{job=\"swarm\",restart_condition=\"none\"} == 1) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0))\n  or on(service) (6 + 0 * ((swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"replicated\"} == 0) and on(service) (swarm_service_running_replicas{job=\"swarm\"} == 0)))\n  or on(service) (6 + 0 * (((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode!~\".*-job\"} == 0) and on(service) (swarm_service_restart_policy{job=\"swarm\",restart_condition=\"none\"} == 1)) unless on(service) (sum by (service) (swarm_task_replicas_state{job=\"swarm\",state=~\"failed|rejected\"}) > 0)))\n  or on(service) (0 * ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == 0) and on(service) (swarm_service_desired_replicas{job=\"swarm\"} > 0)))\n  or on(service) (3 + 0 * (max by (service) (swarm_service_update_state_info{job=\"swarm\",service=~\"${service:regex}\",state=~\"updating|rollback_started\"}) == 1))\n  or on(service) (4 + 0 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=~\".*-job\"} > 0))\n  or on(service) (1 + 0 * (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\",service_mode=\"global\"} == 0))\n  or on(service) ((swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} > bool 0) + on(service) 3 * (swarm_service_running_replicas{job=\"swarm\",service=~\"${service:regex}\"} == bool on(service) swarm_service_desired_replicas{job=\"swarm\"}))\n) and on(service) (swarm_service_restart_policy{job=\"swarm\"} == 1)\nand on() (min(up{job=\"swarm\"}) == 1)\nand on() (min(swarm_exporter_health{job=\"swarm\"}) == 1)\nand on() (time() - min(swarm_exporter_last_poll_success_timestamp_seconds{job=\"swarm\"}) < 60)\nor on(service) (2 + 0 * sum by (service) (swarm_service_desired_replicas{job=\"swarm\",service=~\"${service:regex}\"}))",
           "instant": true,
           "range": false,
           "format": "table"
@@ -825,9 +456,29 @@
           "instant": true,
           "range": false,
           "format": "table"
+        },
+        {
+          "refId": "F",
+          "expr": "count by (service, node) (container_memory_working_set_bytes{job=\"cadvisor\",service=~\"${service:regex}\",node!=\"\"} and (time() - timestamp(container_memory_working_set_bytes{job=\"cadvisor\",service=~\"${service:regex}\",node!=\"\"}) < 60))",
+          "instant": true,
+          "range": false,
+          "format": "table"
         }
       ],
       "transformations": [
+        {
+          "id": "groupBy",
+          "filter": { "id": "byRefId", "options": "F" },
+          "options": {
+            "fields": {
+              "service": { "operation": "groupby", "aggregations": [] },
+              "node": {
+                "operation": "aggregate",
+                "aggregations": ["uniqueValues"]
+              }
+            }
+          }
+        },
         {
           "id": "joinByField",
           "options": { "byField": "service", "mode": "outerTabular" }
@@ -841,15 +492,17 @@
               "Time 2": true,
               "Time 3": true,
               "Time 4": true,
-              "Time 5": true
+              "Time 5": true,
+              "Time 6": true
             },
             "indexByName": {
               "service": 0,
-              "Value #B": 1,
-              "Value #A": 2,
-              "Value #D": 3,
-              "Value #E": 4,
-              "Value #C": 5
+              "node (uniqueValues)": 1,
+              "Value #B": 2,
+              "Value #A": 3,
+              "Value #D": 4,
+              "Value #E": 5,
+              "Value #C": 6
             },
             "renameByName": {
               "service": "Service",
@@ -857,19 +510,24 @@
               "Value #B": "Running",
               "Value #D": "CPU",
               "Value #E": "RAM",
-              "Value #C": "Status"
+              "Value #C": "Scheduling",
+              "node (uniqueValues)": "Nodes"
             }
           }
         },
         {
           "id": "sortBy",
-          "options": { "sort": [{ "field": "Status", "desc": false }] }
+          "options": { "sort": [{ "field": "Service", "desc": false }] }
+        },
+        {
+          "id": "sortBy",
+          "options": { "sort": [{ "field": "Scheduling", "desc": false }] }
         }
       ],
       "fieldConfig": {
         "defaults": {
           "decimals": 0,
-          "noValue": "Unknown",
+          "noValue": "?",
           "custom": {
             "align": "left",
             "minWidth": 80,
@@ -887,6 +545,10 @@
                   {
                     "title": "Service logs",
                     "url": "/explore?schemaVersion=1&panes=%7B%22logs%22%3A%7B%22datasource%22%3A%22logs%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22%7Bservice_name%3D%5C%22${__value.raw}%5C%22%7D%22%7D%5D%7D%7D"
+                  },
+                  {
+                    "title": "Service metrics",
+                    "url": "/explore?schemaVersion=1&panes=%7B%22metrics%22%3A%7B%22datasource%22%3A%22metrics%22%2C%22queries%22%3A%5B%7B%22refId%22%3A%22A%22%2C%22expr%22%3A%22%7Bservice%3D%5C%22${__value.raw}%5C%22%7D%22%7D%5D%7D%7D"
                   }
                 ]
               }
@@ -910,7 +572,14 @@
                 "value": [
                   {
                     "type": "value",
-                    "options": { "-1": { "text": "Unknown", "color": "gray" } }
+                    "options": { "-1": { "text": "?", "color": "gray" } }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "?", "color": "gray" }
+                    }
                   }
                 ]
               }
@@ -927,7 +596,14 @@
                 "value": [
                   {
                     "type": "value",
-                    "options": { "-1": { "text": "Unknown", "color": "gray" } }
+                    "options": { "-1": { "text": "?", "color": "gray" } }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "?", "color": "gray" }
+                    }
                   }
                 ]
               }
@@ -941,7 +617,7 @@
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Status" },
+            "matcher": { "id": "byName", "options": "Scheduling" },
             "properties": [
               {
                 "id": "mappings",
@@ -949,19 +625,35 @@
                   {
                     "type": "value",
                     "options": {
-                      "0": { "text": "Failing", "color": "red" },
+                      "0": { "text": "Failed", "color": "red" },
                       "1": { "text": "Degraded", "color": "orange" },
-                      "2": { "text": "Updating", "color": "blue" },
-                      "3": { "text": "OK", "color": "green" },
-                      "4": { "text": "Completed", "color": "gray" },
-                      "5": { "text": "Stopped", "color": "gray" },
-                      "6": { "text": "Unknown", "color": "gray" }
+                      "2": { "text": "Unknown", "color": "gray" },
+                      "3": { "text": "Updating", "color": "blue" },
+                      "4": { "text": "Running", "color": "green" },
+                      "5": { "text": "Completed", "color": "gray" },
+                      "6": { "text": "Stopped", "color": "gray" }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "Unknown", "color": "gray" }
                     }
                   }
                 ]
               },
               { "id": "custom.cellOptions", "value": { "type": "color-text" } },
-              { "id": "custom.width", "value": 120 }
+              { "id": "custom.width", "value": 130 }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Nodes" },
+            "properties": [
+              { "id": "custom.width", "value": 190 },
+              { "id": "custom.wrapText", "value": true },
+              { "id": "noValue", "value": "Unknown" },
+              { "id": "custom.cellOptions", "value": { "type": "auto" } }
             ]
           }
         ]
@@ -975,58 +667,43 @@
     },
     {
       "id": 16,
-      "title": "Latest backups",
       "type": "table",
-      "description": "Latest success/failure markers in 30 hours. Persistent ZFS data and off-site storage refer to the same Borg archive operation, not independent snapshot or restore checks. Missing jobs have no result, never an assumed success.",
-      "gridPos": { "x": 16, "y": 16, "w": 8, "h": 7 },
+      "title": "Backups",
+      "description": "Last successful backup and latest reported outcome within 30 hours. A Borg archive is one persistent-data/off-site operation, not independent backups or restore verification.",
+      "gridPos": { "x": 0, "y": 25, "w": 8, "h": 7 },
       "datasource": { "type": "loki", "uid": "logs" },
       "timeFrom": "30h",
       "hideTimeOverride": true,
       "targets": [
         {
           "refId": "A",
-          "expr": "{service_name=\"postgres_backup\"} |~ `SQL backup created successfully|Exit Status: -?[1-9][0-9]*` | line_format `{\"Backup\":\"PostgreSQL dump\",\"Status\":\"{{ if contains \"SQL backup created successfully\" (__line__) }}Successful{{ else }}Failed{{ end }}\"}`",
-          "queryType": "range",
-          "maxLines": 1,
-          "direction": "backward"
+          "queryType": "instant",
+          "expr": "max by (backup) (max_over_time({service_name=\"postgres_backup\"} |= \"SQL backup created successfully\" | label_format backup=\"PostgreSQL dump\", backup_timestamp=`{{ __timestamp__ | unixEpoch }}` | unwrap backup_timestamp | __error__=\"\" [30h])) * 1000 or max by (backup) (max_over_time({app=\"borgmatic\",hostname=\"pve\",config=\"config.yaml\"} |~ `^borgmatic_archive_created$` | label_format backup=\"Borg archive\", backup_timestamp=`{{ __timestamp__ | unixEpoch }}` | unwrap backup_timestamp | __error__=\"\" [30h])) * 1000"
         },
         {
           "refId": "B",
-          "expr": "{app=\"borgmatic\",hostname=\"pve\",config=\"config.yaml\"} |~ `^(borgmatic_archive_created|Failed backup)$` | line_format `{\"Backup\":\"Persistent data (ZFS)\",\"Status\":\"{{ if eq (__line__) \"borgmatic_archive_created\" }}Successful{{ else }}Failed{{ end }}\"}`",
-          "queryType": "range",
-          "maxLines": 1,
-          "direction": "backward"
-        },
-        {
-          "refId": "C",
-          "expr": "{app=\"borgmatic\",hostname=\"pve\",config=\"config.yaml\"} |~ `^(borgmatic_archive_created|Failed backup)$` | line_format `{\"Backup\":\"Hetzner Storage Box\",\"Status\":\"{{ if eq (__line__) \"borgmatic_archive_created\" }}Successful{{ else }}Failed{{ end }}\"}`",
-          "queryType": "range",
-          "maxLines": 1,
-          "direction": "backward"
+          "queryType": "instant",
+          "expr": "topk by (backup) (1, (max by (backup, result) (max_over_time({service_name=\"postgres_backup\"} |~ `SQL backup created successfully|Exit Status: -?[1-9][0-9]*` | label_format backup=\"PostgreSQL dump\", result=`{{ if contains \"SQL backup created successfully\" (__line__) }}Successful{{ else }}Failed{{ end }}`, backup_timestamp=`{{ __timestamp__ | unixEpoch }}` | unwrap backup_timestamp | __error__=\"\" [30h])) or max by (backup, result) (max_over_time({app=\"borgmatic\",hostname=\"pve\",config=\"config.yaml\"} |~ `^(borgmatic_archive_created|Failed backup)$` | label_format backup=\"Borg archive\", result=`{{ if eq (__line__) \"borgmatic_archive_created\" }}Successful{{ else }}Failed{{ end }}`, backup_timestamp=`{{ __timestamp__ | unixEpoch }}` | unwrap backup_timestamp | __error__=\"\" [30h])))) * 1000"
         }
       ],
       "transformations": [
         { "id": "merge", "options": {} },
         {
-          "id": "extractFields",
-          "options": {
-            "source": "Line",
-            "format": "json",
-            "replace": true,
-            "keepTime": true
-          }
-        },
-        {
           "id": "organize",
           "options": {
-            "indexByName": { "Backup": 0, "Time": 1, "Status": 2 },
-            "renameByName": { "Time": "Last run" }
+            "excludeByName": { "Time": true, "Value #B": true },
+            "indexByName": { "backup": 0, "Value #A": 1, "result": 2 },
+            "renameByName": {
+              "backup": "Backup",
+              "Value #A": "Last success",
+              "result": "Result"
+            }
           }
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "noValue": "Unknown",
+          "noValue": "?",
           "custom": {
             "align": "left",
             "minWidth": 80,
@@ -1036,17 +713,17 @@
         "overrides": [
           {
             "matcher": { "id": "byName", "options": "Backup" },
-            "properties": [{ "id": "custom.minWidth", "value": 200 }]
+            "properties": [{ "id": "custom.minWidth", "value": 150 }]
           },
           {
-            "matcher": { "id": "byName", "options": "Last run" },
+            "matcher": { "id": "byName", "options": "Last success" },
             "properties": [
               { "id": "unit", "value": "dateTimeFromNow" },
-              { "id": "custom.width", "value": 110 }
+              { "id": "custom.width", "value": 130 }
             ]
           },
           {
-            "matcher": { "id": "byName", "options": "Status" },
+            "matcher": { "id": "byName", "options": "Result" },
             "properties": [
               {
                 "id": "mappings",
@@ -1054,14 +731,21 @@
                   {
                     "type": "value",
                     "options": {
-                      "Successful": { "color": "green" },
-                      "Failed": { "color": "red" }
+                      "Successful": { "text": "Successful", "color": "green" },
+                      "Failed": { "text": "Failed", "color": "red" }
+                    }
+                  },
+                  {
+                    "type": "special",
+                    "options": {
+                      "match": "null",
+                      "result": { "text": "Unknown", "color": "gray" }
                     }
                   }
                 ]
               },
               { "id": "custom.cellOptions", "value": { "type": "color-text" } },
-              { "id": "custom.width", "value": 100 }
+              { "id": "custom.width", "value": 115 }
             ]
           }
         ]
@@ -1070,6 +754,86 @@
         "showHeader": true,
         "cellHeight": "sm",
         "footer": { "show": false }
+      }
+    },
+    {
+      "id": 44,
+      "type": "timeseries",
+      "title": "HTTP errors",
+      "description": "Platform-wide 5xx responses per second by Traefik service. No traffic or missing telemetry is not filled with synthetic zeroes.",
+      "gridPos": { "x": 8, "y": 25, "w": 8, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "metrics" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (service) (rate(traefik_service_requests_total{job=\"traefik\",code=~\"5..\"}[$__rate_interval]))",
+          "legendFormat": "{{service}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "min": 0,
+          "noValue": "?",
+          "custom": {
+            "spanNulls": false,
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never"
+          },
+          "color": { "mode": "fixed", "fixedColor": "red" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
+      }
+    },
+    {
+      "id": 45,
+      "type": "timeseries",
+      "title": "Latency · p95",
+      "description": "Platform-wide p95 response time by Traefik service. No observations remain a gap, never assumed zero latency.",
+      "gridPos": { "x": 16, "y": 25, "w": 8, "h": 7 },
+      "datasource": { "type": "prometheus", "uid": "metrics" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum by (service, le) (rate(traefik_service_request_duration_seconds_bucket{job=\"traefik\"}[$__rate_interval])))",
+          "legendFormat": "{{service}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "min": 0,
+          "noValue": "?",
+          "custom": {
+            "spanNulls": false,
+            "lineWidth": 1,
+            "fillOpacity": 0,
+            "showPoints": "never"
+          },
+          "color": { "mode": "fixed", "fixedColor": "blue" }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       }
     }
   ]

@@ -15,7 +15,16 @@ from secretspec import SecretSpecError, resolve
 ROOT = "/rpool/swarm/postgres"
 VMROOT = "/var/mnt/swarm/postgres"
 DATABASES = {"postgres", "authentik", "grafana", "paperless", "vaultwarden"}
-PASSWORDS = ("superuser", "authentik", "grafana", "paperless", "vaultwarden")
+PASSWORDS = (
+    "superuser",
+    "authentik",
+    "grafana",
+    "immich",
+    "miniflux",
+    "paperless",
+    "vaultwarden",
+    "exporter",
+)
 
 
 def run(command, *, input=None, capture=True):
