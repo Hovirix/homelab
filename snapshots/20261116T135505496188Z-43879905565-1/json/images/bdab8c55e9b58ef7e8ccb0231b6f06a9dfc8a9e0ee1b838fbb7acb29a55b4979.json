@@ -1,0 +1,1096 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a1e4a3-c221-7b0b-b4b9-50b2a54eeb1a",
+  "CreatedAt": "2026-11-16T13:54:59.74572508Z",
+  "ArtifactID": "sha256:e619082e1cbb7165fc9e68552e9495ed370134b4e54cb12f928cd3a3ec678156",
+  "ArtifactName": "victoriametrics/victoria-metrics:v1.156.0@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "Size": 37518336,
+    "OS": {
+      "Family": "alpine",
+      "Name": "3.24.3"
+    },
+    "ImageID": "sha256:00a6bab449d0dd4ebdf553f02c174bafed9d9faf26a887dab7684d694e10eafe",
+    "DiffIDs": [
+      "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba",
+      "sha256:19cd8819b8d7ed30210a9cba5a1279a3b2850a46873ffddcead7f536a09db2cb",
+      "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+    ],
+    "RepoDigests": [
+      "victoriametrics/victoria-metrics@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970"
+    ],
+    "Reference": "victoriametrics/victoria-metrics@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970",
+    "ImageConfig": {
+      "architecture": "amd64",
+      "created": "2026-11-06T17:50:31.516530226Z",
+      "history": [
+        {
+          "created": "2026-10-21T22:37:22.870489069Z",
+          "created_by": "ADD alpine-minirootfs-3.24.3-x86_64.tar.gz / # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-10-21T22:37:22.870489069Z",
+          "created_by": "CMD [\"/bin/sh\"]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-10-23T16:17:29.525420774Z",
+          "created_by": "COPY /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "EXPOSE [8428/tcp]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "ENTRYPOINT [\"/victoria-metrics-prod\"]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "ARG TARGETARCH=amd64",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "ARG BINARY_SUFFIX=",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "COPY victoria-metrics-linux-amd64-prod ./victoria-metrics-prod # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba",
+          "sha256:19cd8819b8d7ed30210a9cba5a1279a3b2850a46873ffddcead7f536a09db2cb",
+          "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+        ]
+      },
+      "config": {
+        "Entrypoint": [
+          "/victoria-metrics-prod"
+        ],
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Labels": {
+          "org.opencontainers.image.created": "2026-11-06T17:50:15Z",
+          "org.opencontainers.image.documentation": "https://docs.victoriametrics.com/",
+          "org.opencontainers.image.source": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+          "org.opencontainers.image.title": "victoria-metrics",
+          "org.opencontainers.image.vendor": "VictoriaMetrics",
+          "org.opencontainers.image.version": "v1.156.0"
+        },
+        "WorkingDir": "/",
+        "ExposedPorts": {
+          "8428/tcp": {}
+        }
+      }
+    },
+    "Layers": [
+      {
+        "Size": 8709632,
+        "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+        "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+      },
+      {
+        "Size": 182272,
+        "Digest": "sha256:b2e4a86e58fa9679a5d85b72021ace64db05cdd4dc774c517027f5e2b6824b6d",
+        "DiffID": "sha256:19cd8819b8d7ed30210a9cba5a1279a3b2850a46873ffddcead7f536a09db2cb"
+      },
+      {
+        "Size": 28626432,
+        "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+        "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+      }
+    ]
+  },
+  "Results": [
+    {
+      "Target": "victoriametrics/victoria-metrics:v1.156.0@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970 (alpine 3.24.3)",
+      "Class": "os-pkgs",
+      "Type": "alpine",
+      "Packages": [
+        {
+          "ID": "alpine-baselayout@3.7.2-r1",
+          "Name": "alpine-baselayout",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-baselayout@3.7.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "1b9c543300f8073e"
+          },
+          "Version": "3.7.2-r1",
+          "Arch": "x86_64",
+          "SrcName": "alpine-baselayout",
+          "SrcVersion": "3.7.2-r1",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "alpine-baselayout-data@3.7.2-r1",
+            "busybox-binsh@1.37.0-r31"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:f0fcfdc2f4da058af6473bc45c4eab62916225b2",
+          "InstalledFiles": [
+            "etc/motd",
+            "etc/crontabs/root",
+            "etc/modprobe.d/aliases.conf",
+            "etc/modprobe.d/blacklist.conf",
+            "etc/modprobe.d/i386.conf",
+            "etc/profile.d/20locale.sh",
+            "etc/profile.d/README",
+            "etc/profile.d/color_prompt.sh.disabled",
+            "usr/lib/sysctl.d/00-alpine.conf",
+            "var/lock",
+            "var/run",
+            "var/spool/mail",
+            "var/spool/cron/crontabs"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "alpine-baselayout-data@3.7.2-r1",
+          "Name": "alpine-baselayout-data",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-baselayout-data@3.7.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "fcc3cd90122d8aa7"
+          },
+          "Version": "3.7.2-r1",
+          "Arch": "x86_64",
+          "SrcName": "alpine-baselayout",
+          "SrcVersion": "3.7.2-r1",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:c6f9bded17d844b6f1b0bb5766d2c35c0d5c8508",
+          "InstalledFiles": [
+            "etc/fstab",
+            "etc/group",
+            "etc/hostname",
+            "etc/hosts",
+            "etc/inittab",
+            "etc/modules",
+            "etc/mtab",
+            "etc/nsswitch.conf",
+            "etc/passwd",
+            "etc/profile",
+            "etc/protocols",
+            "etc/services",
+            "etc/shadow",
+            "etc/shells",
+            "etc/sysctl.conf"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "alpine-keys@2.6-r0",
+          "Name": "alpine-keys",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-keys@2.6-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "cb1f6c8fa74713e0"
+          },
+          "Version": "2.6-r0",
+          "Arch": "x86_64",
+          "SrcName": "alpine-keys",
+          "SrcVersion": "2.6-r0",
+          "Licenses": [
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:d8d6b80e53c059a77e4915da78ba964f3ffea240",
+          "InstalledFiles": [
+            "etc/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "etc/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub",
+            "etc/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-66ba20fe.rsa.pub",
+            "usr/share/apk/keys/aarch64/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub",
+            "usr/share/apk/keys/aarch64/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub",
+            "usr/share/apk/keys/armhf/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub",
+            "usr/share/apk/keys/armhf/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub",
+            "usr/share/apk/keys/armv7/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub",
+            "usr/share/apk/keys/armv7/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub",
+            "usr/share/apk/keys/loongarch64/alpine-devel@lists.alpinelinux.org-66ba20fe.rsa.pub",
+            "usr/share/apk/keys/mips64/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub",
+            "usr/share/apk/keys/ppc64le/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub",
+            "usr/share/apk/keys/ppc64le/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub",
+            "usr/share/apk/keys/riscv64/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub",
+            "usr/share/apk/keys/riscv64/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub",
+            "usr/share/apk/keys/s390x/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub",
+            "usr/share/apk/keys/s390x/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub",
+            "usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub",
+            "usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub",
+            "usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub",
+            "usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "alpine-release@3.24.3-r0",
+          "Name": "alpine-release",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-release@3.24.3-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "58aa066dd1e7befc"
+          },
+          "Version": "3.24.3-r0",
+          "Arch": "x86_64",
+          "SrcName": "alpine-base",
+          "SrcVersion": "3.24.3-r0",
+          "Licenses": [
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "alpine-keys@2.6-r0"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:5ac96a125562b69acb43e645122b1862a1074141",
+          "InstalledFiles": [
+            "etc/alpine-release",
+            "etc/issue",
+            "etc/os-release",
+            "etc/secfixes.d/alpine",
+            "usr/lib/os-release"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "apk-tools@3.0.8-r0",
+          "Name": "apk-tools",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/apk-tools@3.0.8-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "fd5527f61ccb458d"
+          },
+          "Version": "3.0.8-r0",
+          "Arch": "x86_64",
+          "SrcName": "apk-tools",
+          "SrcVersion": "3.0.8-r0",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "ca-certificates-bundle@20261020-r0",
+            "libapk@3.0.8-r0",
+            "libcrypto3@3.5.9-r0",
+            "musl@1.2.6-r3",
+            "zlib@1.3.2-r1"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:786130a8f2d3ac69fc316118757b7e8151b8b8c3",
+          "InstalledFiles": [
+            "sbin/apk"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "busybox@1.37.0-r31",
+          "Name": "busybox",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/busybox@1.37.0-r31?arch=x86_64\u0026distro=3.24.3",
+            "UID": "fc424f8052296b79"
+          },
+          "Version": "1.37.0-r31",
+          "Arch": "x86_64",
+          "SrcName": "busybox",
+          "SrcVersion": "1.37.0-r31",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Sören Tempel \u003csoeren+alpine@soeren-tempel.net\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:b5405ebc02f7dd8be95b6265c54b243d5456ab8f",
+          "InstalledFiles": [
+            "bin/busybox",
+            "etc/securetty",
+            "etc/busybox-paths.d/busybox",
+            "etc/logrotate.d/acpid",
+            "etc/network/if-up.d/dad",
+            "etc/udhcpc/udhcpc.conf",
+            "usr/share/udhcpc/default.script"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "busybox-binsh@1.37.0-r31",
+          "Name": "busybox-binsh",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64\u0026distro=3.24.3",
+            "UID": "1ec8a3d5d2b63297"
+          },
+          "Version": "1.37.0-r31",
+          "Arch": "x86_64",
+          "SrcName": "busybox",
+          "SrcVersion": "1.37.0-r31",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Sören Tempel \u003csoeren+alpine@soeren-tempel.net\u003e",
+          "DependsOn": [
+            "busybox@1.37.0-r31"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:5cbd14acc6f1804c5bac6c77dc2c492f010b0fc7",
+          "InstalledFiles": [
+            "bin/sh"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "ca-certificates-bundle@20261020-r0",
+          "Name": "ca-certificates-bundle",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/ca-certificates-bundle@20261020-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "a70608abcaf07d7a"
+          },
+          "Version": "20261020-r0",
+          "Arch": "x86_64",
+          "SrcName": "ca-certificates",
+          "SrcVersion": "20261020-r0",
+          "Licenses": [
+            "MPL-2.0",
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:7c6e635f86aafb46cb3b015d8505b3a5f61156bd",
+          "InstalledFiles": [
+            "etc/ssl/cert.pem",
+            "etc/ssl/certs/ca-certificates.crt",
+            "etc/ssl1.1/cert.pem",
+            "etc/ssl1.1/certs"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "libapk@3.0.8-r0",
+          "Name": "libapk",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/libapk@3.0.8-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "cdfc970c784f7001"
+          },
+          "Version": "3.0.8-r0",
+          "Arch": "x86_64",
+          "SrcName": "apk-tools",
+          "SrcVersion": "3.0.8-r0",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "libcrypto3@3.5.9-r0",
+            "libssl3@3.5.9-r0",
+            "musl@1.2.6-r3",
+            "zlib@1.3.2-r1"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:b93ce9573c1d0db3eea7ce32841ad0857abc4a54",
+          "InstalledFiles": [
+            "usr/lib/libapk.so.3.0.0"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "libcrypto3@3.5.9-r0",
+          "Name": "libcrypto3",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "Version": "3.5.9-r0",
+          "Arch": "x86_64",
+          "SrcName": "openssl",
+          "SrcVersion": "3.5.9-r0",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:1c0dee9734cf22fc97cdd181913bbd710e6dfb08",
+          "InstalledFiles": [
+            "etc/ssl/ct_log_list.cnf",
+            "etc/ssl/ct_log_list.cnf.dist",
+            "etc/ssl/openssl.cnf",
+            "etc/ssl/openssl.cnf.dist",
+            "usr/lib/libcrypto.so.3",
+            "usr/lib/engines-3/afalg.so",
+            "usr/lib/engines-3/capi.so",
+            "usr/lib/engines-3/loader_attic.so",
+            "usr/lib/engines-3/padlock.so",
+            "usr/lib/ossl-modules/legacy.so"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "libssl3@3.5.9-r0",
+          "Name": "libssl3",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "Version": "3.5.9-r0",
+          "Arch": "x86_64",
+          "SrcName": "openssl",
+          "SrcVersion": "3.5.9-r0",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "libcrypto3@3.5.9-r0",
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:20c4c90ea9d20a9dd3a04deadf2c6c4f64233643",
+          "InstalledFiles": [
+            "usr/lib/libssl.so.3"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "musl@1.2.6-r3",
+          "Name": "musl",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/musl@1.2.6-r3?arch=x86_64\u0026distro=3.24.3",
+            "UID": "43d4b05c5472a58c"
+          },
+          "Version": "1.2.6-r3",
+          "Arch": "x86_64",
+          "SrcName": "musl",
+          "SrcVersion": "1.2.6-r3",
+          "Licenses": [
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:770e8304d958dced98d76997df9e8fa1db5ca32f",
+          "InstalledFiles": [
+            "lib/ld-musl-x86_64.so.1",
+            "lib/libc.musl-x86_64.so.1"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "musl-utils@1.2.6-r3",
+          "Name": "musl-utils",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/musl-utils@1.2.6-r3?arch=x86_64\u0026distro=3.24.3",
+            "UID": "1bd73db44d355699"
+          },
+          "Version": "1.2.6-r3",
+          "Arch": "x86_64",
+          "SrcName": "musl",
+          "SrcVersion": "1.2.6-r3",
+          "Licenses": [
+            "MIT",
+            "BSD-2-Clause",
+            "GPL-2.0-or-later"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3",
+            "scanelf@1.3.9-r1"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:51372daafb234646960eca4d7a13f706324f24d6",
+          "InstalledFiles": [
+            "sbin/ldconfig",
+            "usr/bin/getconf",
+            "usr/bin/getent",
+            "usr/bin/iconv",
+            "usr/bin/ldd"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "scanelf@1.3.9-r1",
+          "Name": "scanelf",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/scanelf@1.3.9-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "f832b0b0d6c76e18"
+          },
+          "Version": "1.3.9-r1",
+          "Arch": "x86_64",
+          "SrcName": "pax-utils",
+          "SrcVersion": "1.3.9-r1",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:013f903d0ba219673aebbdd04f74bb5ed82b01f0",
+          "InstalledFiles": [
+            "usr/bin/scanelf"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "ssl_client@1.37.0-r31",
+          "Name": "ssl_client",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/ssl_client@1.37.0-r31?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3e7a1baa8bc3bfe0"
+          },
+          "Version": "1.37.0-r31",
+          "Arch": "x86_64",
+          "SrcName": "busybox",
+          "SrcVersion": "1.37.0-r31",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Sören Tempel \u003csoeren+alpine@soeren-tempel.net\u003e",
+          "DependsOn": [
+            "libcrypto3@3.5.9-r0",
+            "libssl3@3.5.9-r0",
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:c220f4a5125a313af733e98def94132bb1e9d40d",
+          "InstalledFiles": [
+            "usr/bin/ssl_client"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "zlib@1.3.2-r1",
+          "Name": "zlib",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/zlib@1.3.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "926381dc853769fb"
+          },
+          "Version": "1.3.2-r1",
+          "Arch": "x86_64",
+          "SrcName": "zlib",
+          "SrcVersion": "1.3.2-r1",
+          "Licenses": [
+            "Zlib"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:4f525c8cc204f84b8b4ca40db3be389958f056c6",
+          "InstalledFiles": [
+            "usr/lib/libz.so.1",
+            "usr/lib/libz.so.1.3.2"
+          ],
+          "AnalyzedBy": "apk"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-4738",
+          "PkgID": "zlib@1.3.2-r1",
+          "PkgName": "zlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/zlib@1.3.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "926381dc853769fb"
+          },
+          "InstalledVersion": "1.3.2-r1",
+          "FixedVersion": "1.4-r0",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-4738",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:d58bfd31d3e5140d3789641ff875522036ee05d6cba5190ee6a68e933e066f44",
+          "Title": "Improper Restriction of Operations within the Bounds of a Memory Buffe ...",
+          "Description": "Improper Restriction of Operations within the Bounds of a Memory Buffer vulnerability in OSGeo gdal (frmts/zlib/contrib/infback9 modules). This vulnerability is associated with program files inftree9.C‎.\n\nThis issue affects gdal: before 3.11.0.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-119"
+          ],
+          "VendorSeverity": {
+            "bitnami": 4,
+            "julia": 4,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H/E:A/S:P/AU:Y/R:U/V:C/RE:L/U:Amber",
+              "V40Score": 9.4
+            },
+            "julia": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H/E:A/S:P/AU:Y/R:U/V:C/RE:L/U:Amber",
+              "V40Score": 9.4
+            }
+          },
+          "References": [
+            "https://github.com/OSGeo/gdal/pull/12244",
+            "https://github.com/advisories/GHSA-hp6p-5qh5-w9fj",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-4738",
+            "https://www.cve.org/CVERecord?id=CVE-2026-4738"
+          ],
+          "PublishedDate": "2026-03-24T04:17:29Z",
+          "LastModifiedDate": "2026-06-17T10:57:09.03Z"
+        }
+      ]
+    },
+    {
+      "Target": "victoria-metrics-prod",
+      "Class": "lang-pkgs",
+      "Type": "gobinary",
+      "Packages": [
+        {
+          "ID": "github.com/VictoriaMetrics/VictoriaMetrics",
+          "Name": "github.com/VictoriaMetrics/VictoriaMetrics",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/victoriametrics",
+            "UID": "56bdf0f94b5d607a"
+          },
+          "Relationship": "root",
+          "DependsOn": [
+            "cloud.google.com/go/compute/metadata@v0.10.0",
+            "github.com/VictoriaMetrics/easyproto@v1.2.0",
+            "github.com/VictoriaMetrics/fastcache@v1.13.3",
+            "github.com/VictoriaMetrics/metrics@v1.45.0",
+            "github.com/VictoriaMetrics/metricsql@v0.87.6",
+            "github.com/cespare/xxhash/v2@v2.3.0",
+            "github.com/golang/snappy@v1.0.0",
+            "github.com/klauspost/compress@v1.20.3",
+            "github.com/valyala/bytebufferpool@v1.0.0",
+            "github.com/valyala/fastjson@v1.6.10",
+            "github.com/valyala/fastrand@v1.1.0",
+            "github.com/valyala/fasttemplate@v1.2.2",
+            "github.com/valyala/gozstd@v1.27.0",
+            "github.com/valyala/histogram@v1.2.0",
+            "github.com/valyala/quicktemplate@v1.8.0",
+            "golang.org/x/net@v0.62.0",
+            "golang.org/x/oauth2@v0.37.0",
+            "golang.org/x/sys@v0.49.0",
+            "gopkg.in/yaml.v2@v2.4.0",
+            "stdlib@v1.27.3"
+          ],
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "stdlib@v1.27.3",
+          "Name": "stdlib",
+          "Identifier": {
+            "PURL": "pkg:golang/stdlib@v1.27.3",
+            "UID": "bb9c30d70f994d53"
+          },
+          "Version": "v1.27.3",
+          "Relationship": "direct",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "cloud.google.com/go/compute/metadata@v0.10.0",
+          "Name": "cloud.google.com/go/compute/metadata",
+          "Identifier": {
+            "PURL": "pkg:golang/cloud.google.com/go/compute/metadata@v0.10.0",
+            "UID": "bbc770fd4e92fee8"
+          },
+          "Version": "v0.10.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/easyproto@v1.2.0",
+          "Name": "github.com/VictoriaMetrics/easyproto",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/easyproto@v1.2.0",
+            "UID": "e0d4a4699d3bf61c"
+          },
+          "Version": "v1.2.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/fastcache@v1.13.3",
+          "Name": "github.com/VictoriaMetrics/fastcache",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/fastcache@v1.13.3",
+            "UID": "289164f755a4e54a"
+          },
+          "Version": "v1.13.3",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/metrics@v1.45.0",
+          "Name": "github.com/VictoriaMetrics/metrics",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/metrics@v1.45.0",
+            "UID": "cc542de4a238a87d"
+          },
+          "Version": "v1.45.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/metricsql@v0.87.6",
+          "Name": "github.com/VictoriaMetrics/metricsql",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/metricsql@v0.87.6",
+            "UID": "191472debc6d4d7e"
+          },
+          "Version": "v0.87.6",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/cespare/xxhash/v2@v2.3.0",
+          "Name": "github.com/cespare/xxhash/v2",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/cespare/xxhash/v2@v2.3.0",
+            "UID": "4ed47b4b0f0cfe41"
+          },
+          "Version": "v2.3.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/golang/snappy@v1.0.0",
+          "Name": "github.com/golang/snappy",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/golang/snappy@v1.0.0",
+            "UID": "bdb1b761d0b1b5cf"
+          },
+          "Version": "v1.0.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/klauspost/compress@v1.20.3",
+          "Name": "github.com/klauspost/compress",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/klauspost/compress@v1.20.3",
+            "UID": "20603948802afe5d"
+          },
+          "Version": "v1.20.3",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/bytebufferpool@v1.0.0",
+          "Name": "github.com/valyala/bytebufferpool",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/bytebufferpool@v1.0.0",
+            "UID": "e3271e7cbad91a04"
+          },
+          "Version": "v1.0.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/fastjson@v1.6.10",
+          "Name": "github.com/valyala/fastjson",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/fastjson@v1.6.10",
+            "UID": "5da955641baaca38"
+          },
+          "Version": "v1.6.10",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/fastrand@v1.1.0",
+          "Name": "github.com/valyala/fastrand",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/fastrand@v1.1.0",
+            "UID": "dcf1dca21602c3b5"
+          },
+          "Version": "v1.1.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/fasttemplate@v1.2.2",
+          "Name": "github.com/valyala/fasttemplate",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/fasttemplate@v1.2.2",
+            "UID": "17b6fac2b14ef4d6"
+          },
+          "Version": "v1.2.2",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/gozstd@v1.27.0",
+          "Name": "github.com/valyala/gozstd",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/gozstd@v1.27.0",
+            "UID": "1e9fcc704d876b05"
+          },
+          "Version": "v1.27.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/histogram@v1.2.0",
+          "Name": "github.com/valyala/histogram",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/histogram@v1.2.0",
+            "UID": "9832a18e759a7333"
+          },
+          "Version": "v1.2.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/quicktemplate@v1.8.0",
+          "Name": "github.com/valyala/quicktemplate",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/quicktemplate@v1.8.0",
+            "UID": "bbbedcf5b0064f1b"
+          },
+          "Version": "v1.8.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "golang.org/x/net@v0.62.0",
+          "Name": "golang.org/x/net",
+          "Identifier": {
+            "PURL": "pkg:golang/golang.org/x/net@v0.62.0",
+            "UID": "5ef4f1681b1c0f9"
+          },
+          "Version": "v0.62.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "golang.org/x/oauth2@v0.37.0",
+          "Name": "golang.org/x/oauth2",
+          "Identifier": {
+            "PURL": "pkg:golang/golang.org/x/oauth2@v0.37.0",
+            "UID": "66012b5eb3648a35"
+          },
+          "Version": "v0.37.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "golang.org/x/sys@v0.49.0",
+          "Name": "golang.org/x/sys",
+          "Identifier": {
+            "PURL": "pkg:golang/golang.org/x/sys@v0.49.0",
+            "UID": "933aa3fac2fefc4e"
+          },
+          "Version": "v0.49.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "gopkg.in/yaml.v2@v2.4.0",
+          "Name": "gopkg.in/yaml.v2",
+          "Identifier": {
+            "PURL": "pkg:golang/gopkg.in/yaml.v2@v2.4.0",
+            "UID": "870925001f5a4b30"
+          },
+          "Version": "v2.4.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-97054",
+          "VendorIDs": [
+            "GO-2026-6859"
+          ],
+          "PkgID": "stdlib@v1.27.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.27.3",
+            "UID": "bb9c30d70f994d53"
+          },
+          "InstalledVersion": "v1.27.3",
+          "FixedVersion": "1.26.11, 1.27.4",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-97054",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:9d513d1c9328aa2358d7dffb135f6779c09183fb08833a31f8fb203fb2dddbef",
+          "Title": "For HTTP/1 servers, when MaxBytesReader's limit is exceeded, \"Connecti ...",
+          "Description": "For HTTP/1 servers, when MaxBytesReader's limit is exceeded, \"Connection: close\" header is automatically set without synchronization, which might race with another header being set explicitly in the server handler. As a result, an HTTP/1 server that utilizes MaxBytesReader or MaxBytesHandler can crash due to runtime panic if its handler reads the request body concurrently with writing the response header.",
+          "Severity": "UNKNOWN",
+          "References": [
+            "https://go.dev/cl/862185",
+            "https://go.dev/issue/82563",
+            "https://groups.google.com/g/golang-announce/c/iY8TY0wWgbM",
+            "https://pkg.go.dev/vuln/GO-2026-6859"
+          ],
+          "PublishedDate": "2026-11-11T05:19:58.943Z",
+          "LastModifiedDate": "2026-11-12T22:09:39.233Z"
+        }
+      ]
+    }
+  ]
+}
