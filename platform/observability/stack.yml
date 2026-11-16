@@ -9,6 +9,7 @@ services:
       GF_DATABASE_USER: grafana
       GF_DATABASE_PASSWORD__FILE: /run/secrets/postgres_grafana_password
       GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
+      GF_DATE_FORMATS_FULL_DATE: "YYYY-MM-DD HH:mm:ss Z"
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
       GF_AUTH_OAUTH_AUTO_LOGIN: "true"
@@ -48,8 +49,8 @@ services:
       - source: grafana_dashboard_platform
         target: /etc/grafana/dashboards/platform.json
 
-      - source: grafana_dashboard_openwrt
-        target: /etc/grafana/dashboards/openwrt.json
+      - source: grafana_dashboard_networking
+        target: /etc/grafana/dashboards/networking.json
 
       - source: grafana_alerting_openwrt
         target: /etc/grafana/provisioning/alerting/openwrt.yml
@@ -416,9 +417,9 @@ configs:
     name: observability_grafana_dashboard_platform_v19
     file: ./configs/grafana/dashboards/platform.json
 
-  grafana_dashboard_openwrt:
-    name: observability_grafana_dashboard_openwrt_v2
-    file: ./configs/grafana/dashboards/openwrt.json
+  grafana_dashboard_networking:
+    name: observability_grafana_dashboard_networking_v11
+    file: ./configs/grafana/dashboards/networking.json
 
   grafana_alerting_openwrt:
     name: observability_grafana_alerting_openwrt_v2
@@ -477,7 +478,7 @@ configs:
     file: ./configs/alloy/outputs.alloy
 
   alloy_openwrt:
-    name: observability_alloy_openwrt_v2
+    name: observability_alloy_openwrt_v5
     file: ./configs/alloy/openwrt.alloy
 
   alloy_docker:
@@ -513,7 +514,7 @@ configs:
     file: ./configs/alloy/blackbox.alloy
 
   alloy_blackbox_modules:
-    name: observability_alloy_blackbox_modules_v1
+    name: observability_alloy_blackbox_modules_v3
     file: ./configs/alloy/blackbox.yml
 
 secrets:

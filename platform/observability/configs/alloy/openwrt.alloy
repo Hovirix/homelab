@@ -15,6 +15,65 @@ prometheus.scrape "openwrt" {
 	scrape_timeout  = "10s"
 }
 
+// Probes originate on Swarm nodes in Homelab, never from isolated VLANs.
+prometheus.exporter.blackbox "network" {
+	config_file = "/etc/alloy/blackbox.yml"
+
+	target {
+		name    = "cloudflare"
+		address = "1.1.1.1"
+		module  = "icmp_ipv4"
+		labels  = {probe_target = "Cloudflare", kind = "internet"}
+	}
+
+	target {
+		name    = "quad9"
+		address = "9.9.9.9"
+		module  = "icmp_ipv4"
+		labels  = {probe_target = "Quad9", kind = "internet"}
+	}
+
+	target {
+		name    = "dns_public"
+		address = "10.30.0.1:53"
+		module  = "dns_public"
+		labels  = {probe_target = "AdGuard public resolution", kind = "dns"}
+	}
+
+	target {
+		name    = "dns_rewrite"
+		address = "10.30.0.1:53"
+		module  = "dns_rewrite"
+		labels  = {probe_target = "AdGuard internal rewrite", kind = "dns"}
+	}
+}
+
+discovery.relabel "network" {
+	targets = prometheus.exporter.blackbox.network.targets
+
+	rule {
+		target_label = "collector"
+		replacement  = sys.env("ALLOY_NODE")
+	}
+
+	rule {
+		target_label = "job"
+		replacement  = "network_probe"
+	}
+
+	rule {
+		target_label = "node"
+		replacement  = "openwrt"
+	}
+}
+
+prometheus.scrape "network" {
+	targets         = discovery.relabel.network.output
+	forward_to      = [prometheus.remote_write.default.receiver]
+	scrape_interval = "30s"
+	scrape_timeout  = "5s"
+}
+
 // Host-mode publishing preserves the source IP for the router-only filter.
 loki.source.syslog "openwrt" {
 	listener {

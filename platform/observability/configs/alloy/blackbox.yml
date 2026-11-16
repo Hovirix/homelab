@@ -1,4 +1,32 @@
 modules:
+  icmp_ipv4:
+    prober: icmp
+    timeout: 3s
+    icmp:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+  dns_public:
+    prober: dns
+    timeout: 3s
+    dns:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+      query_name: one.one.one.one
+      query_type: A
+      valid_rcodes: [NOERROR]
+      validate_answer_rrs:
+        fail_if_none_matches_regexp: ['^one\.one\.one\.one\.\s+\d+\s+IN\s+A\s+1\.(1\.1\.1|0\.0\.1)$']
+  dns_rewrite:
+    prober: dns
+    timeout: 3s
+    dns:
+      preferred_ip_protocol: ip4
+      ip_protocol_fallback: false
+      query_name: swarm-01.home.hovirix.dev
+      query_type: A
+      valid_rcodes: [NOERROR]
+      validate_answer_rrs:
+        fail_if_none_matches_regexp: ['^swarm-01\.home\.hovirix\.dev\.\s+\d+\s+IN\s+A\s+10\.30\.0\.101$']
   http_2xx:
     prober: http
     timeout: 5s
