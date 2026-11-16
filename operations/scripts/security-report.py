@@ -275,7 +275,43 @@ def sarif(target, source):
     write_json(path, data)
 
 
+def write_snapshot(manifest, deployments, counts):
+    reports = {"database.json"}
+    reports.update(deployment["report"] for deployment in deployments)
+    reports.update(
+        f"json/images/{digest(deployment['image'])}.json" for deployment in deployments
+    )
+    write_json(
+        DIR / "snapshot.json",
+        {
+            "schema_version": 1,
+            "scope": "repository inventory, not verified deployed images",
+            "complete": True,
+            "mode": manifest["mode"],
+            "run_id": os.environ.get("GITHUB_RUN_ID", ""),
+            "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", ""),
+            "run_url": os.environ.get("REPORT_URL", ""),
+            "summary": [
+                {
+                    "captured_at": datetime.datetime.now(datetime.UTC).isoformat(),
+                    "commit": manifest["commit"],
+                    "deployments": len(deployments),
+                    "expected_deployments": len(manifest["deployments"]),
+                    "images": len(manifest["images"]),
+                    **counts,
+                }
+            ],
+            "deployments": deployments,
+            "reports": {
+                path: hashlib.sha256((DIR / path).read_bytes()).hexdigest()
+                for path in sorted(reports)
+            },
+        },
+    )
+
+
 def report():
+    (DIR / "snapshot.json").unlink(missing_ok=True)
     manifest = json.loads((DIR / "manifest.json").read_text())
     require(
         (DIR / "scan.complete").read_text().strip() == manifest["run_id"],
@@ -303,10 +339,62 @@ def report():
     for path in manifest["exceptions"]:
         validate_exception(Path(path))
     summary, comment, failed, glance = [], [], False, {}
+    deployments = []
+    inventory_counts = dict.fromkeys(
+        [level.lower() for level in SEVERITIES] + ["findings", "excepted", "fixable"], 0
+    )
     for deployment in manifest["deployments"]:
         target, image = deployment["target"], deployment["image"]
         source = DIR / "json/images" / f"{digest(image)}.json"
         current = load_report(source, image)
+        vulnerabilities = [
+            vuln
+            for result in current["Results"]
+            for vuln in result.get("Vulnerabilities", [])
+        ]
+        published = source
+        if deployment["ignore"] != "/dev/null":
+            published = DIR / "json/images" / f"{deployment['id']}.exceptions.json"
+            subprocess.run(
+                [
+                    "trivy",
+                    "convert",
+                    "--ignorefile",
+                    deployment["ignore"],
+                    "--show-suppressed",
+                    "--severity",
+                    ",".join(SEVERITIES),
+                    "--format",
+                    "json",
+                    "--output",
+                    str(published),
+                    str(source),
+                ],
+                check=True,
+            )
+            filtered = load_report(published, image)
+            require(
+                filtered["Metadata"]["ImageID"] == current["Metadata"]["ImageID"],
+                f"Exception report changed image: {target}",
+            )
+            suppressed = sum(
+                len(result.get("ExperimentalModifiedFindings", []))
+                for result in filtered["Results"]
+            )
+            require(
+                len(vulnerabilities)
+                == suppressed
+                + sum(
+                    len(result.get("Vulnerabilities", []))
+                    for result in filtered["Results"]
+                ),
+                f"Exception report lost findings: {target}",
+            )
+            inventory_counts["excepted"] += suppressed
+        deployments.append({**deployment, "report": str(published.relative_to(DIR))})
+        inventory_counts["findings"] += len(vulnerabilities)
+        for vuln in vulnerabilities:
+            inventory_counts[vuln["Severity"].lower()] += 1
         old_image = deployment["base_image"]
         old = (
             load_report(DIR / "json/images" / f"{digest(old_image)}.json", old_image)
@@ -325,6 +413,9 @@ def report():
             f"Gate scanned a different image: {target}",
         )
         eligible = findings(gate)
+        inventory_counts["fixable"] += sum(
+            len(result.get("Vulnerabilities", [])) for result in gate["Results"]
+        )
         require(
             eligible.keys() <= after.keys(),
             f"Gate results disagree with raw scan: {target}",
@@ -378,6 +469,7 @@ def report():
         print(
             f"\nInventory: {len(glance)} images, {sum(row[2] for row in glance.values())} fixable HIGH/CRITICAL findings."
         )
+    write_snapshot(manifest, deployments, inventory_counts)
     return failed, "".join(summary), "".join(comment), manifest["mode"] == "full"
 
 

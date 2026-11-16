@@ -13,3 +13,11 @@ datasources:
     uid: logs
     type: loki
     url: http://loki:3100
+
+  - name: security reports
+    uid: security-reports
+    type: yesoreyeram-infinity-datasource
+    access: proxy
+    jsonData:
+      allowedHosts:
+        - https://raw.githubusercontent.com

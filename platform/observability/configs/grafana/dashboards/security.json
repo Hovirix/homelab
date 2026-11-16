@@ -1,0 +1,479 @@
+{
+  "uid": "security",
+  "title": "Security · repository images",
+  "description": "Repository inventory, not verified production state. Counts are vulnerability/package occurrences per deployment, including exceptions. Empty or failed queries are not a clean scan. Weekly scans: latest data is stale after eight days. Historical differences may reflect scanner/database changes, not remediation.",
+  "tags": ["security"],
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "timezone": "utc",
+  "refresh": "1h",
+  "time": { "from": "now-90d", "to": "now" },
+  "templating": {
+    "list": [
+      {
+        "name": "snapshot",
+        "label": "Inventory snapshot",
+        "type": "query",
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "security-reports"
+        },
+        "refresh": 2,
+        "sort": 0,
+        "multi": false,
+        "includeAll": false,
+        "current": {
+          "text": "Latest complete inventory",
+          "value": "latest.json"
+        },
+        "options": [],
+        "query": {
+          "queryType": "infinity",
+          "refId": "variable",
+          "infinityQuery": {
+            "refId": "variable",
+            "type": "json",
+            "source": "url",
+            "parser": "backend",
+            "format": "table",
+            "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/index.json",
+            "root_selector": "options",
+            "columns": [
+              { "selector": "__text", "text": "__text", "type": "string" },
+              { "selector": "__value", "text": "__value", "type": "string" }
+            ],
+            "url_options": { "method": "GET" }
+          }
+        }
+      },
+      {
+        "name": "report_root",
+        "type": "query",
+        "hide": 2,
+        "refresh": 2,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "security-reports"
+        },
+        "query": {
+          "queryType": "infinity",
+          "refId": "variable",
+          "infinityQuery": {
+            "refId": "variable",
+            "type": "json",
+            "source": "url",
+            "parser": "backend",
+            "format": "table",
+            "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${snapshot}",
+            "root_selector": "{'path': path}",
+            "columns": [
+              { "selector": "path", "text": "path", "type": "string" }
+            ],
+            "url_options": { "method": "GET" }
+          }
+        }
+      },
+      {
+        "name": "deployment",
+        "label": "Deployment",
+        "type": "query",
+        "refresh": 1,
+        "datasource": {
+          "type": "yesoreyeram-infinity-datasource",
+          "uid": "security-reports"
+        },
+        "query": {
+          "queryType": "infinity",
+          "refId": "variable",
+          "infinityQuery": {
+            "refId": "variable",
+            "type": "json",
+            "source": "url",
+            "parser": "backend",
+            "format": "table",
+            "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/manifest.json",
+            "root_selector": "deployments",
+            "columns": [
+              { "selector": "target", "text": "__text", "type": "string" },
+              { "selector": "report", "text": "__value", "type": "string" }
+            ],
+            "url_options": { "method": "GET" }
+          }
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Repository inventory ≠ deployed images",
+      "type": "text",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 3 },
+      "options": {
+        "mode": "markdown",
+        "content": "Main-branch image inventory only; **not verified production state**. Findings count package occurrences per deployment. Exceptions remain visible. Missing/error data is **unknown**, never zero. Weekly scans are stale after **8 days**. Historical trends include scanner/database changes, not just remediation."
+      }
+    },
+    {
+      "id": 2,
+      "title": "Selected snapshot findings",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 3, "w": 18, "h": 5 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "fieldConfig": {
+        "defaults": { "noValue": "UNKNOWN", "decimals": 0 },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value_and_name",
+        "colorMode": "none"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/manifest.json",
+          "root_selector": "summary",
+          "columns": [
+            {
+              "selector": "findings",
+              "text": "All findings",
+              "type": "number"
+            },
+            { "selector": "critical", "text": "Critical", "type": "number" },
+            { "selector": "high", "text": "High", "type": "number" },
+            {
+              "selector": "fixable",
+              "text": "Fixable H/C, unexcepted",
+              "type": "number"
+            },
+            { "selector": "excepted", "text": "Excepted", "type": "number" }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Latest inventory age (hours)",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 3, "w": 6, "h": 5 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "description": "Always measures latest inventory, regardless of historical selection. Red after eight days. Query errors mean freshness is unknown.",
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "decimals": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 192 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "colorMode": "background"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/latest.json",
+          "root_selector": "{'age_hours': ($millis() - $toMillis(summary[0].captured_at)) / 3600000}",
+          "columns": [
+            { "selector": "age_hours", "text": "Age", "type": "number" }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Selected snapshot provenance and coverage",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 4 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "fieldConfig": { "defaults": { "noValue": "UNKNOWN" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/manifest.json",
+          "root_selector": "summary",
+          "columns": [
+            {
+              "selector": "captured_at",
+              "text": "Captured (UTC)",
+              "type": "string"
+            },
+            { "selector": "commit", "text": "Source commit", "type": "string" },
+            {
+              "selector": "deployments",
+              "text": "Scanned deployments",
+              "type": "number"
+            },
+            {
+              "selector": "expected_deployments",
+              "text": "Expected deployments",
+              "type": "number"
+            },
+            { "selector": "images", "text": "Unique images", "type": "number" }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Inventory trends (all complete snapshots)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 8 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "custom": { "spanNulls": false, "showPoints": "always" }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "timeseries",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/index.json",
+          "root_selector": "snapshots^(captured_at)",
+          "columns": [
+            { "selector": "captured_at", "text": "Time", "type": "timestamp" },
+            { "selector": "critical", "text": "Critical", "type": "number" },
+            { "selector": "high", "text": "High", "type": "number" },
+            {
+              "selector": "fixable",
+              "text": "Fixable H/C, unexcepted",
+              "type": "number"
+            },
+            { "selector": "excepted", "text": "Excepted", "type": "number" }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Unexcepted findings · $deployment",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 20, "w": 24, "h": 12 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "fieldConfig": {
+        "defaults": { "custom": { "filterable": true } },
+        "overrides": []
+      },
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/${deployment}",
+          "root_selector": "Results.Vulnerabilities",
+          "columns": [
+            { "selector": "Severity", "text": "Severity", "type": "string" },
+            {
+              "selector": "VulnerabilityID",
+              "text": "Vulnerability",
+              "type": "string"
+            },
+            { "selector": "PkgName", "text": "Package", "type": "string" },
+            {
+              "selector": "InstalledVersion",
+              "text": "Installed",
+              "type": "string"
+            },
+            {
+              "selector": "FixedVersion",
+              "text": "Fixed version (blank = no fix)",
+              "type": "string"
+            },
+            { "selector": "PkgPath", "text": "Package path", "type": "string" }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Image provenance · $deployment",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 32, "w": 24, "h": 9 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "fieldConfig": { "defaults": { "noValue": "UNKNOWN" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/${deployment}",
+          "root_selector": "$",
+          "columns": [
+            {
+              "selector": "ArtifactName",
+              "text": "Image reference",
+              "type": "string"
+            },
+            {
+              "selector": "Metadata.ImageID",
+              "text": "Scanned image ID",
+              "type": "string"
+            },
+            {
+              "selector": "CreatedAt",
+              "text": "Scanned (UTC)",
+              "type": "string"
+            }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Scanner and database provenance · selected snapshot",
+      "type": "table",
+      "gridPos": { "x": 0, "y": 41, "w": 24, "h": 5 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "fieldConfig": { "defaults": { "noValue": "UNKNOWN" }, "overrides": [] },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/database.json",
+          "root_selector": "$",
+          "columns": [
+            {
+              "selector": "Version",
+              "text": "Trivy version",
+              "type": "string"
+            },
+            {
+              "selector": "VulnerabilityDB.UpdatedAt",
+              "text": "Vulnerability DB updated",
+              "type": "string"
+            },
+            {
+              "selector": "VulnerabilityDB.DownloadedAt",
+              "text": "Vulnerability DB downloaded",
+              "type": "string"
+            },
+            {
+              "selector": "JavaDB.UpdatedAt",
+              "text": "Java DB updated",
+              "type": "string"
+            }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Excepted findings · $deployment",
+      "type": "table",
+      "description": "Native Trivy --show-suppressed output; no custom findings schema.",
+      "gridPos": { "x": 0, "y": 46, "w": 24, "h": 8 },
+      "datasource": {
+        "type": "yesoreyeram-infinity-datasource",
+        "uid": "security-reports"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "type": "json",
+          "source": "url",
+          "parser": "backend",
+          "format": "table",
+          "url": "https://raw.githubusercontent.com/Hovirix/homelab/security-reports/${report_root}/${deployment}",
+          "root_selector": "Results.ExperimentalModifiedFindings",
+          "columns": [
+            {
+              "selector": "Finding.VulnerabilityID",
+              "text": "Vulnerability",
+              "type": "string"
+            },
+            {
+              "selector": "Finding.Severity",
+              "text": "Severity",
+              "type": "string"
+            },
+            {
+              "selector": "Finding.PkgName",
+              "text": "Package",
+              "type": "string"
+            },
+            {
+              "selector": "Finding.FixedVersion",
+              "text": "Fixed version",
+              "type": "string"
+            },
+            { "selector": "Status", "text": "Status", "type": "string" },
+            { "selector": "Statement", "text": "Reason", "type": "string" },
+            { "selector": "Source", "text": "Exception file", "type": "string" }
+          ],
+          "url_options": { "method": "GET" }
+        }
+      ]
+    }
+  ]
+}

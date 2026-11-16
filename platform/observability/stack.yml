@@ -10,6 +10,7 @@ services:
       GF_DATABASE_PASSWORD__FILE: /run/secrets/postgres_grafana_password
       GF_SERVER_ROOT_URL: https://grafana.hovirix.dev
       GF_DATE_FORMATS_FULL_DATE: "YYYY-MM-DD HH:mm:ss Z"
+      GF_PLUGINS_PREINSTALL_SYNC: yesoreyeram-infinity-datasource@4.1.6
       GF_SECURITY_ADMIN_PASSWORD__FILE: /run/secrets/grafana_admin_password
       GF_AUTH_DISABLE_LOGIN_FORM: "true"
       GF_AUTH_OAUTH_AUTO_LOGIN: "true"
@@ -51,6 +52,9 @@ services:
 
       - source: grafana_dashboard_networking
         target: /etc/grafana/dashboards/networking.json
+
+      - source: grafana_dashboard_security
+        target: /etc/grafana/dashboards/security.json
 
       - source: grafana_alerting_openwrt
         target: /etc/grafana/provisioning/alerting/openwrt.yml
@@ -406,7 +410,7 @@ networks:
 
 configs:
   grafana_datasources:
-    name: observability_grafana_datasources_v3
+    name: observability_grafana_datasources_v4
     file: ./configs/grafana/provisioning/datasources.yml
 
   grafana_dashboards:
@@ -420,6 +424,10 @@ configs:
   grafana_dashboard_networking:
     name: observability_grafana_dashboard_networking_v11
     file: ./configs/grafana/dashboards/networking.json
+
+  grafana_dashboard_security:
+    name: observability_grafana_dashboard_security_v1
+    file: ./configs/grafana/dashboards/security.json
 
   grafana_alerting_openwrt:
     name: observability_grafana_alerting_openwrt_v2
