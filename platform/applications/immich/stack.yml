@@ -12,6 +12,7 @@ services:
       REDIS_DBINDEX: "1"
       IMMICH_CONFIG_FILE: /run/secrets/immich_config
       IMMICH_ALLOW_SETUP: "false"
+      IMMICH_TELEMETRY_INCLUDE: all
 
     secrets:
       - postgres_immich_password
@@ -22,6 +23,7 @@ services:
       - postgres
       - valkey
       - traefik
+      - observability
 
     volumes:
       - type: bind
@@ -79,6 +81,9 @@ services:
         condition: any
 
 networks:
+  observability:
+    external: true
+
   immich:
     driver: overlay
 

@@ -1,0 +1,1610 @@
+{
+  "uid": "homelab-networking",
+  "title": "Networking",
+  "version": 11,
+  "schemaVersion": 39,
+  "editable": false,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "description": "Network health, traffic and troubleshooting; no IDS. Inventory: netlab 583adcb. Collection interval 30s; freshness cutoff max(120s, 3×30s)=120s. Probes originate on Swarm nodes in Homelab, not on clients or isolated VLANs. UNKNOWN is never healthy. Browser timezone applies to axes and timestamps. DHCP/Wi-Fi joins and missing telemetry are documented in panel descriptions.",
+  "tags": ["network", "openwrt"],
+  "templating": {
+    "list": [
+      {
+        "name": "router",
+        "label": "Router",
+        "type": "custom",
+        "query": "Primary : openwrt",
+        "multi": false,
+        "includeAll": false,
+        "current": { "text": "Primary", "value": "openwrt" }
+      },
+      {
+        "name": "network",
+        "label": "Network",
+        "type": "custom",
+        "query": "WAN IPv4 : wan, WAN IPv6 : wan6, Management : vlan10, Proxmox : vlan20, Homelab : vlan30, Kubelab : vlan40, Cyberlab : vlan50, Clients : vlan60",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".+",
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "radio",
+        "label": "Radio",
+        "type": "custom",
+        "query": "2.4 GHz : radio0, 5 GHz : radio1",
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".+",
+        "current": { "text": "All", "value": "$__all" }
+      },
+      {
+        "name": "datasource",
+        "label": "Datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "regex": "/^metrics$/",
+        "current": { "text": "metrics", "value": "metrics" }
+      },
+      {
+        "name": "search",
+        "label": "Event search",
+        "type": "textbox",
+        "query": "",
+        "current": { "text": "", "value": "" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Router",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "description": "OpenWrt monitoring reachability from Swarm collectors, every 30s. Latest scrape result younger than 120s; any successful path means UP, all failed paths DOWN, missing/stale UNKNOWN. Not a judgment of every router function. Network/Radio filters do not apply.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max(up{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(up{job=\"openwrt\",node=\"$router\"}) < 120))",
+          "instant": true
+        }
+      ],
+      "options": {
+        "textMode": "value",
+        "text": { "valueSize": 36 },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["last"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "color": { "mode": "thresholds" },
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "DOWN", "color": "red" },
+                "1": { "text": "UP", "color": "green" }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": { "text": "UNKNOWN", "color": "gray" }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Internet",
+      "gridPos": { "x": 4, "y": 0, "w": 8, "h": 4 },
+      "description": "ICMP connectivity to Cloudflare 1.1.1.1 and Quad9 9.9.9.9 from each Swarm node every 30s. Latest reported attempt per path, younger than 120s; a target succeeds if any fresh path succeeds. Both required targets must be present: 2 OK, 1 DEGRADED, 0 FAIL, otherwise UNKNOWN. Independent of Network/Radio filters; not a test of every client or IP protocol.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\",probe_target=~\"Cloudflare|Quad9\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\",probe_target=~\"Cloudflare|Quad9\"}) < 120))) and on () (count(max by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\",probe_target=~\"Cloudflare|Quad9\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\",probe_target=~\"Cloudflare|Quad9\"}) < 120))) == 2)",
+          "instant": true
+        }
+      ],
+      "options": {
+        "textMode": "value",
+        "text": { "valueSize": 36 },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["last"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "FAIL", "color": "red" },
+                "1": { "text": "DEGRADED", "color": "yellow" },
+                "2": { "text": "OK", "color": "green" }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": { "text": "UNKNOWN", "color": "gray" }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "DNS",
+      "gridPos": { "x": 12, "y": 0, "w": 4, "h": 4 },
+      "description": "AdGuard 10.30.0.1:53, every 30s from Swarm: public one.one.one.one A must contain 1.1.1.1 or 1.0.0.1; internal swarm-01.home.hovirix.dev A must contain 10.30.0.101. Timeout/incorrect answers fail. Both fresh tests required: 2 OK, 1 DEGRADED, 0 FAIL; missing/stale UNKNOWN. Network/Radio filters never hide DNS health.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\",probe_target=~\"AdGuard public resolution|AdGuard internal rewrite\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\",probe_target=~\"AdGuard public resolution|AdGuard internal rewrite\"}) < 120))) and on () (count(max by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\",probe_target=~\"AdGuard public resolution|AdGuard internal rewrite\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\",probe_target=~\"AdGuard public resolution|AdGuard internal rewrite\"}) < 120))) == 2)",
+          "instant": true
+        }
+      ],
+      "options": {
+        "textMode": "value",
+        "text": { "valueSize": 36 },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["last"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "FAIL", "color": "red" },
+                "1": { "text": "DEGRADED", "color": "yellow" },
+                "2": { "text": "OK", "color": "green" }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": { "text": "UNKNOWN", "color": "gray" }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Telemetry",
+      "gridPos": { "x": 16, "y": 0, "w": 4, "h": 4 },
+      "description": "Age of the newest OpenWrt scrape-status sample, independent of whether that scrape succeeded. 30s interval; F=max(120s,3×30s)=120s. Fresh sample FRESH; older or absent STALE. This is scrape-status ingestion freshness, not freshness of every source; see Collection for per-source ages.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "time() - max(timestamp(up{job=\"openwrt\",node=\"$router\"})) < bool 120",
+          "instant": true
+        }
+      ],
+      "options": {
+        "textMode": "value",
+        "text": { "valueSize": 36 },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["last"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "STALE",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "STALE", "color": "gray" },
+                "1": { "text": "FRESH", "color": "green" }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": { "text": "STALE", "color": "gray" }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Collectors",
+      "gridPos": { "x": 20, "y": 0, "w": 4, "h": 4 },
+      "description": "Router collector results, independent of scrape success: networks, leases, wireless plus upstream WireGuard. Every 30s; all four must have samples younger than 120s. Any collector failure is PARTIAL (none successful FAIL); missing source UNKNOWN. A successful scrape is not evidence that its collectors succeeded.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(min by (source) ((openwrt_router_source_success{job=\"openwrt\",node=\"$router\",source=~\"networks|leases|wireless\"} and (time() - timestamp(openwrt_router_source_success{job=\"openwrt\",node=\"$router\"}) < 120)) or label_replace(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"} and (time() - timestamp(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"}) < 120), \"source\", \"wireguard\", \"\", \"\"))) and on () (count(min by (source) ((openwrt_router_source_success{job=\"openwrt\",node=\"$router\",source=~\"networks|leases|wireless\"} and (time() - timestamp(openwrt_router_source_success{job=\"openwrt\",node=\"$router\"}) < 120)) or label_replace(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"} and (time() - timestamp(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"}) < 120), \"source\", \"wireguard\", \"\", \"\"))) == 4)",
+          "instant": true
+        }
+      ],
+      "options": {
+        "textMode": "value",
+        "text": { "valueSize": 36 },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "reduceOptions": { "calcs": ["last"] }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "0": { "text": "FAIL", "color": "red" },
+                "4": { "text": "OK", "color": "green" }
+              }
+            },
+            {
+              "type": "range",
+              "options": {
+                "from": 1,
+                "to": 3,
+                "result": { "text": "PARTIAL", "color": "yellow" }
+              }
+            },
+            {
+              "type": "special",
+              "options": {
+                "match": "null",
+                "result": { "text": "UNKNOWN", "color": "gray" }
+              }
+            }
+          ]
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 100,
+      "type": "row",
+      "title": "CONNECTIVITY",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": { "x": 0, "y": 4, "w": 24, "h": 1 }
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Internet latency · successful checks",
+      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 8 },
+      "description": "Swarm-origin ICMP connectivity probes every 30s. Successful fresh attempts only; failures are gaps, never 0ms. Mean duration across successful collectors, not client experience. Router filter only; browser timezone in timestamps.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(1000 * avg by (probe_target) (probe_duration_seconds{job=\"network_probe\",node=\"$router\",kind=\"internet\"} and (time() - timestamp(probe_duration_seconds{job=\"network_probe\",node=\"$router\",kind=\"internet\"}) < 120) and on (collector,probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\"} == 1)) or (0/0 * group by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\"}) < 120)))) or on () label_replace(label_replace(vector(0/0),\"probe_target\",\"NOT CONFIGURED / no fresh telemetry\",\"\",\"\"),\"node\",\"$router\",\"\",\"\")",
+          "legendFormat": "{{probe_target}}"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 100
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "noValue": "UNKNOWN",
+          "color": { "mode": "palette-classic-by-name" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "spanNulls": false,
+            "stacking": { "mode": "none" }
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Cloudflare" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          { "matcher": { "id": "byName", "options": "Quad9" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }] }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Internet failed checks · last 5 minutes",
+      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 8 },
+      "description": "Every successful network_probe scrape invokes one probe and reports one binary probe_success attempt. Failure rate is 100×(reported attempts−successful attempts)/reported attempts over 5m, across collectors. Missing scrapes are not counted as failures or successes. Current probe samples must be fresh (<120s). Not packet loss.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(100 * (1 - sum by (probe_target) (sum_over_time(probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\"}[5m])) / sum by (probe_target) (count_over_time(probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\"}[5m]))) and on (probe_target) max by (probe_target) (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"internet\"}) < 120)) or on () label_replace(label_replace(vector(0/0),\"probe_target\",\"NOT AVAILABLE / no fresh reported attempts\",\"\",\"\"),\"node\",\"$router\",\"\",\"\")",
+          "legendFormat": "{{probe_target}}"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 100
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "noValue": "NOT AVAILABLE",
+          "color": { "mode": "palette-classic-by-name" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "spanNulls": false,
+            "stacking": { "mode": "none" }
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "Cloudflare" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          { "matcher": { "id": "byName", "options": "Quad9" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "orange" } }] }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "type": "state-timeline",
+      "title": "Connectivity history",
+      "gridPos": { "x": 0, "y": 13, "w": 24, "h": 6 },
+      "description": "Individual latest outcomes, every 30s, per required target; any fresh collector succeeds = OK, none succeed = FAIL, missing/stale = UNKNOWN. Expected targets are explicitly enumerated from Alloy configuration so vanished targets remain visible. Swarm-origin, not Wi-Fi clients. Nulls are not connected. DNS tests check expected answers, not just reachability.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=~\"internet|dns\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=~\"internet|dns\"}) < 120)) or label_replace(vector(-1),\"probe_target\",\"Cloudflare\",\"\",\"\") or label_replace(vector(-1),\"probe_target\",\"Quad9\",\"\",\"\") or label_replace(vector(-1),\"probe_target\",\"AdGuard public resolution\",\"\",\"\") or label_replace(vector(-1),\"probe_target\",\"AdGuard internal rewrite\",\"\",\"\")",
+          "legendFormat": "{{probe_target}}"
+        }
+      ],
+      "options": {
+        "mergeValues": true,
+        "showValue": "auto",
+        "tooltip": { "mode": "single" },
+        "legend": { "showLegend": false }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "UNKNOWN",
+          "mappings": [
+            {
+              "type": "value",
+              "options": {
+                "-1": { "text": "UNKNOWN", "color": "gray" },
+                "0": { "text": "FAIL", "color": "red" },
+                "1": { "text": "OK", "color": "green" }
+              }
+            }
+          ],
+          "custom": { "spanNulls": false }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "DNS response time · successful checks",
+      "gridPos": { "x": 0, "y": 19, "w": 12, "h": 7 },
+      "description": "AdGuard UDP DNS at 10.30.0.1:53, public resolution and internal rewrite answer validation, every 30s from Swarm. Successful fresh probes only, mean across collectors in ms. Failures are gaps. Requires DNS probe rollout; no demo values or fabricated latency. Independent of Network/Radio filters.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(1000 * avg by (probe_target) (probe_duration_seconds{job=\"network_probe\",node=\"$router\",kind=\"dns\"} and (time() - timestamp(probe_duration_seconds{job=\"network_probe\",node=\"$router\",kind=\"dns\"}) < 120) and on (collector,probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\"} == 1)) or (0/0 * group by (probe_target) (probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\"} and (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\"}) < 120)))) or on () label_replace(label_replace(vector(0/0),\"probe_target\",\"NOT CONFIGURED / no fresh telemetry\",\"\",\"\"),\"node\",\"$router\",\"\",\"\")",
+          "legendFormat": "{{probe_target}}"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 100
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "min": 0,
+          "noValue": "UNKNOWN",
+          "color": { "mode": "palette-classic-by-name" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "spanNulls": false,
+            "stacking": { "mode": "none" }
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "AdGuard internal rewrite" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          { "matcher": { "id": "byName", "options": "AdGuard public resolution" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "cyan" } }] }
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "DNS failed checks · last 5 minutes",
+      "gridPos": { "x": 12, "y": 19, "w": 12, "h": 7 },
+      "description": "Known reported DNS attempts over trailing 5m: one probe_success sample per scrape/attempt, every 30s. Timeout, incorrect answer or invalid response code fails. Missing scrapes are excluded, not treated as successful. Latest attempts must be younger than 120s. NOT AVAILABLE until DNS probing is rolled out; not inferred from latency.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(100 * (1 - sum by (probe_target) (sum_over_time(probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\"}[5m])) / sum by (probe_target) (count_over_time(probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\"}[5m]))) and on (probe_target) max by (probe_target) (time() - timestamp(probe_success{job=\"network_probe\",node=\"$router\",kind=\"dns\"}) < 120)) or on () label_replace(label_replace(vector(0/0),\"probe_target\",\"NOT AVAILABLE / no fresh reported attempts\",\"\",\"\"),\"node\",\"$router\",\"\",\"\")",
+          "legendFormat": "{{probe_target}}"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 100
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0,
+          "max": 100,
+          "decimals": 1,
+          "noValue": "NOT AVAILABLE",
+          "color": { "mode": "palette-classic-by-name" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "spanNulls": false,
+            "stacking": { "mode": "none" }
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "AdGuard internal rewrite" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "blue" } }] },
+          { "matcher": { "id": "byName", "options": "AdGuard public resolution" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "cyan" } }] }
+        ]
+      }
+    },
+    {
+      "id": 101,
+      "type": "row",
+      "title": "TRAFFIC",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": { "x": 0, "y": 26, "w": 24, "h": 1 }
+    },
+    {
+      "id": 12,
+      "type": "timeseries",
+      "title": "WAN throughput",
+      "gridPos": { "x": 0, "y": 27, "w": 12, "h": 8 },
+      "description": "One accounting boundary: physical WAN eth1; never summed with VLAN/tunnel counters. 30s scrapes, 120s freshness gate; rate over $__rate_interval handles resets, ×8 converts bytes/s to bits/s. Hardware-offloaded traffic may be missing. RX download and TX upload both positive. Network filter cannot hide WAN.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "8 * max(rate(node_network_receive_bytes_total{job=\"openwrt\",node=\"$router\",device=\"eth1\"}[$__rate_interval]) and (time() - timestamp(node_network_receive_bytes_total{job=\"openwrt\",node=\"$router\",device=\"eth1\"}) < 120))",
+          "legendFormat": "Download"
+        },
+        {
+          "refId": "B",
+          "expr": "8 * max(rate(node_network_transmit_bytes_total{job=\"openwrt\",node=\"$router\",device=\"eth1\"}[$__rate_interval]) and (time() - timestamp(node_network_transmit_bytes_total{job=\"openwrt\",node=\"$router\",device=\"eth1\"}) < 120))",
+          "legendFormat": "Upload"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 100
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "min": 0,
+          "color": { "mode": "palette-classic-by-name" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": false,
+            "stacking": { "mode": "none" }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "Download" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "blue" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Upload" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "orange" }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": { "fill": "dash", "dash": [6, 4] }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "type": "timeseries",
+      "title": "VLAN throughput",
+      "gridPos": { "x": 12, "y": 27, "w": 12, "h": 8 },
+      "description": "Only each VLAN L3 interface, from netlab network→l3_device metadata, selected Network. 30s scrapes; rate before deduplication, ×8 bits/s. Router-perspective RX/TX, not same-VLAN visibility. Never add physical, bridge and VLAN counters. Metadata changes may cause gaps. Cyberlab is observed passively; no egress probes are sent from it.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "8 * max by (network) (max by (device) (rate(node_network_receive_bytes_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_receive_bytes_total{job=\"openwrt\",node=\"$router\"}) < 120)) * on (device) group_right () label_replace(max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\",network=~\"${network:regex}\",network=~\"vlan[0-9]+\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)),\"device\",\"$1\",\"l3_device\",\"(.+)\"))",
+          "legendFormat": "{{network}} / RX"
+        },
+        {
+          "refId": "B",
+          "expr": "8 * max by (network) (max by (device) (rate(node_network_transmit_bytes_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_transmit_bytes_total{job=\"openwrt\",node=\"$router\"}) < 120)) * on (device) group_right () label_replace(max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\",network=~\"${network:regex}\",network=~\"vlan[0-9]+\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)),\"device\",\"$1\",\"l3_device\",\"(.+)\"))",
+          "legendFormat": "{{network}} / TX"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 120
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "min": 0,
+          "color": { "mode": "palette-classic-by-name" },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "spanNulls": false,
+            "stacking": { "mode": "none" }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": { "id": "byRegexp", "options": "/^vlan10 \\//" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "blue" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/^vlan20 \\//" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "orange" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/^vlan30 \\//" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "purple" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/^vlan40 \\//" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "cyan" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/^vlan50 \\//" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "yellow" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/^vlan60 \\//" },
+            "properties": [
+              {
+                "id": "color",
+                "value": { "mode": "fixed", "fixedColor": "red" }
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/TX$/" },
+            "properties": [
+              {
+                "id": "custom.lineStyle",
+                "value": { "fill": "dash", "dash": [6, 4] }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "type": "table",
+      "title": "Networks",
+      "gridPos": { "x": 0, "y": 35, "w": 24, "h": 9 },
+      "description": "Expected wan, wan6 and VLANs from netlab 583adcb remain visible when absent (UNKNOWN). Selected Network filters table rows. 30s netifd state/uptime; 120s freshness gate. Interface state is not Internet health. Rates use each network's L3 device only, ×8 for bits/s; errors/drops events/s. Missing counters remain UNKNOWN. Metadata column Device may be absent when its source fails.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "max by (network) (openwrt_network_up{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_up{job=\"openwrt\",node=\"$router\"}) < 120)) or label_replace(vector(-1),\"network\",\"wan\",\"\",\"\") or label_replace(vector(-1),\"network\",\"wan6\",\"\",\"\") or label_replace(vector(-1),\"network\",\"vlan10\",\"\",\"\") or label_replace(vector(-1),\"network\",\"vlan20\",\"\",\"\") or label_replace(vector(-1),\"network\",\"vlan30\",\"\",\"\") or label_replace(vector(-1),\"network\",\"vlan40\",\"\",\"\") or label_replace(vector(-1),\"network\",\"vlan50\",\"\",\"\") or label_replace(vector(-1),\"network\",\"vlan60\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "expr": "max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)) or on () label_replace(label_replace(vector(0/0),\"network\",\"__schema__\",\"\",\"\"),\"l3_device\",\"UNKNOWN\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "C",
+          "expr": "max by (network) (openwrt_network_uptime_seconds{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_uptime_seconds{job=\"openwrt\",node=\"$router\"}) < 120)) or on () label_replace(vector(0/0),\"network\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "D",
+          "expr": "8 * max by (network) (max by (device) (rate(node_network_receive_bytes_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_receive_bytes_total{job=\"openwrt\",node=\"$router\"}) < 120)) * on (device) group_right () label_replace(max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)),\"device\",\"$1\",\"l3_device\",\"(.+)\")) or on () label_replace(vector(0/0),\"network\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "E",
+          "expr": "8 * max by (network) (max by (device) (rate(node_network_transmit_bytes_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_transmit_bytes_total{job=\"openwrt\",node=\"$router\"}) < 120)) * on (device) group_right () label_replace(max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)),\"device\",\"$1\",\"l3_device\",\"(.+)\")) or on () label_replace(vector(0/0),\"network\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "F",
+          "expr": "max by (network) (max by (device) ((rate(node_network_receive_errs_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_receive_errs_total{job=\"openwrt\",node=\"$router\"}) < 120)) + (rate(node_network_transmit_errs_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_transmit_errs_total{job=\"openwrt\",node=\"$router\"}) < 120))) * on (device) group_right () label_replace(max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)),\"device\",\"$1\",\"l3_device\",\"(.+)\")) or on () label_replace(vector(0/0),\"network\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "G",
+          "expr": "max by (network) (max by (device) ((rate(node_network_receive_drop_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_receive_drop_total{job=\"openwrt\",node=\"$router\"}) < 120)) + (rate(node_network_transmit_drop_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(node_network_transmit_drop_total{job=\"openwrt\",node=\"$router\"}) < 120))) * on (device) group_right () label_replace(max by (network,l3_device) (openwrt_network_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_network_info{job=\"openwrt\",node=\"$router\"}) < 120)),\"device\",\"$1\",\"l3_device\",\"(.+)\")) or on () label_replace(vector(0/0),\"network\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "H",
+          "expr": "label_replace(label_replace(vector(1),\"network\",\"wan\",\"\",\"\"),\"order\",\"01\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"wan6\",\"\",\"\"),\"order\",\"02\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"vlan10\",\"\",\"\"),\"order\",\"10\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"vlan20\",\"\",\"\"),\"order\",\"20\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"vlan30\",\"\",\"\"),\"order\",\"30\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"vlan40\",\"\",\"\"),\"order\",\"40\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"vlan50\",\"\",\"\"),\"order\",\"50\",\"\",\"\") or label_replace(label_replace(vector(1),\"network\",\"vlan60\",\"\",\"\"),\"order\",\"60\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": { "byField": "network", "mode": "outerTabular" }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "network",
+                "config": {
+                  "id": "regex",
+                  "options": {
+                    "value": "^(wan|wan6|vlan10|vlan20|vlan30|vlan40|vlan50|vlan60)$"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": { "sort": [{ "field": "order", "desc": false }] }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "network",
+                "config": {
+                  "id": "regex",
+                  "options": { "value": "^(${network:regex})$" }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "network",
+                "l3_device",
+                "Value #A",
+                "Value #C",
+                "Value #D",
+                "Value #E",
+                "Value #F",
+                "Value #G"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "network": 0,
+              "l3_device": 1,
+              "Value #A": 2,
+              "Value #C": 3,
+              "Value #D": 4,
+              "Value #E": 5,
+              "Value #F": 6,
+              "Value #G": 7
+            },
+            "renameByName": {
+              "network": "Network",
+              "l3_device": "Device",
+              "Value #A": "State",
+              "Value #C": "Uptime",
+              "Value #D": "RX",
+              "Value #E": "TX",
+              "Value #F": "Errors/s",
+              "Value #G": "Drops/s"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "enablePagination": false,
+        "cellHeight": "sm",
+        "footer": { "show": false },
+        "sortBy": []
+      },
+      "fieldConfig": {
+        "defaults": { "noValue": "UNKNOWN", "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "State" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "-1": { "text": "UNKNOWN", "color": "gray" },
+                      "0": { "text": "DOWN", "color": "red" },
+                      "1": { "text": "UP", "color": "green" }
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "matcher": { "id": "byName", "options": "Uptime" },
+            "properties": [{ "id": "unit", "value": "s" }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/^(RX|TX)$/" },
+            "properties": [{ "id": "unit", "value": "bps" }]
+          },
+          {
+            "matcher": { "id": "byRegexp", "options": "/\\/s$/" },
+            "properties": [{ "id": "unit", "value": "ops" }]
+          }
+        ]
+      }
+    },
+    {
+      "id": 102,
+      "type": "row",
+      "title": "WI-FI",
+      "collapsed": false,
+      "panels": [],
+      "gridPos": { "x": 0, "y": 44, "w": 24, "h": 1 }
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "Radios & SSIDs",
+      "gridPos": { "x": 0, "y": 45, "w": 24, "h": 4 },
+      "description": "30s OpenWrt nl80211 observations: actual channel and width (80+80 retained), associated-client count, not lease count. Radio-state telemetry is UNAVAILABLE because the collector does not export it; presence never implies healthy. Network mapping follows netlab 583adcb: radio0→Clients/vlan60, radio1→Management/vlan10. Selected Network/Radio filter rows. Missing observations UNKNOWN.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace(max by (radio,ifname,ssid) (wifi_network_info{job=\"openwrt\",node=\"$router\",radio=\"radio0\"} and (time() - timestamp(wifi_network_info{job=\"openwrt\",node=\"$router\",radio=\"radio0\"}) < 120)),\"network\",\"vlan60\",\"\",\"\") or label_replace(max by (radio,ifname,ssid) (wifi_network_info{job=\"openwrt\",node=\"$router\",radio=\"radio1\"} and (time() - timestamp(wifi_network_info{job=\"openwrt\",node=\"$router\",radio=\"radio1\"}) < 120)),\"network\",\"vlan10\",\"\",\"\") or on (ifname) label_replace((label_replace(label_replace(label_replace(vector(1),\"radio\",\"radio0\",\"\",\"\"),\"ifname\",\"phy0-ap0\",\"\",\"\"),\"network\",\"vlan60\",\"\",\"\") or label_replace(label_replace(label_replace(vector(1),\"radio\",\"radio1\",\"\",\"\"),\"ifname\",\"phy1-ap0\",\"\",\"\"),\"network\",\"vlan10\",\"\",\"\")),\"ssid\",\"UNKNOWN\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "B",
+          "expr": "max by (ifname) (openwrt_wifi_channel{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_wifi_channel{job=\"openwrt\",node=\"$router\"}) < 120)) or on () label_replace(vector(0/0),\"ifname\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "C",
+          "expr": "max by (ifname,width) (openwrt_wifi_channel_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_wifi_channel_info{job=\"openwrt\",node=\"$router\"}) < 120)) or on () label_replace(label_replace(vector(0/0),\"ifname\",\"__schema__\",\"\",\"\"),\"width\",\"UNKNOWN\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        },
+        {
+          "refId": "D",
+          "expr": "max by (ifname) (wifi_stations_total{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(wifi_stations_total{job=\"openwrt\",node=\"$router\"}) < 120)) or on () label_replace(vector(0/0),\"ifname\",\"__schema__\",\"\",\"\")",
+          "instant": true,
+          "range": false,
+          "format": "table"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": { "byField": "ifname", "mode": "outerTabular" }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "exclude",
+            "match": "any",
+            "filters": [
+              {
+                "fieldName": "ifname",
+                "config": {
+                  "id": "equal",
+                  "options": { "value": "__schema__" }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "type": "include",
+            "match": "all",
+            "filters": [
+              {
+                "fieldName": "network",
+                "config": {
+                  "id": "regex",
+                  "options": { "value": "^(${network:regex})$" }
+                }
+              },
+              {
+                "fieldName": "radio",
+                "config": {
+                  "id": "regex",
+                  "options": { "value": "^(${radio:regex})$" }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "radio",
+                "ssid",
+                "network",
+                "Value #A",
+                "Value #B",
+                "width",
+                "Value #D"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "radio": 0,
+              "ssid": 1,
+              "network": 2,
+              "Value #A": 3,
+              "Value #B": 4,
+              "width": 5,
+              "Value #D": 6
+            },
+            "renameByName": {
+              "radio": "Radio",
+              "ssid": "SSID",
+              "network": "Network",
+              "Value #A": "State",
+              "Value #B": "Actual channel",
+              "width": "Width MHz",
+              "Value #D": "Clients"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "enablePagination": false,
+        "cellHeight": "sm",
+        "footer": { "show": false }
+      },
+      "fieldConfig": {
+        "defaults": { "noValue": "UNKNOWN", "custom": { "filterable": true } },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "State" },
+            "properties": [
+              { "id": "custom.cellOptions", "value": { "type": "color-text" } },
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "1": { "text": "UNAVAILABLE", "color": "gray" }
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "type": "timeseries",
+      "title": "Client signal",
+      "gridPos": { "x": 0, "y": 49, "w": 12, "h": 8 },
+      "description": "Signal measured at the AP every 30s, not a connectivity guarantee. -75/-67 dBm are suggested quality boundaries. Disconnections are gaps, never 0 dBm. Router, Network and Radio filters apply. Empty-state legend labels describe conditions encountered within the selected time range: no clients connected, no filter matches or unavailable telemetry. Status series contain no signal measurements.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace((max by (mac,radio,ifname) (wifi_station_signal_dbm{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"} and (time() - timestamp(wifi_station_signal_dbm{job=\"openwrt\",node=\"$router\"}) < 120)) and on (radio) ((label_replace(max by (network) (openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}),\"radio\",\"radio0\",\"\",\"\")) or label_replace(max by (network) (openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}),\"radio\",\"radio1\",\"\",\"\"))),\"display\",\"$1\",\"mac\",\"(.+)\") or on () label_replace((label_replace((0/0 * ((sum((max by (radio) (last_over_time(wifi_stations_total{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\")))) == 0) and on () (max(last_over_time(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wifi\"}[2m])) == 1) and on () (count((max by (radio) (last_over_time(wifi_stations_total{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\")))) == count((max by (radio) (last_over_time(wifi_network_info{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\"))))))),\"status\",\"No clients connected\",\"\",\"\") or on () label_replace((0/0 * (absent(sum((max by (radio) (last_over_time(wifi_network_info{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\"))))) and on () (max(last_over_time(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wifi\"}[2m])) == 1) and on () group(last_over_time(wifi_stations_total{job=\"openwrt\",node=\"$router\"}[2m])) and on () group(last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\"}[2m])))),\"status\",\"No matches\",\"\",\"\") or on () label_replace((0/0 * (vector(1))),\"status\",\"Telemetry unavailable\",\"\",\"\")),\"display\",\"$1\",\"status\",\"(.+)\")",
+          "legendFormat": "{{display}}"
+        }
+      ],
+      "options": {
+        "tooltip": { "mode": "multi", "sort": "desc" },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["last"],
+          "height": 100
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dBm",
+          "noValue": "—",
+          "min": -100,
+          "max": -20,
+          "color": { "mode": "palette-classic-by-name" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "value": null, "color": "green" },
+              { "value": -75, "color": "red" },
+              { "value": -67, "color": "yellow" }
+            ]
+          },
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 2,
+            "fillOpacity": 0,
+            "spanNulls": false,
+            "stacking": { "mode": "none" },
+            "thresholdsStyle": { "mode": "line" }
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": "/^(No clients connected|No matches|Telemetry unavailable)$/" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "gray" } }] }
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "type": "bargauge",
+      "title": "Top Wi-Fi clients",
+      "gridPos": { "x": 12, "y": 49, "w": 12, "h": 8 },
+      "description": "Top 10 associated Wi-Fi clients by current RX+TX byte-counter rates, in bits/s; not negotiated link speed. Fresh association required within 120s. Hostname from DHCP when available, otherwise MAC. Router, Network and Radio filters apply. Empty states distinguish no clients connected, no filter matches and unavailable telemetry; status labels contain no traffic measurements.",
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "label_replace((topk(10, max by (mac,radio) (8 * (rate(wifi_station_receive_bytes_total{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[$__rate_interval]) + rate(wifi_station_transmit_bytes_total{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[$__rate_interval]))) and on (mac,radio) max by (mac,radio) (wifi_station_signal_dbm{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(wifi_station_signal_dbm{job=\"openwrt\",node=\"$router\"}) < 120)) and on (radio) (label_replace(max by (network) (openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}),\"radio\",\"radio1\",\"\",\"\"))) * on (mac) group_left (hostname) (topk by (mac) (1, max by (mac,hostname) (openwrt_dhcp_lease_info{job=\"openwrt\",node=\"$router\",hostname!=\"\"})) or on (mac) label_replace(group by (mac) (wifi_station_signal_dbm{job=\"openwrt\",node=\"$router\"}),\"hostname\",\"$1\",\"mac\",\"(.+)\"))),\"display\",\"$1\",\"hostname\",\"(.+)\") or on () label_replace((label_replace((0/0 * ((sum((max by (radio) (last_over_time(wifi_stations_total{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\")))) == 0) and on () (max(last_over_time(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wifi\"}[2m])) == 1) and on () (count((max by (radio) (last_over_time(wifi_stations_total{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\")))) == count((max by (radio) (last_over_time(wifi_network_info{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\"))))))),\"status\",\"No clients connected\",\"\",\"\") or on () label_replace((0/0 * (absent(sum((max by (radio) (last_over_time(wifi_network_info{job=\"openwrt\",node=\"$router\",radio=~\"${radio:regex}\"}[2m])) and on (radio) (label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan60\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio0\",\"\",\"\") or label_replace(max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=\"vlan10\",network=~\"${network:regex}\"}[2m])),\"radio\",\"radio1\",\"\",\"\"))))) and on () (max(last_over_time(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wifi\"}[2m])) == 1) and on () group(last_over_time(wifi_stations_total{job=\"openwrt\",node=\"$router\"}[2m])) and on () group(last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\"}[2m])))),\"status\",\"No matches\",\"\",\"\") or on () label_replace((0/0 * (vector(1))),\"status\",\"Telemetry unavailable\",\"\",\"\")),\"display\",\"$1\",\"status\",\"(.+)\")",
+          "legendFormat": "{{display}}",
+          "instant": true
+        }
+      ],
+      "options": {
+        "orientation": "horizontal",
+        "namePlacement": "top",
+        "text": { "titleSize": 18, "valueSize": 24 },
+        "displayMode": "basic",
+        "reduceOptions": { "calcs": ["last"] },
+        "showUnfilled": false
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "min": 0,
+          "noValue": "—",
+          "displayName": "${__field.labels.display}",
+          "color": { "mode": "fixed", "fixedColor": "blue" },
+          "mappings": [{ "type": "special", "options": { "match": "nan", "result": { "text": " ", "color": "gray" } } }]
+        },
+        "overrides": [
+          { "matcher": { "id": "byRegexp", "options": "/^(No clients connected|No matches|Telemetry unavailable)$/" }, "properties": [{ "id": "color", "value": { "mode": "fixed", "fixedColor": "gray" } }] }
+        ]
+      }
+    },
+    {
+      "id": 103,
+      "type": "row",
+      "title": "DETAILS",
+      "collapsed": true,
+      "gridPos": { "x": 0, "y": 57, "w": 24, "h": 1 },
+      "panels": [
+        {
+          "id": 18,
+          "type": "table",
+          "title": "DHCP leases",
+          "gridPos": { "x": 0, "y": 58, "w": 12, "h": 6 },
+          "description": "Valid DHCPv4 leases every 30s, not online devices. Remaining time is expiry−now; zero expiry is STATIC. Network follows declared /24 subnets. Router and Network filters apply. An informational row distinguishes no active DHCP leases, no filter matches and unavailable telemetry; dashes are not lease measurements. Hostnames are client-supplied; MAC/IPs private.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "((label_replace((max by (mac,hostname,ip) ((openwrt_dhcp_lease_expiry_timestamp_seconds{job=\"openwrt\",node=\"$router\"} - time()) and (openwrt_dhcp_lease_expiry_timestamp_seconds{job=\"openwrt\",node=\"$router\"} > time())) or max by (mac,hostname,ip) (-1 + 0 * (openwrt_dhcp_lease_expiry_timestamp_seconds{job=\"openwrt\",node=\"$router\"} == 0))),\"network\",\"vlan$1\",\"ip\",\"10[.](10|20|30|40|50|60)[.]0[.].+\") and on (mac,hostname,ip) max by (mac,hostname,ip) (time() - timestamp(openwrt_dhcp_lease_expiry_timestamp_seconds{job=\"openwrt\",node=\"$router\"}) < 120)) and on (network) max by (network) (last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\",network=~\"${network:regex}\"}[2m]))) or on () (label_replace(label_replace(label_replace(label_replace((label_replace((0/0 * ((max(last_over_time(openwrt_dhcp_active_leases{job=\"openwrt\",node=\"$router\"}[2m])) == 0) and on () (max(last_over_time(openwrt_router_source_success{job=\"openwrt\",node=\"$router\",source=\"leases\"}[2m])) == 1))),\"status\",\"No active DHCP leases\",\"\",\"\") or on () label_replace((0/0 * ((max(last_over_time(openwrt_dhcp_active_leases{job=\"openwrt\",node=\"$router\"}[2m])) > 0) and on () (max(last_over_time(openwrt_router_source_success{job=\"openwrt\",node=\"$router\",source=\"leases\"}[2m])) == 1) and on () group(last_over_time(openwrt_network_info{job=\"openwrt\",node=\"$router\"}[2m])))),\"status\",\"No matches\",\"\",\"\") or on () label_replace((0/0 * (vector(1))),\"status\",\"Telemetry unavailable\",\"\",\"\")),\"hostname\",\"$1\",\"status\",\"(.+)\"),\"network\",\"—\",\"\",\"\"),\"ip\",\"—\",\"\",\"\"),\"mac\",\"—\",\"\",\"\"))",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": { "Time": true, "status": true },
+                "indexByName": {
+                  "network": 0,
+                  "hostname": 1,
+                  "ip": 2,
+                  "mac": 3,
+                  "Value": 4,
+                  "Value #A": 4
+                },
+                "renameByName": {
+                  "network": "Network",
+                  "hostname": "Hostname",
+                  "ip": "IPv4",
+                  "mac": "MAC",
+                  "Value": "Lease remaining",
+                  "Value #A": "Lease remaining"
+                }
+              }
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "enablePagination": true,
+            "footer": { "show": false },
+            "sortBy": [
+              { "displayName": "Network", "desc": false },
+              { "displayName": "Hostname", "desc": false },
+              { "displayName": "IPv4", "desc": false }
+            ]
+          },
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "—",
+              "custom": { "filterable": true }
+            },
+            "overrides": [
+              {
+                "matcher": { "id": "byName", "options": "Hostname" },
+                "properties": [{ "id": "custom.width", "value": 220 }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Lease remaining" },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "type": "value",
+                        "options": { "-1": { "text": "STATIC" } }
+                      },
+                      {
+                        "type": "special",
+                        "options": { "match": "nan", "result": { "text": "—", "color": "gray" } }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": 19,
+          "type": "table",
+          "title": "WireGuard peers",
+          "gridPos": { "x": 12, "y": 58, "w": 12, "h": 6 },
+          "description": "30s WireGuard collector. Handshake age is not a liveness test: idle peers are not DOWN; timestamp zero NEVER. RX/TX counter rates ×8 bits/s from router perspective. Outer join preserves peers when handshake/traffic is absent. Peer names are OpenWrt descriptions. Router filter only.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "max by (public_key,description) (wireguard_peer_info{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(wireguard_peer_info{job=\"openwrt\",node=\"$router\"}) < 120))",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "B",
+              "expr": "(time() - (max by (public_key) (wireguard_latest_handshake_seconds{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(wireguard_latest_handshake_seconds{job=\"openwrt\",node=\"$router\"}) < 120)) > 0)) or (-1 + 0 * (max by (public_key) (wireguard_latest_handshake_seconds{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(wireguard_latest_handshake_seconds{job=\"openwrt\",node=\"$router\"}) < 120)) == 0))",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "C",
+              "expr": "8 * max by (public_key) (rate(wireguard_received_bytes_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(wireguard_received_bytes_total{job=\"openwrt\",node=\"$router\"}) < 120))",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "D",
+              "expr": "8 * max by (public_key) (rate(wireguard_sent_bytes_total{job=\"openwrt\",node=\"$router\"}[$__rate_interval]) and (time() - timestamp(wireguard_sent_bytes_total{job=\"openwrt\",node=\"$router\"}) < 120))",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "joinByField",
+              "options": { "byField": "public_key", "mode": "outerTabular" }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": ["description", "Value #B", "Value #C", "Value #D"]
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "indexByName": {
+                  "description": 0,
+                  "Value #B": 1,
+                  "Value #C": 2,
+                  "Value #D": 3
+                },
+                "renameByName": {
+                  "description": "Peer",
+                  "Value #B": "Latest handshake age",
+                  "Value #C": "RX bits/s",
+                  "Value #D": "TX bits/s"
+                }
+              }
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "enablePagination": false,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "UNKNOWN",
+              "custom": { "filterable": true }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Latest handshake age"
+                },
+                "properties": [
+                  { "id": "unit", "value": "s" },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "type": "value",
+                        "options": { "-1": { "text": "NEVER" } }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": { "id": "byRegexp", "options": "/bits\\/s$/" },
+                "properties": [{ "id": "unit", "value": "bps" }]
+              }
+            ]
+          }
+        },
+        {
+          "id": 20,
+          "type": "gauge",
+          "title": "Router capacity",
+          "gridPos": { "x": 0, "y": 64, "w": 24, "h": 6 },
+          "description": "CPU, RAM and connection-table utilization on a fixed 0–100% scale, one decimal; 30s scrapes, 120s freshness gate. Neutral gauges show utilization, not health. Router filter only; redundant observations are deduplicated, not summed.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "100 * (1 - avg by (node) (max by (node,cpu) (rate(node_cpu_seconds_total{job=\"openwrt\",node=\"$router\",mode=\"idle\"}[$__rate_interval]) and (time() - timestamp(node_cpu_seconds_total{job=\"openwrt\",node=\"$router\",mode=\"idle\"}) < 120)))) or on () label_replace(vector(0/0),\"node\",\"$router\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "B",
+              "expr": "100 * (1 - max by (node) ((node_memory_MemAvailable_bytes{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(node_memory_MemAvailable_bytes{job=\"openwrt\",node=\"$router\"}) < 120)) / (node_memory_MemTotal_bytes{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(node_memory_MemTotal_bytes{job=\"openwrt\",node=\"$router\"}) < 120)))) or on () label_replace(vector(0/0),\"node\",\"$router\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "C",
+              "expr": "100 * max by (node) ((node_nf_conntrack_entries{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(node_nf_conntrack_entries{job=\"openwrt\",node=\"$router\"}) < 120)) / (node_nf_conntrack_entries_limit{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(node_nf_conntrack_entries_limit{job=\"openwrt\",node=\"$router\"}) < 120))) or on () label_replace(vector(0/0),\"node\",\"$router\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "joinByField",
+              "options": { "byField": "node", "mode": "outerTabular" }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "Value #A",
+                    "Value #B",
+                    "Value #C"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "indexByName": {
+                  "Value #A": 0,
+                  "Value #B": 1,
+                  "Value #C": 2
+                },
+                "renameByName": {
+                  "Value #A": "CPU",
+                  "Value #B": "RAM",
+                  "Value #C": "Conntrack"
+                }
+              }
+            }
+          ],
+          "options": {
+            "orientation": "vertical",
+            "reduceOptions": { "calcs": ["last"], "fields": "", "values": false },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": false
+          },
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "UNKNOWN",
+              "unit": "percent",
+              "min": 0,
+              "max": 100,
+              "decimals": 1,
+              "color": { "mode": "fixed", "fixedColor": "blue" },
+              "mappings": [
+                { "type": "special", "options": { "match": "null", "result": { "text": "UNKNOWN", "color": "gray" } } },
+                { "type": "special", "options": { "match": "nan", "result": { "text": "UNKNOWN", "color": "gray" } } }
+              ]
+            },
+            "overrides": []
+          }
+        },
+        {
+          "id": 21,
+          "type": "logs",
+          "title": "Network events",
+          "gridPos": { "x": 0, "y": 70, "w": 24, "h": 10 },
+          "description": "Existing Loki router syslog, event-driven (no scrape interval), filtered to networking apps and selected Router. User-editable Event search. Newest first, maximum 200 entries. Syslog is not durably buffered on the router. Network logs not configured when the router has no configured syslog source; an empty result alone can also mean no matching events.",
+          "datasource": { "type": "loki", "uid": "logs" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "{job=\"openwrt\",node=\"$router\",app=~\"netifd|odhcp.*|dnsmasq|hostapd|wpa.*|kernel|adguardhome\"} | regexp `(?P<network_event>(?i:link|interface|dhcp|dns|wan|wlan|wifi|wireless|vlan|wireguard|associated|disconnect))` | network_event != \"\" | drop network_event |= ${search:doublequote}",
+              "queryType": "range",
+              "maxLines": 200
+            }
+          ],
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending",
+            "enableLogDetails": true,
+            "wrapLogMessage": true,
+            "showLabels": false,
+            "dedupStrategy": "none"
+          }
+        }
+      ]
+    },
+    {
+      "id": 104,
+      "type": "row",
+      "title": "COLLECTION",
+      "collapsed": true,
+      "gridPos": { "x": 0, "y": 80, "w": 24, "h": 1 },
+      "panels": [
+        {
+          "id": 22,
+          "type": "table",
+          "title": "Collection health",
+          "gridPos": { "x": 0, "y": 81, "w": 24, "h": 6 },
+          "description": "Expected Swarm scrape targets plus networks, leases, wireless and WireGuard collector results. 30s interval; >120s STALE. Scrape success and collector success are distinct. Detailed error text is NOT EXPOSED by these metrics. Missing supported results UNKNOWN; unsupported status NOT EXPOSED. WireGuard status uses exported_collector because Alloy's collector label identifies the Swarm node.",
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "targets": [
+            {
+              "refId": "A",
+              "expr": "label_replace(vector(1),\"source\",\"swarm-01\",\"\",\"\") or label_replace(vector(1),\"source\",\"swarm-02\",\"\",\"\") or label_replace(vector(1),\"source\",\"swarm-03\",\"\",\"\") or label_replace(vector(1),\"source\",\"networks\",\"\",\"\") or label_replace(vector(1),\"source\",\"leases\",\"\",\"\") or label_replace(vector(1),\"source\",\"wireless\",\"\",\"\") or label_replace(vector(1),\"source\",\"wireguard\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "B",
+              "expr": "label_replace(max by (collector) (up{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(up{job=\"openwrt\",node=\"$router\"}) < 120)),\"source\",\"$1\",\"collector\",\"(.+)\") or (max(up{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(up{job=\"openwrt\",node=\"$router\"}) < 120)) * on () group_right () (label_replace(vector(1),\"source\",\"networks\",\"\",\"\") or label_replace(vector(1),\"source\",\"leases\",\"\",\"\") or label_replace(vector(1),\"source\",\"wireless\",\"\",\"\") or label_replace(vector(1),\"source\",\"wireguard\",\"\",\"\"))) or on () label_replace(vector(0/0),\"source\",\"__schema__\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "C",
+              "expr": "label_replace(time() - max by (collector) (timestamp(up{job=\"openwrt\",node=\"$router\"})),\"source\",\"$1\",\"collector\",\"(.+)\") or (time() - max by (source) (timestamp(openwrt_router_source_success{job=\"openwrt\",node=\"$router\"}))) or label_replace(time() - max(timestamp(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"})),\"source\",\"wireguard\",\"\",\"\") or on () label_replace(vector(0/0),\"source\",\"__schema__\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            },
+            {
+              "refId": "D",
+              "expr": "min by (source) (openwrt_router_source_success{job=\"openwrt\",node=\"$router\"} and (time() - timestamp(openwrt_router_source_success{job=\"openwrt\",node=\"$router\"}) < 120)) or label_replace(min(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"} and (time() - timestamp(node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"}) < 120)),\"source\",\"wireguard\",\"\",\"\") or min by (source) (-1 + 0 * openwrt_router_source_success{job=\"openwrt\",node=\"$router\"}) or label_replace(min(-1 + 0 * node_scrape_collector_success{job=\"openwrt\",node=\"$router\",exported_collector=\"wireguard\"}),\"source\",\"wireguard\",\"\",\"\") or label_replace(vector(-2),\"source\",\"swarm-01\",\"\",\"\") or label_replace(vector(-2),\"source\",\"swarm-02\",\"\",\"\") or label_replace(vector(-2),\"source\",\"swarm-03\",\"\",\"\")",
+              "instant": true,
+              "range": false,
+              "format": "table"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "joinByField",
+              "options": { "byField": "source", "mode": "outerTabular" }
+            },
+            {
+              "id": "filterByValue",
+              "options": {
+                "type": "exclude",
+                "match": "any",
+                "filters": [
+                  {
+                    "fieldName": "source",
+                    "config": {
+                      "id": "equal",
+                      "options": { "value": "__schema__" }
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": "filterFieldsByName",
+              "options": {
+                "include": {
+                  "names": [
+                    "source",
+                    "Value #A",
+                    "Value #B",
+                    "Value #C",
+                    "Value #D"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "indexByName": {
+                  "source": 0,
+                  "Value #B": 1,
+                  "Value #C": 2,
+                  "Value #D": 3,
+                  "Value #A": 4
+                },
+                "renameByName": {
+                  "source": "Source",
+                  "Value #B": "Scrape status",
+                  "Value #C": "Last sample age",
+                  "Value #D": "Collector success",
+                  "Value #A": "Error"
+                }
+              }
+            }
+          ],
+          "options": {
+            "showHeader": true,
+            "enablePagination": false,
+            "cellHeight": "sm",
+            "footer": { "show": false }
+          },
+          "fieldConfig": {
+            "defaults": {
+              "noValue": "UNKNOWN",
+              "custom": { "filterable": true }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/^(Scrape status|Collector success)$/"
+                },
+                "properties": [
+                  {
+                    "id": "custom.cellOptions",
+                    "value": { "type": "color-text" }
+                  },
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "type": "value",
+                        "options": {
+                          "0": { "text": "FAILED", "color": "red" },
+                          "-1": { "text": "STALE", "color": "gray" },
+                          "-2": { "text": "NOT EXPOSED", "color": "gray" },
+                          "1": { "text": "OK", "color": "green" }
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Last sample age" },
+                "properties": [{ "id": "unit", "value": "s" }]
+              },
+              {
+                "matcher": { "id": "byName", "options": "Error" },
+                "properties": [
+                  {
+                    "id": "mappings",
+                    "value": [
+                      {
+                        "type": "value",
+                        "options": { "1": { "text": "NOT EXPOSED" } }
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

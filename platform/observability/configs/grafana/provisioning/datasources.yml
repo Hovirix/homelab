@@ -6,6 +6,8 @@ datasources:
     type: prometheus
     url: http://victoriametrics:8428
     isDefault: true
+    jsonData:
+      timeInterval: 30s
 
   - name: logs
     uid: logs

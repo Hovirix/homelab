@@ -21,6 +21,7 @@ print(json.dumps({
                 "client_id": Path("/run/secrets/paperless_client_id").read_text(),
                 "secret": Path("/run/secrets/paperless_client_secret").read_text(),
                 "settings": {
+                    "oauth_pkce_enabled": True,
                     "server_url": "https://authentik.hovirix.dev/application/o/paperless/.well-known/openid-configuration",
                 },
             },

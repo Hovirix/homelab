@@ -162,7 +162,7 @@ configs:
     file: ./blueprints/provider_grafana.yaml
 
   authentik_provider_paperless:
-    name: identity_authentik_provider_paperless_20261022
+    name: identity_authentik_provider_paperless_20261115
     file: ./blueprints/provider_paperless.yaml
 
   authentik_provider_miniflux:

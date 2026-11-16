@@ -4,6 +4,48 @@ prometheus.exporter.blackbox "services" {
 	config_file = "/etc/alloy/blackbox.yml"
 
 	target {
+		name    = "immich_public"
+		address = "https://immich.hovirix.dev/api/server/ping"
+		module  = "http_2xx"
+		labels  = {service = "immich", path = "public"}
+	}
+
+	target {
+		name    = "grafana_public"
+		address = "https://grafana.hovirix.dev/api/health"
+		module  = "http_2xx"
+		labels  = {service = "grafana", path = "public"}
+	}
+
+	target {
+		name    = "authentik_public"
+		address = "https://authentik.hovirix.dev/-/health/ready/"
+		module  = "http_2xx"
+		labels  = {service = "authentik", path = "public"}
+	}
+
+	target {
+		name    = "vaultwarden_public"
+		address = "https://vaultwarden.hovirix.dev/alive"
+		module  = "http_2xx"
+		labels  = {service = "vaultwarden", path = "public"}
+	}
+
+	target {
+		name    = "miniflux_public"
+		address = "https://miniflux.hovirix.dev/healthcheck"
+		module  = "http_2xx"
+		labels  = {service = "miniflux", path = "public"}
+	}
+
+	target {
+		name    = "paperless_public"
+		address = "https://paperless.hovirix.dev/accounts/login/"
+		module  = "http_2xx"
+		labels  = {service = "paperless", path = "public"}
+	}
+
+	target {
 		name    = "immich"
 		address = "https://traefik_proxy:443/api/server/ping"
 		module  = "http_2xx"
@@ -48,6 +90,13 @@ prometheus.exporter.blackbox "services" {
 
 discovery.relabel "blackbox" {
 	targets = prometheus.exporter.blackbox.services.targets
+
+	rule {
+		source_labels = ["path"]
+		regex         = ""
+		replacement   = "internal"
+		target_label  = "path"
+	}
 
 	// Blackbox uses hostname for both the HTTP Host header and TLS SNI.
 	rule {

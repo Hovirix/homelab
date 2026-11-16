@@ -1,0 +1,46 @@
+vulnerabilities:
+  - id: CVE-2026-103111
+    owner: Hovirix
+    statement: &accepted-risk >-
+      Hovirix explicitly accepts the reviewed blockers for relocated internal socket proxy v0.5.0, digest sha256:1f5038b54f06c3e18422902cf00ba21803d1c97805aae032e5e6673d532d3459, in https://github.com/Hovirix/homelab/pull/188 to retain restricted Docker discovery while awaiting a patched upstream image. The image digest is unchanged, but the move adds swarm-exporter access and manager placement; CI still treats these as introduced. Fixed regex patterns and a plain HTTP listener remove several apparent prerequisites, not all exploitability uncertainty. PCRE matching prerequisites remain unverified. Root in this container is not equivalent to root on the host: successful proxy code execution could use its direct Docker socket to compromise the Swarm manager and cluster secrets. POST=0 and a read-only socket mount do not protect against a compromised proxy process; this escalation risk is explicitly accepted. Reassess on a patched upstream release, image/package changes, consumer/network/mount/privilege changes, new exploitation evidence, or expiry; do not renew automatically. This exception is not digest-bound and unchanged deployments may not be rescanned. Advisory records: https://www.cve.org/CVERecord?id=CVE-2026-103111, https://www.cve.org/CVERecord?id=CVE-2026-107891, https://www.cve.org/CVERecord?id=CVE-2026-14456, https://www.cve.org/CVERecord?id=CVE-2026-85091, https://www.cve.org/CVERecord?id=CVE-2026-86145, https://www.cve.org/CVERecord?id=CVE-2026-89157, https://www.cve.org/CVERecord?id=CVE-2026-89161.
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/pcre2@10.47-r1?arch=x86_64&distro=3.24.1
+  - id: CVE-2026-107891
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/musl-utils@1.2.6-r2?arch=x86_64&distro=3.24.1
+      - pkg:apk/alpine/musl@1.2.6-r2?arch=x86_64&distro=3.24.1
+  - id: CVE-2026-14456
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/libcrypto3@3.5.7-r0?arch=x86_64&distro=3.24.1
+      - pkg:apk/alpine/libssl3@3.5.7-r0?arch=x86_64&distro=3.24.1
+  - id: CVE-2026-85091
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/zlib@1.3.2-r0?arch=x86_64&distro=3.24.1
+  - id: CVE-2026-86145
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/pcre2@10.47-r1?arch=x86_64&distro=3.24.1
+  - id: CVE-2026-89157
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/pcre2@10.47-r1?arch=x86_64&distro=3.24.1
+  - id: CVE-2026-89161
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:apk/alpine/pcre2@10.47-r1?arch=x86_64&distro=3.24.1

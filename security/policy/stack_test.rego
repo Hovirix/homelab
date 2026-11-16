@@ -74,3 +74,15 @@ compliant_stack := {
   },
   "secrets": {"app_token": {"external": true, "name": "app_token_aaaaaaaaaaaa"}},
 }
+
+test_allows_only_alloy_host_syslog_port if {
+  service := {"image": sprintf("grafana/alloy:v1@sha256:%s", [sha])}
+  port := {"target": 1514, "published": 1514, "protocol": "tcp", "mode": "host"}
+  allowed_port("alloy", service, port)
+  not allowed_port("app", service, port)
+  not allowed_port("alloy", {"image": app_image}, port)
+  not allowed_port("alloy", service, object.union(port, {"published": 514}))
+  not allowed_port("alloy", service, object.union(port, {"target": 12345}))
+  not allowed_port("alloy", service, object.union(port, {"protocol": "udp"}))
+  not allowed_port("alloy", service, object.union(port, {"mode": "ingress"}))
+}
