@@ -130,4 +130,14 @@ allowed_port(name, service, port) if {
   port.published == port.target
 }
 
+# OpenWrt syslog; Alloy filters messages by the router's source IP.
+allowed_port(name, service, port) if {
+  name == "alloy"
+  startswith(service.image, "grafana/alloy:")
+  port.target == 1514
+  port.published == 1514
+  port.protocol == "tcp"
+  port.mode == "host"
+}
+
 secret_environment_key(key) if regex.match("(?i)(password|secret|token|api_key)", key)
