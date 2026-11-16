@@ -1,0 +1,98 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: openwrt
+    folder: Alerts
+    interval: 1m
+    rules:
+      - uid: openwrt-missing
+        title: "OpenWrt: metrics unavailable"
+        condition: C
+        data:
+          - &query
+            refId: A
+            datasourceUid: metrics
+            relativeTimeRange:
+              from: 600
+              to: 0
+            model: &model
+              datasource:
+                type: prometheus
+                uid: metrics
+              editorMode: code
+              expr: 1 - (max(up{job="openwrt"}) or vector(0))
+              instant: true
+              intervalMs: 1000
+              maxDataPoints: 43200
+              range: false
+              refId: A
+          - &reduce
+            refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: A
+              reducer: last
+              refId: B
+              settings:
+                mode: dropNN
+              type: reduce
+          - &threshold
+            refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                type: __expr__
+                uid: __expr__
+              expression: $B > 0
+              refId: C
+              type: math
+        noDataState: Alerting
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: OpenWrt metrics are unavailable from all collectors; check the router and collection paths
+        labels:
+          severity: critical
+        isPaused: false
+
+      - uid: openwrt-memory
+        title: "OpenWrt: memory pressure"
+        condition: C
+        data:
+          - !!merge <<: *query
+            model:
+              !!merge <<: *model
+              expr: max without (collector) (node_memory_MemAvailable_bytes{job="openwrt"} / node_memory_MemTotal_bytes{job="openwrt"}) < bool 0.1
+          - *reduce
+          - *threshold
+        noDataState: OK
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: OpenWrt available memory has remained below 10%
+        labels:
+          severity: warning
+        isPaused: false
+
+      - uid: openwrt-interface-errors
+        title: "OpenWrt: interface errors"
+        condition: C
+        data:
+          - !!merge <<: *query
+            model:
+              !!merge <<: *model
+              expr: max by (node, device) (rate(node_network_receive_errs_total{job="openwrt"}[5m]) + rate(node_network_transmit_errs_total{job="openwrt"}[5m])) > bool 1
+          - *reduce
+          - *threshold
+        noDataState: OK
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: 'OpenWrt interface {{ $labels.device }} exceeds one error per second'
+        labels:
+          severity: warning
+        isPaused: false

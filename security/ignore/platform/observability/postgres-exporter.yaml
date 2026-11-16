@@ -1,0 +1,106 @@
+vulnerabilities:
+  - id: CVE-2026-111943
+    owner: Hovirix
+    statement: &accepted-risk >-
+      Hovirix explicitly accepts the reviewed blockers for internal PostgreSQL exporter v0.20.1, digest sha256:ac5ec343104fae0e2d84a27bb8d69b38430a11910c5382cad85d478d2bab713e, in https://github.com/Hovirix/homelab/pull/188 to retain database monitoring while awaiting a patched stable upstream image. Internal access is not authentication: /probe accepts caller-selected destinations, outbound TLS remains reachable, and profiling and database connections may permit resource exhaustion, lateral movement or information exposure. Exploitability of individual bundled Go vulnerabilities is not proven absent; no endpoint restrictions were added. Reassess on a patched upstream release, image/package changes, exposure or privilege changes, new exploitation evidence, or expiry; do not renew automatically. This exception is not digest-bound and unchanged deployments may not be rescanned. Advisory records: https://www.cve.org/CVERecord?id=CVE-2026-111943, https://www.cve.org/CVERecord?id=CVE-2026-33818, https://www.cve.org/CVERecord?id=CVE-2026-39821, https://www.cve.org/CVERecord?id=CVE-2026-39822, https://www.cve.org/CVERecord?id=CVE-2026-46600, https://www.cve.org/CVERecord?id=CVE-2026-56851, https://www.cve.org/CVERecord?id=CVE-2026-56852, https://www.cve.org/CVERecord?id=CVE-2026-56853, https://www.cve.org/CVERecord?id=CVE-2026-56854, https://www.cve.org/CVERecord?id=CVE-2026-56858, https://www.cve.org/CVERecord?id=CVE-2026-56859, https://www.cve.org/CVERecord?id=CVE-2026-56860, https://www.cve.org/CVERecord?id=CVE-2026-56862, https://www.cve.org/CVERecord?id=CVE-2026-78661, https://www.cve.org/CVERecord?id=CVE-2026-78667, https://www.cve.org/CVERecord?id=CVE-2026-78669, https://www.cve.org/CVERecord?id=CVE-2026-97031.
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-33818
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-39821
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-39822
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-46600
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/golang.org/x/net@v0.55.0
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-56851
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/golang.org/x/text@v0.38.0
+  - id: CVE-2026-56852
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/golang.org/x/text@v0.38.0
+  - id: CVE-2026-56853
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-56854
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/golang.org/x/crypto@v0.53.0
+  - id: CVE-2026-56858
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-56859
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-56860
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-56862
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-78661
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/golang.org/x/net@v0.55.0
+  - id: CVE-2026-78667
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-78669
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/golang.org/x/net@v0.55.0
+      - pkg:golang/stdlib@v1.26.4
+  - id: CVE-2026-97031
+    owner: Hovirix
+    statement: *accepted-risk
+    expired_at: 2026-12-15
+    purls:
+      - pkg:golang/stdlib@v1.26.4

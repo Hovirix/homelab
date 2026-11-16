@@ -7,6 +7,7 @@ services:
 
     environment:
       PAPERLESS_URL: https://paperless.hovirix.dev
+      PAPERLESS_ENABLE_FLOWER: "1"
       PAPERLESS_SECRET_KEY_FILE: /run/secrets/paperless_secret_key
       PAPERLESS_REDIS: redis://valkey:6379
       PAPERLESS_DBENGINE: postgresql
@@ -37,6 +38,7 @@ services:
       - postgres
       - valkey
       - traefik
+      - observability
 
     volumes:
       - type: bind
@@ -80,6 +82,9 @@ services:
         condition: any
 
 networks:
+  observability:
+    external: true
+
   postgres:
     external: true
 

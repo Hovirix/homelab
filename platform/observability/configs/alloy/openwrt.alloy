@@ -1,0 +1,123 @@
+// Each node scrapes independently; queries aggregate redundant observations.
+discovery.relabel "openwrt" {
+	targets = [{
+		__address__ = "10.30.0.1:9101",
+		collector   = sys.env("ALLOY_NODE"),
+		job         = "openwrt",
+		node        = "openwrt",
+	}]
+}
+
+prometheus.scrape "openwrt" {
+	targets         = discovery.relabel.openwrt.output
+	forward_to      = [prometheus.remote_write.default.receiver]
+	scrape_interval = "30s"
+	scrape_timeout  = "10s"
+}
+
+// Probes originate on Swarm nodes in Homelab, never from isolated VLANs.
+prometheus.exporter.blackbox "network" {
+	config_file = "/etc/alloy/blackbox.yml"
+
+	target {
+		name    = "cloudflare"
+		address = "1.1.1.1"
+		module  = "icmp_ipv4"
+		labels  = {probe_target = "Cloudflare", kind = "internet"}
+	}
+
+	target {
+		name    = "quad9"
+		address = "9.9.9.9"
+		module  = "icmp_ipv4"
+		labels  = {probe_target = "Quad9", kind = "internet"}
+	}
+
+	target {
+		name    = "dns_public"
+		address = "10.30.0.1:53"
+		module  = "dns_public"
+		labels  = {probe_target = "AdGuard public resolution", kind = "dns"}
+	}
+
+	target {
+		name    = "dns_rewrite"
+		address = "10.30.0.1:53"
+		module  = "dns_rewrite"
+		labels  = {probe_target = "AdGuard internal rewrite", kind = "dns"}
+	}
+}
+
+discovery.relabel "network" {
+	targets = prometheus.exporter.blackbox.network.targets
+
+	rule {
+		target_label = "collector"
+		replacement  = sys.env("ALLOY_NODE")
+	}
+
+	rule {
+		target_label = "job"
+		replacement  = "network_probe"
+	}
+
+	rule {
+		target_label = "node"
+		replacement  = "openwrt"
+	}
+}
+
+prometheus.scrape "network" {
+	targets         = discovery.relabel.network.output
+	forward_to      = [prometheus.remote_write.default.receiver]
+	scrape_interval = "30s"
+	scrape_timeout  = "5s"
+}
+
+// Host-mode publishing preserves the source IP for the router-only filter.
+loki.source.syslog "openwrt" {
+	listener {
+		address       = "0.0.0.0:1514"
+		protocol      = "tcp"
+		syslog_format = "rfc3164"
+		labels        = {job = "openwrt", node = "openwrt", service_name = "openwrt"}
+	}
+
+	relabel_rules = loki.relabel.openwrt_metadata.rules
+	forward_to    = [loki.relabel.openwrt.receiver]
+}
+
+loki.relabel "openwrt_metadata" {
+	forward_to = []
+
+	rule {
+		source_labels = ["__syslog_connection_ip_address"]
+		target_label  = "syslog_source"
+	}
+
+	rule {
+		source_labels = ["__syslog_message_severity"]
+		target_label  = "level"
+	}
+
+	rule {
+		source_labels = ["__syslog_message_app_name"]
+		target_label  = "app"
+	}
+}
+
+// Filter downstream: syslog source relabel_rules do not discard log entries.
+loki.relabel "openwrt" {
+	forward_to = [loki.write.default.receiver]
+
+	rule {
+		action        = "keep"
+		source_labels = ["syslog_source"]
+		regex         = "10\\.30\\.0\\.1"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "syslog_source"
+	}
+}
