@@ -64,7 +64,13 @@ def inventory(revision=None):
 def scan():
     os.environ.setdefault("TRIVY_CONFIG", "security/trivy.yaml")
     DIR.mkdir(parents=True, exist_ok=True)
-    for name in ("scan.complete", "manifest.json", "summary.md", "comment.md"):
+    for name in (
+        "scan.complete",
+        "manifest.json",
+        "summary.md",
+        "comment.md",
+        "snapshot.json",
+    ):
         (DIR / name).unlink(missing_ok=True)
     for directory, pattern in (("json/images", "*.json"), ("sarif/images", "*.sarif")):
         path = DIR / directory

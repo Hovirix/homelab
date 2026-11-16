@@ -116,5 +116,45 @@ jobs:
             .artifacts/security/manifest.json
             .artifacts/security/database.json
             .artifacts/security/comment.md
+            .artifacts/security/snapshot.json
           include-hidden-files: true
           retention-days: 14
+
+      - name: Upload complete inventory snapshot
+        if: >-
+          ${{ !cancelled() && github.ref == 'refs/heads/main' &&
+              github.event_name != 'pull_request' &&
+              hashFiles('.artifacts/security/snapshot.json') != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: security-snapshot
+          path: |
+            .artifacts/security/snapshot.json
+            .artifacts/security/database.json
+            .artifacts/security/json/images
+          include-hidden-files: true
+          retention-days: 14
+
+  publish:
+    needs: security
+    if: ${{ !cancelled() && github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+    steps:
+      - name: Checkout trusted publisher
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Download complete inventory snapshot
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8
+        with:
+          name: security-snapshot
+          path: .artifacts/security
+
+      - name: Publish immutable snapshot and index
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: operations/scripts/security-publish.py
