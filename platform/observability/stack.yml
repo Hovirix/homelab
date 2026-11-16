@@ -48,6 +48,12 @@ services:
       - source: grafana_dashboard_platform
         target: /etc/grafana/dashboards/platform.json
 
+      - source: grafana_dashboard_openwrt
+        target: /etc/grafana/dashboards/openwrt.json
+
+      - source: grafana_alerting_openwrt
+        target: /etc/grafana/provisioning/alerting/openwrt.yml
+
       - source: grafana_alerting_notifications
         target: /etc/grafana/provisioning/alerting/notifications.yml
 
@@ -317,6 +323,16 @@ services:
       - source: alloy_blackbox_modules
         target: /etc/alloy/blackbox.yml
 
+      - source: alloy_openwrt
+        target: /etc/alloy/config.d/openwrt.alloy
+
+    # Bypass the routing mesh so the syslog source-IP filter sees the router.
+    ports:
+      - target: 1514
+        published: 1514
+        protocol: tcp
+        mode: host
+
     networks:
       - observability
       - traefik
@@ -400,6 +416,14 @@ configs:
     name: observability_grafana_dashboard_platform_v19
     file: ./configs/grafana/dashboards/platform.json
 
+  grafana_dashboard_openwrt:
+    name: observability_grafana_dashboard_openwrt_v2
+    file: ./configs/grafana/dashboards/openwrt.json
+
+  grafana_alerting_openwrt:
+    name: observability_grafana_alerting_openwrt_v2
+    file: ./configs/grafana/provisioning/alerting/openwrt.yml
+
   grafana_alerting_notifications:
     name: observability_grafana_alerting_notifications_v1
     file: ./configs/grafana/provisioning/alerting/notifications.yml
@@ -451,6 +475,10 @@ configs:
   alloy_outputs:
     name: observability_alloy_outputs_v1
     file: ./configs/alloy/outputs.alloy
+
+  alloy_openwrt:
+    name: observability_alloy_openwrt_v2
+    file: ./configs/alloy/openwrt.alloy
 
   alloy_docker:
     name: observability_alloy_docker_v1

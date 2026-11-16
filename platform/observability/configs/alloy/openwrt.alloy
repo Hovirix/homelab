@@ -1,0 +1,64 @@
+// Each node scrapes independently; queries aggregate redundant observations.
+discovery.relabel "openwrt" {
+	targets = [{
+		__address__ = "10.30.0.1:9101",
+		collector   = sys.env("ALLOY_NODE"),
+		job         = "openwrt",
+		node        = "openwrt",
+	}]
+}
+
+prometheus.scrape "openwrt" {
+	targets         = discovery.relabel.openwrt.output
+	forward_to      = [prometheus.remote_write.default.receiver]
+	scrape_interval = "30s"
+	scrape_timeout  = "10s"
+}
+
+// Host-mode publishing preserves the source IP for the router-only filter.
+loki.source.syslog "openwrt" {
+	listener {
+		address       = "0.0.0.0:1514"
+		protocol      = "tcp"
+		syslog_format = "rfc3164"
+		labels        = {job = "openwrt", node = "openwrt", service_name = "openwrt"}
+	}
+
+	relabel_rules = loki.relabel.openwrt_metadata.rules
+	forward_to    = [loki.relabel.openwrt.receiver]
+}
+
+loki.relabel "openwrt_metadata" {
+	forward_to = []
+
+	rule {
+		source_labels = ["__syslog_connection_ip_address"]
+		target_label  = "syslog_source"
+	}
+
+	rule {
+		source_labels = ["__syslog_message_severity"]
+		target_label  = "level"
+	}
+
+	rule {
+		source_labels = ["__syslog_message_app_name"]
+		target_label  = "app"
+	}
+}
+
+// Filter downstream: syslog source relabel_rules do not discard log entries.
+loki.relabel "openwrt" {
+	forward_to = [loki.write.default.receiver]
+
+	rule {
+		action        = "keep"
+		source_labels = ["syslog_source"]
+		regex         = "10\\.30\\.0\\.1"
+	}
+
+	rule {
+		action = "labeldrop"
+		regex  = "syslog_source"
+	}
+}
