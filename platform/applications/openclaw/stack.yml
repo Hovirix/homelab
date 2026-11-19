@@ -1,6 +1,6 @@
 services:
   gateway:
-    image: ghcr.io/openclaw/openclaw:2026.11.4-browser@sha256:82848fb1e0f5e0a589fcc08fc700a54f354a98371db9d96bb7f3d5468e894ab0
+    image: ghcr.io/openclaw/openclaw:2026.11.6-browser@sha256:e305af77b35f2835923d796b291180dff1978b240213ebe7052008590c663050
 
     command: /etc/openclaw/openclaw-start.sh
 
