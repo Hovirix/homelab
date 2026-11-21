@@ -6,31 +6,18 @@ metadata:
   name: Stages
 
 entries:
-  - model: authentik_stages_authenticator_totp.authenticatortotpstage
-    id: mfa-totp
-    identifiers:
-      name: MFA TOTP Setup
-
-  - model: authentik_stages_authenticator_webauthn.authenticatorwebauthnstage
-    id: mfa-webauthn
-    identifiers:
-      name: MFA WebAuthn Setup
-
   - model: authentik_stages_authenticator_validate.authenticatorvalidatestage
-    id: mfa-validation
     identifiers:
-      name: MFA Validation
+      name: default-authentication-mfa-validation
     attrs:
       device_classes:
         - totp
         - webauthn
       not_configured_action: configure
       configuration_stages:
-        - !KeyOf mfa-totp
-        - !KeyOf mfa-webauthn
-
-  - model: authentik_flows.flowstagebinding
-    identifiers:
-      target: !Find [authentik_flows.flow, [slug, default-authentication-flow]]
-      stage: !KeyOf mfa-validation
-      order: 30
+        - !Find
+          - authentik_stages_authenticator_totp.authenticatortotpstage
+          - [name, default-authenticator-totp-setup]
+        - !Find
+          - authentik_stages_authenticator_webauthn.authenticatorwebauthnstage
+          - [name, default-authenticator-webauthn-setup]
