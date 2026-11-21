@@ -154,7 +154,7 @@ networks:
 
 configs:
   authentik_stages:
-    name: identity_authentik_stages_20261005
+    name: identity_authentik_stages_20261121
     file: ./blueprints/stages.yaml
 
   authentik_provider_grafana:
