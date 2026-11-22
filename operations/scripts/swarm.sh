@@ -24,7 +24,7 @@ init() {
   local advertise_addr="${ADVERTISE_ADDR:?required}"
   local manager_endpoint="${MANAGER_ENDPOINT:?required}"
   for host in "${manager_hosts[@]}"; do
-    ssh -o StrictHostKeyChecking=accept-new "${host#ssh://}" true
+    ssh -o StrictHostKeyChecking=accept-new "$host" true
   done
 
   if ! is_active "$primary_host"; then
