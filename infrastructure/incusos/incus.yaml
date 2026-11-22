@@ -1,0 +1,6 @@
+apply_defaults: true
+preseed:
+  certificates:
+    - name: administrator
+      type: client
+      certificate: ""
