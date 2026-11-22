@@ -21,6 +21,7 @@
         name:
           - borgbackup
           - borgmatic
+          - jq
           - sshpass
           - openssh-client
           - postgresql-client
@@ -60,6 +61,14 @@
         owner: root
         group: root
         mode: "0755"
+
+    - name: Install interactive application restore
+      ansible.builtin.copy:
+        src: files/restore.sh
+        dest: /usr/local/sbin/restore
+        owner: root
+        group: root
+        mode: "0750"
 
     - name: Install Borgmatic systemd units
       ansible.builtin.copy:

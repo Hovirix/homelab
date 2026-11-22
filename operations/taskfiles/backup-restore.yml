@@ -11,8 +11,6 @@ tasks:
     cmd: incus exec incus:backup -- systemctl enable --now borgmatic.timer
 
   restore:
-    desc: Restore snapshots, backups, or PostgreSQL
+    desc: Restore application files from an off-site Borg archive
     interactive: true
-    env:
-      PVE: '{{.PVE}}'
-    cmd: operations/scripts/restore.py
+    cmd: incus exec incus:backup -- /usr/local/sbin/restore
