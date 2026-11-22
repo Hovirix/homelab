@@ -6,7 +6,7 @@ vars:
 
 tasks:
   incusos:image:
-    desc: Build IncusOS ISO
+    desc: Build IncusOS USB image
     cmd: secretspec run -P production -S incusos -- operations/scripts/incusos-image.sh
 
   fcos:render:
@@ -21,6 +21,11 @@ tasks:
     internal: true
     deps: ['fcos:render']
     desc: Build Fedora CoreOS image
+    sources:
+      - operations/scripts/fcos-image.sh
+    generates:
+      - infrastructure/opentofu/stacks/incus/build/fcos-proxmoxve.qcow2
+      - infrastructure/opentofu/stacks/incus/build/metadata.tar
     cmds:
       - operations/scripts/fcos-image.sh
 
@@ -34,12 +39,11 @@ tasks:
 
   incus:apply:
     desc: Apply Incus infrastructure changes
-    prompt: Apply production Incus changes? Proxmox guests must not be using the same IPs or VIP.
     deps: ['fcos:build']
     dir: infrastructure/opentofu/stacks/incus
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
-      - secretspec run -P production -S opentofu -- tofu apply
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
 
   plan:
     desc: Preview infrastructure changes

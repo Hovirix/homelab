@@ -158,8 +158,8 @@
                 uv
                 yaml-language-server
               ]);
-            # Small Fix for rootless docker
-            shellHook = "unset DOCKER_HOST";
+            # Small Fix for rootless docker and always target homelab incus api
+            shellHook = "unset DOCKER_HOST && INCUS_REMOTE=incus";
           };
         }
       );
