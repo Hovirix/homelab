@@ -7,9 +7,8 @@ vars:
 
 tasks:
   backup:
-    desc: Run an off-site backup
-    cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} systemctl start borgmatic.service
+    desc: Enable and start the off-site backup timer
+    cmd: incus exec incus:backup -- systemctl enable --now borgmatic.timer
 
   restore:
     desc: Restore snapshots, backups, or PostgreSQL

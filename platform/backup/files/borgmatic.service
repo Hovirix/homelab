@@ -1,0 +1,11 @@
+[Unit]
+Description=Off-site application and PostgreSQL dump backup
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=/sources/swarm /backups
+ConditionPathExists=/etc/borgmatic/ready
+
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/usr/bin/borgmatic --config /etc/borgmatic/config.yaml

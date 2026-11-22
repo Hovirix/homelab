@@ -1,0 +1,109 @@
+- name: Configure the backup container
+  hosts: backup
+  gather_facts: false
+
+  tasks:
+    - name: Wait for cloud-init and verify Python is available
+      ansible.builtin.raw: cloud-init status --wait || test -x /usr/bin/python3
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Verify required credentials
+      ansible.builtin.assert:
+        that:
+          - lookup('ansible.builtin.env', 'BORG_PASSPHRASE') | length > 0
+          - lookup('ansible.builtin.env', 'HETZNER_STORAGE_BOX_PASSWORD') | length > 0
+        fail_msg: Supply backup credentials through SecretSpec.
+      no_log: true
+
+    - name: Install backup tooling
+      ansible.builtin.apt:
+        name:
+          - borgbackup
+          - borgmatic
+          - sshpass
+          - openssh-client
+          - postgresql-client
+        update_cache: true
+        state: present
+
+    - name: Leave scheduled backups disabled until explicitly started
+      ansible.builtin.systemd_service:
+        name: borgmatic.timer
+        enabled: false
+        state: stopped
+
+    - name: Create private configuration and restore directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+      loop:
+        - /etc/borgmatic
+        - /root/.ssh
+        - /backups/restore
+
+    - name: Install Borgmatic configuration
+      ansible.builtin.copy:
+        src: files/borgmatic.yaml
+        dest: /etc/borgmatic/config.yaml
+        owner: root
+        group: root
+        mode: "0600"
+
+    - name: Install PostgreSQL dump validation
+      ansible.builtin.copy:
+        src: files/check-postgres-dump.sh
+        dest: /usr/local/sbin/check-postgres-dump
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install Borgmatic systemd units
+      ansible.builtin.copy:
+        src: "files/{{ item }}"
+        dest: "/etc/systemd/system/{{ item }}"
+        owner: root
+        group: root
+        mode: "0644"
+      loop:
+        - borgmatic.service
+        - borgmatic.timer
+      notify: Reload systemd
+
+    - name: Install backup credentials
+      ansible.builtin.copy:
+        content: "{{ lookup('ansible.builtin.env', item.secret) }}\n"
+        dest: "/etc/borgmatic/{{ item.file }}"
+        owner: root
+        group: root
+        mode: "0600"
+      loop:
+        - {secret: BORG_PASSPHRASE, file: passphrase}
+        - {secret: HETZNER_STORAGE_BOX_PASSWORD, file: storagebox-password}
+      no_log: true
+      diff: false
+
+    - name: Validate Borgmatic configuration
+      ansible.builtin.command: borgmatic --config /etc/borgmatic/config.yaml config validate
+      changed_when: false
+
+    - name: Verify existing off-site repository access
+      ansible.builtin.command: borgmatic --config /etc/borgmatic/config.yaml repo-info
+      changed_when: false
+      no_log: true
+
+    - name: Mark backup configuration ready
+      ansible.builtin.copy:
+        content: ""
+        dest: /etc/borgmatic/ready
+        owner: root
+        group: root
+        mode: "0600"
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: true

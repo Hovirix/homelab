@@ -40,7 +40,9 @@ tasks:
   lint:ansible:
     internal: true
     dir: infrastructure/ansible
-    cmd: ansible-lint -q
+    cmds:
+      - ansible-lint -q
+      - ansible-lint -q ../../platform/backup/playbook.yml
 
   lint:tofu:
     internal: true
