@@ -38,7 +38,10 @@ services:
 
 networks:
   cloudflared:
-    external: true
+    name: cloudflared
+    ipam:
+      config:
+        - subnet: 10.254.0.0/24
 
 secrets:
   cloudflared_tunnel_token:

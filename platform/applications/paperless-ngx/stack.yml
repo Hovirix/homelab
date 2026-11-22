@@ -37,8 +37,7 @@ services:
     networks:
       - postgres
       - valkey
-      - traefik
-      - observability
+      - paperless
 
     volumes:
       - type: bind
@@ -71,6 +70,7 @@ services:
 
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=paperless
         - traefik.http.routers.paperless.rule=Host(`paperless.hovirix.dev`)
         - traefik.http.routers.paperless.entrypoints=websecure
         - traefik.http.services.paperless.loadbalancer.server.port=8000
@@ -82,16 +82,13 @@ services:
         condition: any
 
 networks:
-  observability:
-    external: true
+  paperless:
+    name: paperless
 
   postgres:
     external: true
 
   valkey:
-    external: true
-
-  traefik:
     external: true
 
 configs:

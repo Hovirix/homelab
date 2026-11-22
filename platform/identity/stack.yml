@@ -31,7 +31,6 @@ services:
     networks:
       - authentik
       - postgres
-      - traefik
 
     healthcheck:
       test:
@@ -48,6 +47,7 @@ services:
 
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=authentik
         - traefik.http.routers.authentik.rule=Host(`authentik.hovirix.dev`)
         - traefik.http.routers.authentik.entrypoints=websecure
         - traefik.http.services.authentik.loadbalancer.server.port=9000
@@ -147,9 +147,6 @@ networks:
     attachable: true
 
   postgres:
-    external: true
-
-  traefik:
     external: true
 
 configs:

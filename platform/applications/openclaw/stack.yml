@@ -55,6 +55,8 @@ services:
 networks:
   openclaw:
     name: openclaw
+    driver: overlay
+    attachable: true
     ipam:
       config:
         - subnet: 10.254.1.0/24
