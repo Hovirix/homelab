@@ -2,7 +2,7 @@
 Description=Off-site application and PostgreSQL dump backup
 Wants=network-online.target
 After=network-online.target
-RequiresMountsFor=/sources/swarm /backups
+RequiresMountsFor=/mnt/swarm /backups
 ConditionPathExists=/etc/borgmatic/ready
 
 [Service]

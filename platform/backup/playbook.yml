@@ -28,12 +28,6 @@
         update_cache: true
         state: present
 
-    - name: Leave scheduled backups disabled until explicitly started
-      ansible.builtin.systemd_service:
-        name: borgmatic.timer
-        enabled: false
-        state: stopped
-
     - name: Create private configuration and restore directories
       ansible.builtin.file:
         path: "{{ item }}"

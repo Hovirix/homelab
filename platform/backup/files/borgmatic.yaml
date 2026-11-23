@@ -1,9 +1,9 @@
 source_directories:
-  - /sources/swarm/immich
-  - /sources/swarm/openclaw
-  - /sources/swarm/paperless
-  - /sources/swarm/postgres
-  - /sources/swarm/vaultwarden
+  - /mnt/swarm/immich
+  - /mnt/swarm/openclaw
+  - /mnt/swarm/paperless
+  - /mnt/swarm/postgres
+  - /mnt/swarm/vaultwarden
 
 repositories:
   - path: ssh://u683062-sub1@u683062.your-storagebox.de:23/./homelab
@@ -26,6 +26,6 @@ loki:
     config: __config
 
 before_backup:
-  - /usr/local/sbin/check-postgres-dump /sources/swarm/postgres/backups/daily/postgres-latest.sql.gz
+  - /usr/local/sbin/check-postgres-dump /mnt/swarm/postgres/backups/daily/postgres-latest.sql.gz
 after_backup:
   - echo borgmatic_archive_created
