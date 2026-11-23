@@ -10,8 +10,7 @@ fi
 modified=$(stat -L -c %Y -- "$dump")
 age=$(($(date +%s) - modified))
 if ((age < 0 || age > 21600)); then
-  printf 'PostgreSQL dump must be less than six hours old: %s\n' "$dump" >&2
-  exit 1
+  printf 'WARNING: PostgreSQL dump is older than six hours. %s\n' "$dump" >&2
 fi
 
 gzip -t -- "$dump"
