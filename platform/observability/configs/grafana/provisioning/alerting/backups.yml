@@ -21,7 +21,7 @@ groups:
                 type: loki
                 uid: logs
               editorMode: code
-              expr: sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |~ `^Failed backup$` [15m])) or vector(0)
+              expr: sum(count_over_time({app="borgmatic",hostname="backup",config="config.yaml"} |~ `^Failed backup$` [15m])) or vector(0)
               instant: true
               queryType: instant
               refId: A
@@ -53,7 +53,7 @@ groups:
         execErrState: Error
         for: 1m
         annotations:
-          summary: PVE borgmatic reported a backup failure
+          summary: Backup container borgmatic reported a backup failure
         labels:
           severity: critical
         isPaused: false
@@ -73,7 +73,7 @@ groups:
                 uid: logs
               editorMode: code
               expr: >-
-                max(last_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |= "Storage Box capacity:" | regexp "used_percent=(?P<used_percent>[0-9]+)" | unwrap used_percent | __error__="" [30h]))
+                max(last_over_time({app="borgmatic",hostname="backup",config="config.yaml"} |= "Storage Box capacity:" | regexp "used_percent=(?P<used_percent>[0-9]+)" | unwrap used_percent | __error__="" [30h]))
               instant: true
               queryType: instant
               refId: A
@@ -124,7 +124,7 @@ groups:
                 type: loki
                 uid: logs
               editorMode: code
-              expr: sum(absent_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |~ `^borgmatic_archive_created$` [30h])) or vector(0)
+              expr: sum(absent_over_time({app="borgmatic",hostname="backup",config="config.yaml"} |~ `^borgmatic_archive_created$` [30h])) or vector(0)
               instant: true
               queryType: instant
               refId: A
@@ -156,7 +156,7 @@ groups:
         execErrState: Error
         for: 1m
         annotations:
-          summary: PVE has not reported a successfully created backup archive in 30 hours
+          summary: Backup container has not reported a successfully created backup archive in 30 hours
         labels:
           severity: critical
         isPaused: false
@@ -279,7 +279,7 @@ groups:
                 uid: logs
               editorMode: code
               expr: >-
-                sum(count_over_time({app="borgmatic",hostname="pve",config="config.yaml"} |= "ERROR: PostgreSQL dump " [15m])) or vector(0)
+                sum(count_over_time({app="borgmatic",hostname="backup",config="config.yaml"} |= "ERROR: PostgreSQL dump " [15m])) or vector(0)
               instant: true
               queryType: instant
               refId: A
@@ -311,7 +311,7 @@ groups:
         execErrState: Error
         for: 1m
         annotations:
-          summary: PostgreSQL dump is missing, empty, older than 6 hours, or invalid; Borgmatic backup aborted
+          summary: PostgreSQL dump validation failed; Borgmatic backup aborted
         labels:
           severity: critical
         isPaused: false
