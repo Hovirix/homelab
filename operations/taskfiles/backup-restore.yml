@@ -7,8 +7,8 @@ vars:
 
 tasks:
   backup:
-    desc: Enable and start the off-site backup timer
-    cmd: incus exec incus:backup -- systemctl enable --now borgmatic.timer
+    desc: Run an off-site backup now
+    cmd: incus exec incus:backup -- systemctl start borgmatic.service
 
   restore:
     desc: Restore application files from an off-site Borg archive

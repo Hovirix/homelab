@@ -106,6 +106,15 @@
         group: root
         mode: "0600"
 
+    - name: Apply pending systemd configuration
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable scheduled off-site backups
+      ansible.builtin.systemd_service:
+        name: borgmatic.timer
+        enabled: true
+        state: started
+
   handlers:
     - name: Reload systemd
       ansible.builtin.systemd_service:
