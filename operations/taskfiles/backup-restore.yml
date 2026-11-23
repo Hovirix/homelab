@@ -17,3 +17,12 @@ tasks:
     cmds:
       - operations/scripts/swarm.sh drain
       - incus exec incus:backup -- /usr/local/sbin/restore
+
+  restore:postgres:
+    desc: Restore all PostgreSQL databases from a local SQL dump
+    interactive: true
+    prompt: Restore SQL using the PostgreSQL backup container? Stop application writers first.
+    env:
+      DOCKER_HOST:
+        sh: operations/scripts/swarm.sh
+    cmd: operations/scripts/restore-postgres.sh
