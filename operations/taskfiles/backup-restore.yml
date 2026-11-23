@@ -13,4 +13,7 @@ tasks:
   restore:
     desc: Restore application files from an off-site Borg archive
     interactive: true
-    cmd: incus exec incus:backup -- /usr/local/sbin/restore
+    prompt: Enter restore mode? This drains all Swarm nodes and stops their services.
+    cmds:
+      - operations/scripts/swarm.sh drain
+      - incus exec incus:backup -- /usr/local/sbin/restore
