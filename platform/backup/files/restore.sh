@@ -105,7 +105,7 @@ for source in "${selected[@]}"; do
   printf 'Source: %s -> %s\n' "$source" "$target"
 done
 read -r -p 'Type RESTORE to confirm: ' confirmation
-[[ "$confirmation" == "RESTORE" ]] || exit 1
+[[ "$confirmation" == "RESTORE" ]] || exit 0
 
 for source in "${selected[@]}"; do
   check_target "$source"

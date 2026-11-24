@@ -54,11 +54,11 @@ while true; do
 done
 
 printf '\nRestore ALL databases from %s using the PostgreSQL backup container.\n' "$dump"
-printf 'Stop application writers and scheduled backups first; keep PostgreSQL running.\n'
+printf 'Stop database clients and suspend SQL dump scheduling; keep PostgreSQL and its backup container running.\n'
 printf 'This imports SQL, not a clean replacement. Existing roles or objects can cause errors.\n'
 printf 'Failure can leave a partial import. No automatic rollback is performed.\n'
 read -r -p 'Type RESTORE to confirm: ' confirmation
-[[ $confirmation == RESTORE ]] || exit 1
+[[ $confirmation == RESTORE ]] || exit 0
 
 # shellcheck disable=SC2016
 if ! docker exec "$container" bash -euo pipefail -c '

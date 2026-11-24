@@ -1,7 +1,6 @@
 version: "3"
 
 vars:
-  PVE: root@pve.home.hovirix.dev
   MENU_GROUP: BACKUP & RESTORE
   MENU_ORDER: 7
 
@@ -13,15 +12,25 @@ tasks:
   restore:
     desc: Restore application files from an off-site Borg archive
     interactive: true
-    prompt: Enter restore mode? This drains all Swarm nodes and stops their services.
+    prompt: Have you stopped all writers for the selected data? Raw PostgreSQL files also require PostgreSQL to be stopped.
     cmds:
-      - operations/scripts/swarm.sh drain
+      - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
       - incus exec incus:backup -- /usr/local/sbin/restore
+      - incus exec incus:backup -- systemctl start borgmatic.timer
+
+  restore:local:
+    desc: Restore an application directory from a local Swarm volume snapshot
+    interactive: true
+    prompt: Have you stopped all writers for the selected app? Raw PostgreSQL files also require PostgreSQL to be stopped.
+    cmds:
+      - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
+      - operations/scripts/restore-local.sh
+      - incus exec incus:backup -- systemctl start borgmatic.timer
 
   restore:postgres:
     desc: Restore all PostgreSQL databases from a local SQL dump
     interactive: true
-    prompt: Restore SQL using the PostgreSQL backup container? Stop application writers first.
+    prompt: Have you stopped all database clients and suspended SQL dump scheduling? Keep PostgreSQL and its backup container running.
     env:
       DOCKER_HOST:
         sh: operations/scripts/swarm.sh
