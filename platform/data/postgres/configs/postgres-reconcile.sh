@@ -12,6 +12,7 @@ grafana_password="$(</run/secrets/postgres_grafana_password)"
 immich_password="$(</run/secrets/postgres_immich_password)"
 miniflux_password="$(</run/secrets/postgres_miniflux_password)"
 ntfy_password="$(</run/secrets/postgres_ntfy_password)"
+mail_archiver_password="$(</run/secrets/postgres_mail_archiver_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 vaultwarden_password="$(</run/secrets/postgres_vaultwarden_password)"
 exporter_password="$(</run/secrets/postgres_exporter_password)"
@@ -29,6 +30,7 @@ psql -X \
   --set=immich_password="$immich_password" \
   --set=miniflux_password="$miniflux_password" \
   --set=ntfy_password="$ntfy_password" \
+  --set=mail_archiver_password="$mail_archiver_password" \
   --set=paperless_password="$paperless_password" \
   --set=vaultwarden_password="$vaultwarden_password" \
   --set=exporter_password="$exporter_password" <<'SQL'
@@ -67,6 +69,18 @@ ALTER ROLE miniflux PASSWORD :'miniflux_password';
 SELECT 'CREATE DATABASE miniflux OWNER miniflux'
 WHERE NOT EXISTS (
   SELECT FROM pg_database WHERE datname = 'miniflux'
+)\gexec
+
+SELECT 'CREATE ROLE mail_archiver LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'mail_archiver'
+)\gexec
+
+ALTER ROLE mail_archiver PASSWORD :'mail_archiver_password';
+
+SELECT 'CREATE DATABASE mail_archiver OWNER mail_archiver'
+WHERE NOT EXISTS (
+  SELECT FROM pg_database WHERE datname = 'mail_archiver'
 )\gexec
 
 SELECT 'CREATE ROLE authentik LOGIN'

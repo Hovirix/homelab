@@ -10,6 +10,7 @@ locals {
       # "immich", # Internal-only until upstream images are patched.
       "miniflux",
       "ntfy",
+      # "mail-archiver", # Internal-only until upstream images are patched.
       "paperless",
       "vaultwarden",
     ] : "${app}.${local.domain}"

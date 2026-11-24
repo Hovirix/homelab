@@ -475,7 +475,7 @@ configs:
     file: ./configs/grafana/provisioning/alerting/authentik.yml
 
   grafana_alerting_blackbox:
-    name: observability_grafana_alerting_blackbox_ntfy_20261124
+    name: observability_grafana_alerting_blackbox_v7
     file: ./configs/grafana/provisioning/alerting/blackbox.yml
 
   grafana_alerting_backups:
@@ -531,7 +531,7 @@ configs:
     file: ./configs/alloy/services.alloy
 
   alloy_blackbox:
-    name: observability_alloy_blackbox_ntfy_20261124
+    name: observability_alloy_blackbox_v9
     file: ./configs/alloy/blackbox.alloy
 
   alloy_blackbox_modules:

@@ -76,13 +76,14 @@ groups:
               editorMode: code
               expr: |
                 (1 - up{job="blackbox"})
-                or (count by (service, node) (probe_success{job="blackbox"}) < bool 2)
+                or (count by (service, node) (probe_success{job="blackbox",service!="mail-archiver"}) < bool 2)
                 or absent_over_time(probe_success{job="blackbox",service="grafana"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="authentik"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="vaultwarden"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="paperless"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="miniflux"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="ntfy"}[3m])
+                or absent_over_time(probe_success{job="blackbox",service="mail-archiver"}[3m])
                 or absent_over_time(probe_success{job="blackbox",service="immich"}[3m])
               instant: true
               intervalMs: 1000

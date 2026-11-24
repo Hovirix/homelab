@@ -50,6 +50,7 @@ services:
       - paperless
       - miniflux
       - ntfy
+      - mail-archiver
       - immich
       - openclaw
 
@@ -90,6 +91,9 @@ services:
 
 networks:
   ntfy:
+    external: true
+
+  mail-archiver:
     external: true
 
   openclaw:
