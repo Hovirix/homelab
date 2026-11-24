@@ -23,3 +23,11 @@ vulnerabilities:
     expired_at: 2026-12-24
     purls:
       - pkg:nuget/Microsoft.AspNetCore.App.Runtime.linux-x64@10.0.14
+
+  - id: CVE-2026-114149
+    owner: Hovirix
+    statement: >-
+      Accepted temporarily by the owner for internal-only Mail-Archiver 2611.2 after Cloudflare DNS and tunnel ingress removal. Multipart parsing remains affected before authentication; trusted-network clients can exhaust resources, and no container memory limit protects other swarm-01 workloads. Reviewed digest sha256:4baca9cb9dc6f97f2824f62489ba649ededc1095c4555f4d8b87da71349f7ebc in https://github.com/Hovirix/homelab/pull/234. Evidence: https://github.com/dotnet/aspnetcore/security/advisories/GHSA-x33c-w48q-qrgc. Replace with a verified image using ASP.NET Core 10.0.15 or newer; reassess before public access, image or privilege changes, or expiry.
+    expired_at: 2026-12-24
+    purls:
+      - pkg:nuget/Microsoft.AspNetCore.App.Runtime.linux-x64@10.0.14
