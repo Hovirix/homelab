@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-build_dir="infrastructure/opentofu/stacks/incus/build"
+build_dir="infrastructure/incus/build"
 mkdir -p "$build_dir"
 
 # Download, verify the signature, and decompress the official FCOS disk.

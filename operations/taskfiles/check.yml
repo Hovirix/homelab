@@ -48,14 +48,14 @@ tasks:
       - for: [cloudflare, hetzner, incus]
         cmd: |
           export TF_DATA_DIR=".artifacts/tofu/{{.ITEM}}"
-          cd infrastructure/opentofu/stacks/{{.ITEM}}
+          cd infrastructure/{{.ITEM}}
           tflint
           tofu init -backend=false -input=false -lockfile=readonly -no-color > /dev/null
           tofu validate -no-color > /dev/null
 
   lint:butane:
     internal: true
-    dir: infrastructure/opentofu/stacks/incus
+    dir: infrastructure/incus
     method: none
     sources:
       - fcos/swarm-*.bu
