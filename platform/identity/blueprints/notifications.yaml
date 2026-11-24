@@ -12,12 +12,34 @@ entries:
       name: ntfy body
     attrs:
       expression: |
+        from datetime import timezone
+        from ua_parser import user_agent_parser
+
         notification = request.context["notification"]
+        event = notification.event
+        context = event.context if event else {}
+        action = event.action if event else notification.severity
+        title = {
+            "login": "login successful",
+            "password_set": "password changed",
+        }.get(action, action.replace("_", " "))
+        username = context.get("username") or (event.user.get("username") if event else None) or "Unknown"
+        agent = user_agent_parser.Parse((context.get("http_request") or {}).get("user_agent") or "")
+        browser = agent["user_agent"]["family"]
+        os = agent["os"]["family"]
+        device = " · ".join("Unknown" if value == "Other" else value for value in (browser, os))
+        created = event.created if event else notification.created
+        timestamp = created.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC") if created else "Unknown"
         return {
             "topic": "authentik",
-            "title": "Authentik: " + notification.severity,
-            "message": notification.body[:2000],
-            "priority": 4 if notification.severity == "alert" else 3,
+            "title": "Authentik: " + title,
+            "message": "\n".join((
+                "User: " + username,
+                "IP: " + (event.client_ip if event and event.client_ip else "Unknown"),
+                "Time: " + timestamp,
+                "Device: " + device,
+            )),
+            "priority": 3 if action == "login" else 4 if notification.severity == "alert" else 3,
             "click": "https://authentik.hovirix.dev/if/admin/#/events/log",
         }
 
@@ -48,8 +70,9 @@ entries:
     attrs:
       expression: |
         return request.context["event"].action in (
-            "login_failed", "suspicious_request", "password_set",
-            "impersonation_started", "secret_view", "secret_rotate",
+            "login", "login_failed", "suspicious_request", "password_set",
+            "impersonation_started", "impersonation_ended",
+            "secret_view", "secret_rotate",
             "policy_exception", "property_mapping_exception",
             "system_task_exception", "system_exception",
             "configuration_error", "configuration_warning",
