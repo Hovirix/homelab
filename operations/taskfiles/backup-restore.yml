@@ -10,27 +10,27 @@ tasks:
     cmd: incus exec incus:backup -- systemctl start borgmatic.service
 
   restore:
-    desc: Restore application files from an off-site Borg archive
+    desc: Restore application files from a Borg archive
     interactive: true
-    prompt: Have you stopped all writers for the selected data? Raw PostgreSQL files also require PostgreSQL to be stopped.
+    prompt: Stop all writers for the selected data. If restoring raw PostgreSQL files, stop PostgreSQL too. Have you done this?
     cmds:
       - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
       - defer: incus exec incus:backup -- systemctl start borgmatic.timer
       - incus exec incus:backup -- /usr/local/sbin/restore
 
   restore:local:
-    desc: Restore an application directory from a local Swarm volume snapshot
+    desc: Restore an application directory from a Swarm snapshot
     interactive: true
-    prompt: Have you stopped all writers for the selected app? Raw PostgreSQL files also require PostgreSQL to be stopped.
+    prompt: Stop all writers for the selected data. If restoring raw PostgreSQL files, stop PostgreSQL too. Have you done this?
     cmds:
       - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
       - defer: incus exec incus:backup -- systemctl start borgmatic.timer
       - operations/scripts/restore-local.sh
 
   restore:postgres:
-    desc: Restore all PostgreSQL databases from a local SQL dump
+    desc: Restore PostgreSQL databases and roles from a SQL dump
     interactive: true
-    prompt: Have you stopped all database clients and suspended SQL dump scheduling? Keep PostgreSQL and its backup container running.
+    prompt: Stop all database clients and suspend SQL dump scheduling. Keep PostgreSQL and its backup container running. Have you done this?
     env:
       DOCKER_HOST:
         sh: operations/scripts/swarm.sh

@@ -41,7 +41,7 @@ listing=$(docker exec -e TZ=UTC "$container" find /backups -type f -name '*.sql.
 [[ -n $listing ]] || { printf 'No SQL dumps found.\n' >&2; exit 1; }
 dumps=()
 declare -A seen=()
-printf '\nAvailable backups (UTC):\n'
+printf '\nSelect a backup (UTC):\n\n'
 while IFS=$'\t' read -r _ identity stamp path; do
   [[ ! ${seen[$identity]+exists} ]] || continue
   seen[$identity]=1
@@ -51,20 +51,20 @@ done <<<"$listing"
 count=${#dumps[@]}
 printf '\n'
 while true; do
-  read -r -p 'Select backup [1]: ' selection
-  selection=${selection:-1}
+  read -r -p 'Select a number (Enter to cancel): ' selection || exit 0
+  [[ -n $selection ]] || exit 0
   if [[ $selection =~ ^[1-9][0-9]*$ ]] &&
     ((${#selection} <= ${#count} && 10#$selection <= count)); then
     dump=${dumps[10#$selection - 1]}
     break
   fi
-  printf 'Invalid selection.\n' >&2
+  printf 'Invalid selection. Enter a number from 1 to %s.\n' "$count" >&2
 done
 
-printf '\n  Source:  %s\n' "$dump"
-printf '  Target:  postgres\n'
-printf '  Action:  replace all non-template databases and application roles\n\n'
-read -r -p 'Type RESTORE to confirm: ' confirmation
+printf '\nSource:  %s\n' "$dump"
+printf 'Target:  postgres\n'
+printf 'Action:  Replace all non-template databases and application roles\n\n'
+read -r -p 'Type RESTORE to confirm: ' confirmation || exit 0
 [[ $confirmation == RESTORE ]] || exit 0
 printf '\n'
 
