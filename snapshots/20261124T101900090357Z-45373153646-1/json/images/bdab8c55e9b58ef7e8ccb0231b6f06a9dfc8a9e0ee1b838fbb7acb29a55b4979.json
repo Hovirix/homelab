@@ -1,0 +1,1614 @@
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.74.0"
+  },
+  "ReportID": "01a20d10-c8cb-7d48-8ecc-476f7b10e059",
+  "CreatedAt": "2026-11-24T10:18:53.515872497Z",
+  "ArtifactID": "sha256:e619082e1cbb7165fc9e68552e9495ed370134b4e54cb12f928cd3a3ec678156",
+  "ArtifactName": "victoriametrics/victoria-metrics:v1.156.0@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "Size": 37518336,
+    "OS": {
+      "Family": "alpine",
+      "Name": "3.24.3"
+    },
+    "ImageID": "sha256:00a6bab449d0dd4ebdf553f02c174bafed9d9faf26a887dab7684d694e10eafe",
+    "DiffIDs": [
+      "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba",
+      "sha256:19cd8819b8d7ed30210a9cba5a1279a3b2850a46873ffddcead7f536a09db2cb",
+      "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+    ],
+    "RepoDigests": [
+      "victoriametrics/victoria-metrics@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970"
+    ],
+    "Reference": "victoriametrics/victoria-metrics@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970",
+    "ImageConfig": {
+      "architecture": "amd64",
+      "created": "2026-11-06T17:50:31.516530226Z",
+      "history": [
+        {
+          "created": "2026-10-21T22:37:22.870489069Z",
+          "created_by": "ADD alpine-minirootfs-3.24.3-x86_64.tar.gz / # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-10-21T22:37:22.870489069Z",
+          "created_by": "CMD [\"/bin/sh\"]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-10-23T16:17:29.525420774Z",
+          "created_by": "COPY /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "EXPOSE [8428/tcp]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "ENTRYPOINT [\"/victoria-metrics-prod\"]",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "ARG TARGETARCH=amd64",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "ARG BINARY_SUFFIX=",
+          "comment": "buildkit.dockerfile.v0",
+          "empty_layer": true
+        },
+        {
+          "created": "2026-11-06T17:50:31.516530226Z",
+          "created_by": "COPY victoria-metrics-linux-amd64-prod ./victoria-metrics-prod # buildkit",
+          "comment": "buildkit.dockerfile.v0"
+        }
+      ],
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba",
+          "sha256:19cd8819b8d7ed30210a9cba5a1279a3b2850a46873ffddcead7f536a09db2cb",
+          "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+        ]
+      },
+      "config": {
+        "Entrypoint": [
+          "/victoria-metrics-prod"
+        ],
+        "Env": [
+          "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        ],
+        "Labels": {
+          "org.opencontainers.image.created": "2026-11-06T17:50:15Z",
+          "org.opencontainers.image.documentation": "https://docs.victoriametrics.com/",
+          "org.opencontainers.image.source": "https://github.com/VictoriaMetrics/VictoriaMetrics",
+          "org.opencontainers.image.title": "victoria-metrics",
+          "org.opencontainers.image.vendor": "VictoriaMetrics",
+          "org.opencontainers.image.version": "v1.156.0"
+        },
+        "WorkingDir": "/",
+        "ExposedPorts": {
+          "8428/tcp": {}
+        }
+      }
+    },
+    "Layers": [
+      {
+        "Size": 8709632,
+        "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+        "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+      },
+      {
+        "Size": 182272,
+        "Digest": "sha256:b2e4a86e58fa9679a5d85b72021ace64db05cdd4dc774c517027f5e2b6824b6d",
+        "DiffID": "sha256:19cd8819b8d7ed30210a9cba5a1279a3b2850a46873ffddcead7f536a09db2cb"
+      },
+      {
+        "Size": 28626432,
+        "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+        "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+      }
+    ]
+  },
+  "Results": [
+    {
+      "Target": "victoriametrics/victoria-metrics:v1.156.0@sha256:da8a90ac0912f16589be2b96a6441a2fca4bca415c83783d972d92e3b5b66970 (alpine 3.24.3)",
+      "Class": "os-pkgs",
+      "Type": "alpine",
+      "Packages": [
+        {
+          "ID": "alpine-baselayout@3.7.2-r1",
+          "Name": "alpine-baselayout",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-baselayout@3.7.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "1b9c543300f8073e"
+          },
+          "Version": "3.7.2-r1",
+          "Arch": "x86_64",
+          "SrcName": "alpine-baselayout",
+          "SrcVersion": "3.7.2-r1",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "alpine-baselayout-data@3.7.2-r1",
+            "busybox-binsh@1.37.0-r31"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:f0fcfdc2f4da058af6473bc45c4eab62916225b2",
+          "InstalledFiles": [
+            "etc/motd",
+            "etc/crontabs/root",
+            "etc/modprobe.d/aliases.conf",
+            "etc/modprobe.d/blacklist.conf",
+            "etc/modprobe.d/i386.conf",
+            "etc/profile.d/20locale.sh",
+            "etc/profile.d/README",
+            "etc/profile.d/color_prompt.sh.disabled",
+            "usr/lib/sysctl.d/00-alpine.conf",
+            "var/lock",
+            "var/run",
+            "var/spool/mail",
+            "var/spool/cron/crontabs"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "alpine-baselayout-data@3.7.2-r1",
+          "Name": "alpine-baselayout-data",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-baselayout-data@3.7.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "fcc3cd90122d8aa7"
+          },
+          "Version": "3.7.2-r1",
+          "Arch": "x86_64",
+          "SrcName": "alpine-baselayout",
+          "SrcVersion": "3.7.2-r1",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:c6f9bded17d844b6f1b0bb5766d2c35c0d5c8508",
+          "InstalledFiles": [
+            "etc/fstab",
+            "etc/group",
+            "etc/hostname",
+            "etc/hosts",
+            "etc/inittab",
+            "etc/modules",
+            "etc/mtab",
+            "etc/nsswitch.conf",
+            "etc/passwd",
+            "etc/profile",
+            "etc/protocols",
+            "etc/services",
+            "etc/shadow",
+            "etc/shells",
+            "etc/sysctl.conf"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "alpine-keys@2.6-r0",
+          "Name": "alpine-keys",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-keys@2.6-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "cb1f6c8fa74713e0"
+          },
+          "Version": "2.6-r0",
+          "Arch": "x86_64",
+          "SrcName": "alpine-keys",
+          "SrcVersion": "2.6-r0",
+          "Licenses": [
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:d8d6b80e53c059a77e4915da78ba964f3ffea240",
+          "InstalledFiles": [
+            "etc/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "etc/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub",
+            "etc/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub",
+            "usr/share/apk/keys/alpine-devel@lists.alpinelinux.org-66ba20fe.rsa.pub",
+            "usr/share/apk/keys/aarch64/alpine-devel@lists.alpinelinux.org-58199dcc.rsa.pub",
+            "usr/share/apk/keys/aarch64/alpine-devel@lists.alpinelinux.org-616ae350.rsa.pub",
+            "usr/share/apk/keys/armhf/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub",
+            "usr/share/apk/keys/armhf/alpine-devel@lists.alpinelinux.org-616a9724.rsa.pub",
+            "usr/share/apk/keys/armv7/alpine-devel@lists.alpinelinux.org-524d27bb.rsa.pub",
+            "usr/share/apk/keys/armv7/alpine-devel@lists.alpinelinux.org-616adfeb.rsa.pub",
+            "usr/share/apk/keys/loongarch64/alpine-devel@lists.alpinelinux.org-66ba20fe.rsa.pub",
+            "usr/share/apk/keys/mips64/alpine-devel@lists.alpinelinux.org-5e69ca50.rsa.pub",
+            "usr/share/apk/keys/ppc64le/alpine-devel@lists.alpinelinux.org-58cbb476.rsa.pub",
+            "usr/share/apk/keys/ppc64le/alpine-devel@lists.alpinelinux.org-616abc23.rsa.pub",
+            "usr/share/apk/keys/riscv64/alpine-devel@lists.alpinelinux.org-60ac2099.rsa.pub",
+            "usr/share/apk/keys/riscv64/alpine-devel@lists.alpinelinux.org-616db30d.rsa.pub",
+            "usr/share/apk/keys/s390x/alpine-devel@lists.alpinelinux.org-58e4f17d.rsa.pub",
+            "usr/share/apk/keys/s390x/alpine-devel@lists.alpinelinux.org-616ac3bc.rsa.pub",
+            "usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-5243ef4b.rsa.pub",
+            "usr/share/apk/keys/x86/alpine-devel@lists.alpinelinux.org-61666e3f.rsa.pub",
+            "usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-4a6a0840.rsa.pub",
+            "usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-5261cecb.rsa.pub",
+            "usr/share/apk/keys/x86_64/alpine-devel@lists.alpinelinux.org-6165ee59.rsa.pub"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "alpine-release@3.24.3-r0",
+          "Name": "alpine-release",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/alpine-release@3.24.3-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "58aa066dd1e7befc"
+          },
+          "Version": "3.24.3-r0",
+          "Arch": "x86_64",
+          "SrcName": "alpine-base",
+          "SrcVersion": "3.24.3-r0",
+          "Licenses": [
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "alpine-keys@2.6-r0"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:5ac96a125562b69acb43e645122b1862a1074141",
+          "InstalledFiles": [
+            "etc/alpine-release",
+            "etc/issue",
+            "etc/os-release",
+            "etc/secfixes.d/alpine",
+            "usr/lib/os-release"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "apk-tools@3.0.8-r0",
+          "Name": "apk-tools",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/apk-tools@3.0.8-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "fd5527f61ccb458d"
+          },
+          "Version": "3.0.8-r0",
+          "Arch": "x86_64",
+          "SrcName": "apk-tools",
+          "SrcVersion": "3.0.8-r0",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "ca-certificates-bundle@20261020-r0",
+            "libapk@3.0.8-r0",
+            "libcrypto3@3.5.9-r0",
+            "musl@1.2.6-r3",
+            "zlib@1.3.2-r1"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:786130a8f2d3ac69fc316118757b7e8151b8b8c3",
+          "InstalledFiles": [
+            "sbin/apk"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "busybox@1.37.0-r31",
+          "Name": "busybox",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/busybox@1.37.0-r31?arch=x86_64\u0026distro=3.24.3",
+            "UID": "fc424f8052296b79"
+          },
+          "Version": "1.37.0-r31",
+          "Arch": "x86_64",
+          "SrcName": "busybox",
+          "SrcVersion": "1.37.0-r31",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Sören Tempel \u003csoeren+alpine@soeren-tempel.net\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:b5405ebc02f7dd8be95b6265c54b243d5456ab8f",
+          "InstalledFiles": [
+            "bin/busybox",
+            "etc/securetty",
+            "etc/busybox-paths.d/busybox",
+            "etc/logrotate.d/acpid",
+            "etc/network/if-up.d/dad",
+            "etc/udhcpc/udhcpc.conf",
+            "usr/share/udhcpc/default.script"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "busybox-binsh@1.37.0-r31",
+          "Name": "busybox-binsh",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/busybox-binsh@1.37.0-r31?arch=x86_64\u0026distro=3.24.3",
+            "UID": "1ec8a3d5d2b63297"
+          },
+          "Version": "1.37.0-r31",
+          "Arch": "x86_64",
+          "SrcName": "busybox",
+          "SrcVersion": "1.37.0-r31",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Sören Tempel \u003csoeren+alpine@soeren-tempel.net\u003e",
+          "DependsOn": [
+            "busybox@1.37.0-r31"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:5cbd14acc6f1804c5bac6c77dc2c492f010b0fc7",
+          "InstalledFiles": [
+            "bin/sh"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "ca-certificates-bundle@20261020-r0",
+          "Name": "ca-certificates-bundle",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/ca-certificates-bundle@20261020-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "a70608abcaf07d7a"
+          },
+          "Version": "20261020-r0",
+          "Arch": "x86_64",
+          "SrcName": "ca-certificates",
+          "SrcVersion": "20261020-r0",
+          "Licenses": [
+            "MPL-2.0",
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:7c6e635f86aafb46cb3b015d8505b3a5f61156bd",
+          "InstalledFiles": [
+            "etc/ssl/cert.pem",
+            "etc/ssl/certs/ca-certificates.crt",
+            "etc/ssl1.1/cert.pem",
+            "etc/ssl1.1/certs"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "libapk@3.0.8-r0",
+          "Name": "libapk",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/libapk@3.0.8-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "cdfc970c784f7001"
+          },
+          "Version": "3.0.8-r0",
+          "Arch": "x86_64",
+          "SrcName": "apk-tools",
+          "SrcVersion": "3.0.8-r0",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "libcrypto3@3.5.9-r0",
+            "libssl3@3.5.9-r0",
+            "musl@1.2.6-r3",
+            "zlib@1.3.2-r1"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:b93ce9573c1d0db3eea7ce32841ad0857abc4a54",
+          "InstalledFiles": [
+            "usr/lib/libapk.so.3.0.0"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "libcrypto3@3.5.9-r0",
+          "Name": "libcrypto3",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "Version": "3.5.9-r0",
+          "Arch": "x86_64",
+          "SrcName": "openssl",
+          "SrcVersion": "3.5.9-r0",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:1c0dee9734cf22fc97cdd181913bbd710e6dfb08",
+          "InstalledFiles": [
+            "etc/ssl/ct_log_list.cnf",
+            "etc/ssl/ct_log_list.cnf.dist",
+            "etc/ssl/openssl.cnf",
+            "etc/ssl/openssl.cnf.dist",
+            "usr/lib/libcrypto.so.3",
+            "usr/lib/engines-3/afalg.so",
+            "usr/lib/engines-3/capi.so",
+            "usr/lib/engines-3/loader_attic.so",
+            "usr/lib/engines-3/padlock.so",
+            "usr/lib/ossl-modules/legacy.so"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "libssl3@3.5.9-r0",
+          "Name": "libssl3",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "Version": "3.5.9-r0",
+          "Arch": "x86_64",
+          "SrcName": "openssl",
+          "SrcVersion": "3.5.9-r0",
+          "Licenses": [
+            "Apache-2.0"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "libcrypto3@3.5.9-r0",
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:20c4c90ea9d20a9dd3a04deadf2c6c4f64233643",
+          "InstalledFiles": [
+            "usr/lib/libssl.so.3"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "musl@1.2.6-r3",
+          "Name": "musl",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/musl@1.2.6-r3?arch=x86_64\u0026distro=3.24.3",
+            "UID": "43d4b05c5472a58c"
+          },
+          "Version": "1.2.6-r3",
+          "Arch": "x86_64",
+          "SrcName": "musl",
+          "SrcVersion": "1.2.6-r3",
+          "Licenses": [
+            "MIT"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:770e8304d958dced98d76997df9e8fa1db5ca32f",
+          "InstalledFiles": [
+            "lib/ld-musl-x86_64.so.1",
+            "lib/libc.musl-x86_64.so.1"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "musl-utils@1.2.6-r3",
+          "Name": "musl-utils",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/musl-utils@1.2.6-r3?arch=x86_64\u0026distro=3.24.3",
+            "UID": "1bd73db44d355699"
+          },
+          "Version": "1.2.6-r3",
+          "Arch": "x86_64",
+          "SrcName": "musl",
+          "SrcVersion": "1.2.6-r3",
+          "Licenses": [
+            "MIT",
+            "BSD-2-Clause",
+            "GPL-2.0-or-later"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3",
+            "scanelf@1.3.9-r1"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:51372daafb234646960eca4d7a13f706324f24d6",
+          "InstalledFiles": [
+            "sbin/ldconfig",
+            "usr/bin/getconf",
+            "usr/bin/getent",
+            "usr/bin/iconv",
+            "usr/bin/ldd"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "scanelf@1.3.9-r1",
+          "Name": "scanelf",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/scanelf@1.3.9-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "f832b0b0d6c76e18"
+          },
+          "Version": "1.3.9-r1",
+          "Arch": "x86_64",
+          "SrcName": "pax-utils",
+          "SrcVersion": "1.3.9-r1",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:013f903d0ba219673aebbdd04f74bb5ed82b01f0",
+          "InstalledFiles": [
+            "usr/bin/scanelf"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "ssl_client@1.37.0-r31",
+          "Name": "ssl_client",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/ssl_client@1.37.0-r31?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3e7a1baa8bc3bfe0"
+          },
+          "Version": "1.37.0-r31",
+          "Arch": "x86_64",
+          "SrcName": "busybox",
+          "SrcVersion": "1.37.0-r31",
+          "Licenses": [
+            "GPL-2.0-only"
+          ],
+          "Maintainer": "Sören Tempel \u003csoeren+alpine@soeren-tempel.net\u003e",
+          "DependsOn": [
+            "libcrypto3@3.5.9-r0",
+            "libssl3@3.5.9-r0",
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:c220f4a5125a313af733e98def94132bb1e9d40d",
+          "InstalledFiles": [
+            "usr/bin/ssl_client"
+          ],
+          "AnalyzedBy": "apk"
+        },
+        {
+          "ID": "zlib@1.3.2-r1",
+          "Name": "zlib",
+          "Identifier": {
+            "PURL": "pkg:apk/alpine/zlib@1.3.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "926381dc853769fb"
+          },
+          "Version": "1.3.2-r1",
+          "Arch": "x86_64",
+          "SrcName": "zlib",
+          "SrcVersion": "1.3.2-r1",
+          "Licenses": [
+            "Zlib"
+          ],
+          "Maintainer": "Natanael Copa \u003cncopa@alpinelinux.org\u003e",
+          "DependsOn": [
+            "musl@1.2.6-r3"
+          ],
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "Digest": "sha1:4f525c8cc204f84b8b4ca40db3be389958f056c6",
+          "InstalledFiles": [
+            "usr/lib/libz.so.1",
+            "usr/lib/libz.so.1.3.2"
+          ],
+          "AnalyzedBy": "apk"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-107496",
+          "PkgID": "libcrypto3@3.5.9-r0",
+          "PkgName": "libcrypto3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-107496",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:5dd3a167062e1e6c903b39f9d91b73c5786bf59dc16c1613e33bb82b3a59ecfc",
+          "Title": "openssl: openssl: Denial of Service via crafted EC certificate in CMS encryption",
+          "Description": "Issue summary: Encrypting a CMS message to an EC certificate whose group order\nis 1 may cause CMS_encrypt() or CMS_encrypt_ex() to loop indefinitely.\n\nImpact summary: An attacker able to supply the recipient certificate to an\napplication performing CMS encryption can cause that application to loop\nindefinitely, consuming CPU and resulting in Denial of Service.\n\nCWE: CWE-835: Loop with Unreachable Exit Condition ('Infinite Loop')\n\nDescription: CMS_encrypt() and CMS_encrypt_ex() encrypt a message to one or\nmore recipient certificates and, for an EC recipient, generate an ephemeral\nkey in the recipient's group. If the certificate declares a group order of 1,\nrandom scalar generation can only produce zero. The key generation routine\nthen retries without limit while waiting for a nonzero private scalar, so the\ncall never returns.\n\nThe OpenSSL TLS and QUIC implementations do not use this path. An application\nis exposed only if it calls CMS_encrypt() or CMS_encrypt_ex() with a recipient\ncertificate whose EC parameters are attacker-controlled. Certificates with\nnormal EC group orders do not trigger the loop.\n\nOpenSSL 4.0 and later reject unknown explicit EC groups in default builds.\nThese versions are affected only when configured with the\nenable-ec_explicit_curves option.\n\nThe result is a hang that consumes a CPU core until the process is\ninterrupted, a Denial of Service. The severity is Low because the attacker\nmust supply the recipient certificate and the application must choose to\nencrypt to it; ordinary CMS encryption to trusted recipients is unaffected.\n\nThe fix makes EC key generation fail when the group has no valid nonzero\nprivate scalar, instead of retrying indefinitely.\n\nFIPS impact: no\nThe FIPS modules in 4.1, 4.0, 3.5 and 3.0 are not affected. The FIPS provider\ndoes not support arbitrary explicit EC domain parameters, so an order-1 group\nis rejected during key import before the vulnerable key generation path is\nreached.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-835"
+          ],
+          "VendorSeverity": {
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-107496",
+            "https://github.com/openssl/openssl/commit/36e15b618decdff1b116eead6747718e6e729ad2",
+            "https://github.com/openssl/openssl/commit/a0051cfe699bf5a047bc1c4faef65f80f7987366",
+            "https://github.com/openssl/openssl/commit/a8531368ddb1f86d2a2782a8b693926bb67b59e7",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-107496",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-107496"
+          ],
+          "PublishedDate": "2026-11-10T19:18:02.583Z",
+          "LastModifiedDate": "2026-11-16T19:17:24.6Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-95691",
+          "PkgID": "libcrypto3@3.5.9-r0",
+          "PkgName": "libcrypto3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-95691",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:20d89b994865211f74e141a3b5566a84901c343884198396cde2f8528758063a",
+          "Title": "openssl: openssl: Denial of Service via overlapping QUIC CRYPTO frame processing",
+          "Description": "Issue summary: A retransmitted QUIC CRYPTO frame can release packet storage\nwhile the TLS record layer retains a direct pointer into that storage causing\nuse after free.\n\nImpact summary: A malicious QUIC server can cause a heap-use-after-free read\nin the OpenSSL QUIC client. The server can also identify one allocator-adjacent\nbyte through the client's protected Handshake response.\n\nCWE: CWE-416: Use After Free\n\nDescription: During CRYPTO stream processing, a pointer into the first frame's\nmemory on the stream is lent to the TLS handshake processing. The memory\nmust remain stable until it is processed and released. However the processing\nof retransmitted CRYPTO frames could release the memory if the retransmitted\nframe fully overlapped the existing frame. This then causes use-after-free read\nwhen the TLS handshake processing continues.\n\nThe use-after-free read can lead to a Denial-of-Service of the client\napplication or a minor leak of information about the heap memory contents\nthat might be overwritten with other data, subsequently allocated by\nthe application, to the peer.\n\nFIPS impact: no\nThe FIPS module is not affected as the QUIC implementation is outside of\nthe OpenSSL FIPS module boundary.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-416"
+          ],
+          "VendorSeverity": {
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:L",
+              "V3Score": 5.4
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-95691",
+            "https://github.com/openssl/openssl/commit/dd90ceb99a3c2ddba336bb4a00be9ebabd84c2a1",
+            "https://github.com/openssl/openssl/commit/ec9d4de9d03989b29db5a3d7efdb4c285deaf386",
+            "https://github.com/openssl/openssl/commit/f6244675833e097c2429a40d1b206d95385bd42f",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-95691",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-95691"
+          ],
+          "PublishedDate": "2026-11-10T19:21:39.377Z",
+          "LastModifiedDate": "2026-11-16T20:19:19.43Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-95692",
+          "PkgID": "libcrypto3@3.5.9-r0",
+          "PkgName": "libcrypto3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-95692",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:9696954fce7215049e5da63186e3148d3554d96c432ddb279c07a92b1df868fc",
+          "Title": "openssl: OpenSSL: Denial of Service via out-of-bounds read in AES-GCM-SIV",
+          "Description": "Issue summary: Setting an AES-GCM-SIV IV shorter than the expected nonce\nlength via EVP_CipherInit_ex() may trigger a heap out-of-bounds read.\nSupplying a longer IV is silently truncated instead of rejected.\n\nImpact summary: An application passing a caller-supplied IV of the wrong\nlength may crash or read beyond its buffer. Because trailing IV bytes are\nignored, an attacker who knows one message and tag may forge messages under a\ndifferent IV.\n\nCWE: CWE-125: Out-of-bounds Read\n\nDescription: AES-GCM-SIV copies the caller-supplied IV or nonce into its\ninternal state using a copy whose length is taken from the expected nonce size\nrather than from the length the caller actually provided. When the caller\npasses a shorter IV, the copy reads past the end of the caller's buffer;\nAddressSanitizer confirms a heap out-of-bounds read reached through\nEVP_CipherInit_ex() into ossl_aes_gcm_siv_init(). When the caller passes a\nlonger IV, the implementation silently discards the trailing bytes instead of\nrejecting the length.\n\nThe truncation breaks the binding between the IV and the computed\nauthentication tag. An attacker who has observed a message and its tag under\none IV can produce a message and tag that verify under a different IV whose\nfirst bytes match, since the surplus bytes never influence the computation.\nThe message itself is unchanged, so this is a failure of IV commitment rather\nthan a classic existential forgery.\n\nOnly applications that call EVP_CipherInit_ex() (or the equivalent provider\ncipher initialization) with an IV length other than the standard 12 bytes for\nAES-GCM-SIV are affected. The severity is limited because the out-of-bounds\nread is small and attacker-controlled only in length, and the forgery requires\nan unusual IV length choice by the application.\n\nFIPS impact: no\nThe FIPS modules are not affected by this issue, as AES-GCM-SIV is not an\napproved algorithm.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-125"
+          ],
+          "VendorSeverity": {
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L",
+              "V3Score": 4.8
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-95692",
+            "https://github.com/openssl/openssl/commit/257a3427aa0ef8d9dd2ef5b3e2d1c021a221b116",
+            "https://github.com/openssl/openssl/commit/510872388f5d145cf870868b3d288a23822cb776",
+            "https://github.com/openssl/openssl/commit/70a47ac78b6f3be1b22fb1551bd0bfcff4f29613",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-95692",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-95692"
+          ],
+          "PublishedDate": "2026-11-10T19:21:39.53Z",
+          "LastModifiedDate": "2026-11-16T19:17:54.88Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-88822",
+          "PkgID": "libcrypto3@3.5.9-r0",
+          "PkgName": "libcrypto3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-88822",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:ef4cc0be926412c3321b3249dd81b84fa6e7ca4b930d7ab8e449a70a4ec9707a",
+          "Title": "openssl: openssl: Information disclosure via uninitialized memory in QUIC peer detection",
+          "Description": "Issue summary: QUIC, when performing automated peer detection, may allow\nuninitialized stack data to leak into the received address which is then used\nas the destination for outgoing packets.\n\nImpact summary: Applications using QUIC's automated peer detection mechanism\nmay receive an invalid address, leading to connection loss and disclosure of\nuninitialized stack data to an attacker observing the outgoing network traffic.\n\nCWE: CWE-457 (Use of Uninitialized Variable)\n\nDescription: The OpenSSL QUIC stack contains a feature in which, when using an\nalready connected socket, it will auto-detect the peer address during the SSL\nhandshake.  This feature uses the getpeername() function, passing a buffer of\nsufficient length to hold any supported address family, but passes a buffer\nlength that is only sized such that larger addresses, such as IPv6, cannot be\nretrieved. The getpeername() function however, still returns the full address\nlength, which is accepted as the valid input buffer length, leading to the\naddress buffer containing uninitialized stack data instead of the actual peer\naddress. The invalid peer address is then used as destination for the outgoing\npackets which leads to a connectivity breakage and a leakage of the\nuninitialized stack data to passive network observers.\n\nFIPS impact: no\nThe FIPS modules in 4.0, 3.6, 3.5, 3.4, and 3.0 are not affected by this CVE as\nthe affected protocol is not implemented in the FIPS module.",
+          "Severity": "LOW",
+          "CweIDs": [
+            "CWE-457"
+          ],
+          "VendorSeverity": {
+            "redhat": 1,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "V3Score": 3.7
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-88822",
+            "https://github.com/openssl/openssl/commit/1a73dc590cbad62d6f0329ea4779eadaa8d8fd75",
+            "https://github.com/openssl/openssl/commit/7b4f5344aa0401e7b777640050b5257ed2a70e88",
+            "https://github.com/openssl/openssl/commit/911eee8eb7550b95a206f1ad8cbdb986098982f3",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-88822",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-88822"
+          ],
+          "PublishedDate": "2026-11-10T19:21:34.623Z",
+          "LastModifiedDate": "2026-11-16T20:19:17.693Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-88823",
+          "PkgID": "libcrypto3@3.5.9-r0",
+          "PkgName": "libcrypto3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libcrypto3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "3de134b31d66634f"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-88823",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:d280c3423a26ec13cf3c6230be3e29bfe2f74328c951fd0dfdcd82eb79a88acc",
+          "Title": "openssl: OpenSSL: Message authentication bypass via zero-length AAD update",
+          "Description": "Issue summary: The AES-GCM-SIV implementation treats a zero-length Additional\nAuthenticated Data (AAD) update as a reset of all the AAD supplied so far,\ninstead of leaving the AAD unchanged. An application that supplies its AAD in\nseveral fragments, one of which is empty, therefore produces or verifies\nmessages whose authentication tag does not cover the AAD supplied before\nthe empty fragment.\n\nImpact summary: Data an application intended to authenticate alongside a\nmessage is silently left unauthenticated. An attacker can forge the AAD of such\na message.\n\nCWE: CWE-325: Missing Cryptographic Step\n\nDescription: An application passing AAD in multiple chunks of which some have\nzero length will have the previous AAD chunks effectively unauthenticated. Also,\non context re-initialisation, the AAD was not reset, which meant that any AAD\naccumulated from the previous context usage were also included in the AAD of the\nnew message.\n\nThe fix makes a zero-length AAD update a no-op and clears any accumulated AAD\nwhenever the context is re-initialised with a key or a nonce.\nA re-initialisation that only changes parameters keeps the AAD.\n\nFIPS impact: no\nThe FIPS modules are not affected, as AES-GCM-SIV is not a FIPS approved\nalgorithm and is implemented only in the default provider, outside the\nOpenSSL FIPS module boundary.",
+          "Severity": "LOW",
+          "CweIDs": [
+            "CWE-325"
+          ],
+          "VendorSeverity": {
+            "redhat": 1,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 3.7
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-88823",
+            "https://github.com/openssl/openssl/commit/159e1de0c448d7b9f09ad768c8e141def4aa1eb4",
+            "https://github.com/openssl/openssl/commit/2f5fc833ff9b5bfe00b32f8b5c74f73c5773c682",
+            "https://github.com/openssl/openssl/commit/6747b1a278816dd7db46438040a70b0b5e5e0a90",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-88823",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-88823"
+          ],
+          "PublishedDate": "2026-11-10T19:21:34.847Z",
+          "LastModifiedDate": "2026-11-16T20:19:17.89Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-107496",
+          "PkgID": "libssl3@3.5.9-r0",
+          "PkgName": "libssl3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-107496",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:80fc68ecb565b1b6fa04371b1e2d49d33c9fb658cc5b9c95542483f5a719862d",
+          "Title": "openssl: openssl: Denial of Service via crafted EC certificate in CMS encryption",
+          "Description": "Issue summary: Encrypting a CMS message to an EC certificate whose group order\nis 1 may cause CMS_encrypt() or CMS_encrypt_ex() to loop indefinitely.\n\nImpact summary: An attacker able to supply the recipient certificate to an\napplication performing CMS encryption can cause that application to loop\nindefinitely, consuming CPU and resulting in Denial of Service.\n\nCWE: CWE-835: Loop with Unreachable Exit Condition ('Infinite Loop')\n\nDescription: CMS_encrypt() and CMS_encrypt_ex() encrypt a message to one or\nmore recipient certificates and, for an EC recipient, generate an ephemeral\nkey in the recipient's group. If the certificate declares a group order of 1,\nrandom scalar generation can only produce zero. The key generation routine\nthen retries without limit while waiting for a nonzero private scalar, so the\ncall never returns.\n\nThe OpenSSL TLS and QUIC implementations do not use this path. An application\nis exposed only if it calls CMS_encrypt() or CMS_encrypt_ex() with a recipient\ncertificate whose EC parameters are attacker-controlled. Certificates with\nnormal EC group orders do not trigger the loop.\n\nOpenSSL 4.0 and later reject unknown explicit EC groups in default builds.\nThese versions are affected only when configured with the\nenable-ec_explicit_curves option.\n\nThe result is a hang that consumes a CPU core until the process is\ninterrupted, a Denial of Service. The severity is Low because the attacker\nmust supply the recipient certificate and the application must choose to\nencrypt to it; ordinary CMS encryption to trusted recipients is unaffected.\n\nThe fix makes EC key generation fail when the group has no valid nonzero\nprivate scalar, instead of retrying indefinitely.\n\nFIPS impact: no\nThe FIPS modules in 4.1, 4.0, 3.5 and 3.0 are not affected. The FIPS provider\ndoes not support arbitrary explicit EC domain parameters, so an order-1 group\nis rejected during key import before the vulnerable key generation path is\nreached.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-835"
+          ],
+          "VendorSeverity": {
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-107496",
+            "https://github.com/openssl/openssl/commit/36e15b618decdff1b116eead6747718e6e729ad2",
+            "https://github.com/openssl/openssl/commit/a0051cfe699bf5a047bc1c4faef65f80f7987366",
+            "https://github.com/openssl/openssl/commit/a8531368ddb1f86d2a2782a8b693926bb67b59e7",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-107496",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-107496"
+          ],
+          "PublishedDate": "2026-11-10T19:18:02.583Z",
+          "LastModifiedDate": "2026-11-16T19:17:24.6Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-95691",
+          "PkgID": "libssl3@3.5.9-r0",
+          "PkgName": "libssl3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-95691",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:e5795c887275cd61b3cdcc8654c0dc3f26f3173dae629d311458fd09e369fae1",
+          "Title": "openssl: openssl: Denial of Service via overlapping QUIC CRYPTO frame processing",
+          "Description": "Issue summary: A retransmitted QUIC CRYPTO frame can release packet storage\nwhile the TLS record layer retains a direct pointer into that storage causing\nuse after free.\n\nImpact summary: A malicious QUIC server can cause a heap-use-after-free read\nin the OpenSSL QUIC client. The server can also identify one allocator-adjacent\nbyte through the client's protected Handshake response.\n\nCWE: CWE-416: Use After Free\n\nDescription: During CRYPTO stream processing, a pointer into the first frame's\nmemory on the stream is lent to the TLS handshake processing. The memory\nmust remain stable until it is processed and released. However the processing\nof retransmitted CRYPTO frames could release the memory if the retransmitted\nframe fully overlapped the existing frame. This then causes use-after-free read\nwhen the TLS handshake processing continues.\n\nThe use-after-free read can lead to a Denial-of-Service of the client\napplication or a minor leak of information about the heap memory contents\nthat might be overwritten with other data, subsequently allocated by\nthe application, to the peer.\n\nFIPS impact: no\nThe FIPS module is not affected as the QUIC implementation is outside of\nthe OpenSSL FIPS module boundary.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-416"
+          ],
+          "VendorSeverity": {
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:L/I:N/A:L",
+              "V3Score": 5.4
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-95691",
+            "https://github.com/openssl/openssl/commit/dd90ceb99a3c2ddba336bb4a00be9ebabd84c2a1",
+            "https://github.com/openssl/openssl/commit/ec9d4de9d03989b29db5a3d7efdb4c285deaf386",
+            "https://github.com/openssl/openssl/commit/f6244675833e097c2429a40d1b206d95385bd42f",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-95691",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-95691"
+          ],
+          "PublishedDate": "2026-11-10T19:21:39.377Z",
+          "LastModifiedDate": "2026-11-16T20:19:19.43Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-95692",
+          "PkgID": "libssl3@3.5.9-r0",
+          "PkgName": "libssl3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-95692",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:5191e8ada987a4189442e671cb3177c50ebdc651745b0cf0ff3f05176333a367",
+          "Title": "openssl: OpenSSL: Denial of Service via out-of-bounds read in AES-GCM-SIV",
+          "Description": "Issue summary: Setting an AES-GCM-SIV IV shorter than the expected nonce\nlength via EVP_CipherInit_ex() may trigger a heap out-of-bounds read.\nSupplying a longer IV is silently truncated instead of rejected.\n\nImpact summary: An application passing a caller-supplied IV of the wrong\nlength may crash or read beyond its buffer. Because trailing IV bytes are\nignored, an attacker who knows one message and tag may forge messages under a\ndifferent IV.\n\nCWE: CWE-125: Out-of-bounds Read\n\nDescription: AES-GCM-SIV copies the caller-supplied IV or nonce into its\ninternal state using a copy whose length is taken from the expected nonce size\nrather than from the length the caller actually provided. When the caller\npasses a shorter IV, the copy reads past the end of the caller's buffer;\nAddressSanitizer confirms a heap out-of-bounds read reached through\nEVP_CipherInit_ex() into ossl_aes_gcm_siv_init(). When the caller passes a\nlonger IV, the implementation silently discards the trailing bytes instead of\nrejecting the length.\n\nThe truncation breaks the binding between the IV and the computed\nauthentication tag. An attacker who has observed a message and its tag under\none IV can produce a message and tag that verify under a different IV whose\nfirst bytes match, since the surplus bytes never influence the computation.\nThe message itself is unchanged, so this is a failure of IV commitment rather\nthan a classic existential forgery.\n\nOnly applications that call EVP_CipherInit_ex() (or the equivalent provider\ncipher initialization) with an IV length other than the standard 12 bytes for\nAES-GCM-SIV are affected. The severity is limited because the out-of-bounds\nread is small and attacker-controlled only in length, and the forgery requires\nan unusual IV length choice by the application.\n\nFIPS impact: no\nThe FIPS modules are not affected by this issue, as AES-GCM-SIV is not an\napproved algorithm.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-125"
+          ],
+          "VendorSeverity": {
+            "redhat": 2,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:L",
+              "V3Score": 4.8
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-95692",
+            "https://github.com/openssl/openssl/commit/257a3427aa0ef8d9dd2ef5b3e2d1c021a221b116",
+            "https://github.com/openssl/openssl/commit/510872388f5d145cf870868b3d288a23822cb776",
+            "https://github.com/openssl/openssl/commit/70a47ac78b6f3be1b22fb1551bd0bfcff4f29613",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-95692",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-95692"
+          ],
+          "PublishedDate": "2026-11-10T19:21:39.53Z",
+          "LastModifiedDate": "2026-11-16T19:17:54.88Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-88822",
+          "PkgID": "libssl3@3.5.9-r0",
+          "PkgName": "libssl3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-88822",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:70e805b02c888b2006bf970879cd431dc822569d2010ca9b3476f2158ba76f56",
+          "Title": "openssl: openssl: Information disclosure via uninitialized memory in QUIC peer detection",
+          "Description": "Issue summary: QUIC, when performing automated peer detection, may allow\nuninitialized stack data to leak into the received address which is then used\nas the destination for outgoing packets.\n\nImpact summary: Applications using QUIC's automated peer detection mechanism\nmay receive an invalid address, leading to connection loss and disclosure of\nuninitialized stack data to an attacker observing the outgoing network traffic.\n\nCWE: CWE-457 (Use of Uninitialized Variable)\n\nDescription: The OpenSSL QUIC stack contains a feature in which, when using an\nalready connected socket, it will auto-detect the peer address during the SSL\nhandshake.  This feature uses the getpeername() function, passing a buffer of\nsufficient length to hold any supported address family, but passes a buffer\nlength that is only sized such that larger addresses, such as IPv6, cannot be\nretrieved. The getpeername() function however, still returns the full address\nlength, which is accepted as the valid input buffer length, leading to the\naddress buffer containing uninitialized stack data instead of the actual peer\naddress. The invalid peer address is then used as destination for the outgoing\npackets which leads to a connectivity breakage and a leakage of the\nuninitialized stack data to passive network observers.\n\nFIPS impact: no\nThe FIPS modules in 4.0, 3.6, 3.5, 3.4, and 3.0 are not affected by this CVE as\nthe affected protocol is not implemented in the FIPS module.",
+          "Severity": "LOW",
+          "CweIDs": [
+            "CWE-457"
+          ],
+          "VendorSeverity": {
+            "redhat": 1,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+              "V3Score": 3.7
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-88822",
+            "https://github.com/openssl/openssl/commit/1a73dc590cbad62d6f0329ea4779eadaa8d8fd75",
+            "https://github.com/openssl/openssl/commit/7b4f5344aa0401e7b777640050b5257ed2a70e88",
+            "https://github.com/openssl/openssl/commit/911eee8eb7550b95a206f1ad8cbdb986098982f3",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-88822",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-88822"
+          ],
+          "PublishedDate": "2026-11-10T19:21:34.623Z",
+          "LastModifiedDate": "2026-11-16T20:19:17.693Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-88823",
+          "PkgID": "libssl3@3.5.9-r0",
+          "PkgName": "libssl3",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/libssl3@3.5.9-r0?arch=x86_64\u0026distro=3.24.3",
+            "UID": "c5a60e84169f3215"
+          },
+          "InstalledVersion": "3.5.9-r0",
+          "FixedVersion": "3.5.9-r1",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-88823",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:61b0d49fc6450e2882bdfbd6460ffc7ca9af3f5ef57d33bcc88a6b3a75e5919b",
+          "Title": "openssl: OpenSSL: Message authentication bypass via zero-length AAD update",
+          "Description": "Issue summary: The AES-GCM-SIV implementation treats a zero-length Additional\nAuthenticated Data (AAD) update as a reset of all the AAD supplied so far,\ninstead of leaving the AAD unchanged. An application that supplies its AAD in\nseveral fragments, one of which is empty, therefore produces or verifies\nmessages whose authentication tag does not cover the AAD supplied before\nthe empty fragment.\n\nImpact summary: Data an application intended to authenticate alongside a\nmessage is silently left unauthenticated. An attacker can forge the AAD of such\na message.\n\nCWE: CWE-325: Missing Cryptographic Step\n\nDescription: An application passing AAD in multiple chunks of which some have\nzero length will have the previous AAD chunks effectively unauthenticated. Also,\non context re-initialisation, the AAD was not reset, which meant that any AAD\naccumulated from the previous context usage were also included in the AAD of the\nnew message.\n\nThe fix makes a zero-length AAD update a no-op and clears any accumulated AAD\nwhenever the context is re-initialised with a key or a nonce.\nA re-initialisation that only changes parameters keeps the AAD.\n\nFIPS impact: no\nThe FIPS modules are not affected, as AES-GCM-SIV is not a FIPS approved\nalgorithm and is implemented only in the default provider, outside the\nOpenSSL FIPS module boundary.",
+          "Severity": "LOW",
+          "CweIDs": [
+            "CWE-325"
+          ],
+          "VendorSeverity": {
+            "redhat": 1,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:L/A:N",
+              "V3Score": 3.7
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-88823",
+            "https://github.com/openssl/openssl/commit/159e1de0c448d7b9f09ad768c8e141def4aa1eb4",
+            "https://github.com/openssl/openssl/commit/2f5fc833ff9b5bfe00b32f8b5c74f73c5773c682",
+            "https://github.com/openssl/openssl/commit/6747b1a278816dd7db46438040a70b0b5e5e0a90",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-88823",
+            "https://openssl-library.org/news/secadv/20261110.txt",
+            "https://www.cve.org/CVERecord?id=CVE-2026-88823"
+          ],
+          "PublishedDate": "2026-11-10T19:21:34.847Z",
+          "LastModifiedDate": "2026-11-16T20:19:17.89Z"
+        },
+        {
+          "VulnerabilityID": "CVE-2026-4738",
+          "PkgID": "zlib@1.3.2-r1",
+          "PkgName": "zlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:apk/alpine/zlib@1.3.2-r1?arch=x86_64\u0026distro=3.24.3",
+            "UID": "926381dc853769fb"
+          },
+          "InstalledVersion": "1.3.2-r1",
+          "FixedVersion": "1.4-r0",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:7b229517ed222597277036d94892173207d01a731ab3a88eeb1de2e963a2c788",
+            "DiffID": "sha256:75c137aedfb2760f88629236cb7b797630aed0c3d91d626d1d1bb694878fc2ba"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-4738",
+          "DataSource": {
+            "ID": "alpine",
+            "Name": "Alpine Secdb",
+            "URL": "https://secdb.alpinelinux.org/"
+          },
+          "Fingerprint": "sha256:d58bfd31d3e5140d3789641ff875522036ee05d6cba5190ee6a68e933e066f44",
+          "Title": "Improper Restriction of Operations within the Bounds of a Memory Buffe ...",
+          "Description": "Improper Restriction of Operations within the Bounds of a Memory Buffer vulnerability in OSGeo gdal (frmts/zlib/contrib/infback9 modules). This vulnerability is associated with program files inftree9.C‎.\n\nThis issue affects gdal: before 3.11.0.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-119"
+          ],
+          "VendorSeverity": {
+            "bitnami": 4,
+            "julia": 4,
+            "ubuntu": 2
+          },
+          "CVSS": {
+            "bitnami": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H/E:A/S:P/AU:Y/R:U/V:C/RE:L/U:Amber",
+              "V40Score": 9.4
+            },
+            "julia": {
+              "V40Vector": "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:P/VC:H/VI:H/VA:H/SC:H/SI:H/SA:H/E:A/S:P/AU:Y/R:U/V:C/RE:L/U:Amber",
+              "V40Score": 9.4
+            }
+          },
+          "References": [
+            "https://github.com/OSGeo/gdal/pull/12244",
+            "https://github.com/advisories/GHSA-hp6p-5qh5-w9fj",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-4738",
+            "https://www.cve.org/CVERecord?id=CVE-2026-4738"
+          ],
+          "PublishedDate": "2026-03-24T04:17:29Z",
+          "LastModifiedDate": "2026-06-17T10:57:09.03Z"
+        }
+      ]
+    },
+    {
+      "Target": "victoria-metrics-prod",
+      "Class": "lang-pkgs",
+      "Type": "gobinary",
+      "Packages": [
+        {
+          "ID": "github.com/VictoriaMetrics/VictoriaMetrics",
+          "Name": "github.com/VictoriaMetrics/VictoriaMetrics",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/victoriametrics",
+            "UID": "56bdf0f94b5d607a"
+          },
+          "Relationship": "root",
+          "DependsOn": [
+            "cloud.google.com/go/compute/metadata@v0.10.0",
+            "github.com/VictoriaMetrics/easyproto@v1.2.0",
+            "github.com/VictoriaMetrics/fastcache@v1.13.3",
+            "github.com/VictoriaMetrics/metrics@v1.45.0",
+            "github.com/VictoriaMetrics/metricsql@v0.87.6",
+            "github.com/cespare/xxhash/v2@v2.3.0",
+            "github.com/golang/snappy@v1.0.0",
+            "github.com/klauspost/compress@v1.20.3",
+            "github.com/valyala/bytebufferpool@v1.0.0",
+            "github.com/valyala/fastjson@v1.6.10",
+            "github.com/valyala/fastrand@v1.1.0",
+            "github.com/valyala/fasttemplate@v1.2.2",
+            "github.com/valyala/gozstd@v1.27.0",
+            "github.com/valyala/histogram@v1.2.0",
+            "github.com/valyala/quicktemplate@v1.8.0",
+            "golang.org/x/net@v0.62.0",
+            "golang.org/x/oauth2@v0.37.0",
+            "golang.org/x/sys@v0.49.0",
+            "gopkg.in/yaml.v2@v2.4.0",
+            "stdlib@v1.27.3"
+          ],
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "stdlib@v1.27.3",
+          "Name": "stdlib",
+          "Identifier": {
+            "PURL": "pkg:golang/stdlib@v1.27.3",
+            "UID": "bb9c30d70f994d53"
+          },
+          "Version": "v1.27.3",
+          "Relationship": "direct",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "cloud.google.com/go/compute/metadata@v0.10.0",
+          "Name": "cloud.google.com/go/compute/metadata",
+          "Identifier": {
+            "PURL": "pkg:golang/cloud.google.com/go/compute/metadata@v0.10.0",
+            "UID": "bbc770fd4e92fee8"
+          },
+          "Version": "v0.10.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/easyproto@v1.2.0",
+          "Name": "github.com/VictoriaMetrics/easyproto",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/easyproto@v1.2.0",
+            "UID": "e0d4a4699d3bf61c"
+          },
+          "Version": "v1.2.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/fastcache@v1.13.3",
+          "Name": "github.com/VictoriaMetrics/fastcache",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/fastcache@v1.13.3",
+            "UID": "289164f755a4e54a"
+          },
+          "Version": "v1.13.3",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/metrics@v1.45.0",
+          "Name": "github.com/VictoriaMetrics/metrics",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/metrics@v1.45.0",
+            "UID": "cc542de4a238a87d"
+          },
+          "Version": "v1.45.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/VictoriaMetrics/metricsql@v0.87.6",
+          "Name": "github.com/VictoriaMetrics/metricsql",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/victoriametrics/metricsql@v0.87.6",
+            "UID": "191472debc6d4d7e"
+          },
+          "Version": "v0.87.6",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/cespare/xxhash/v2@v2.3.0",
+          "Name": "github.com/cespare/xxhash/v2",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/cespare/xxhash/v2@v2.3.0",
+            "UID": "4ed47b4b0f0cfe41"
+          },
+          "Version": "v2.3.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/golang/snappy@v1.0.0",
+          "Name": "github.com/golang/snappy",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/golang/snappy@v1.0.0",
+            "UID": "bdb1b761d0b1b5cf"
+          },
+          "Version": "v1.0.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/klauspost/compress@v1.20.3",
+          "Name": "github.com/klauspost/compress",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/klauspost/compress@v1.20.3",
+            "UID": "20603948802afe5d"
+          },
+          "Version": "v1.20.3",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/bytebufferpool@v1.0.0",
+          "Name": "github.com/valyala/bytebufferpool",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/bytebufferpool@v1.0.0",
+            "UID": "e3271e7cbad91a04"
+          },
+          "Version": "v1.0.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/fastjson@v1.6.10",
+          "Name": "github.com/valyala/fastjson",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/fastjson@v1.6.10",
+            "UID": "5da955641baaca38"
+          },
+          "Version": "v1.6.10",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/fastrand@v1.1.0",
+          "Name": "github.com/valyala/fastrand",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/fastrand@v1.1.0",
+            "UID": "dcf1dca21602c3b5"
+          },
+          "Version": "v1.1.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/fasttemplate@v1.2.2",
+          "Name": "github.com/valyala/fasttemplate",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/fasttemplate@v1.2.2",
+            "UID": "17b6fac2b14ef4d6"
+          },
+          "Version": "v1.2.2",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/gozstd@v1.27.0",
+          "Name": "github.com/valyala/gozstd",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/gozstd@v1.27.0",
+            "UID": "1e9fcc704d876b05"
+          },
+          "Version": "v1.27.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/histogram@v1.2.0",
+          "Name": "github.com/valyala/histogram",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/histogram@v1.2.0",
+            "UID": "9832a18e759a7333"
+          },
+          "Version": "v1.2.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "github.com/valyala/quicktemplate@v1.8.0",
+          "Name": "github.com/valyala/quicktemplate",
+          "Identifier": {
+            "PURL": "pkg:golang/github.com/valyala/quicktemplate@v1.8.0",
+            "UID": "bbbedcf5b0064f1b"
+          },
+          "Version": "v1.8.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "golang.org/x/net@v0.62.0",
+          "Name": "golang.org/x/net",
+          "Identifier": {
+            "PURL": "pkg:golang/golang.org/x/net@v0.62.0",
+            "UID": "5ef4f1681b1c0f9"
+          },
+          "Version": "v0.62.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "golang.org/x/oauth2@v0.37.0",
+          "Name": "golang.org/x/oauth2",
+          "Identifier": {
+            "PURL": "pkg:golang/golang.org/x/oauth2@v0.37.0",
+            "UID": "66012b5eb3648a35"
+          },
+          "Version": "v0.37.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "golang.org/x/sys@v0.49.0",
+          "Name": "golang.org/x/sys",
+          "Identifier": {
+            "PURL": "pkg:golang/golang.org/x/sys@v0.49.0",
+            "UID": "933aa3fac2fefc4e"
+          },
+          "Version": "v0.49.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        },
+        {
+          "ID": "gopkg.in/yaml.v2@v2.4.0",
+          "Name": "gopkg.in/yaml.v2",
+          "Identifier": {
+            "PURL": "pkg:golang/gopkg.in/yaml.v2@v2.4.0",
+            "UID": "870925001f5a4b30"
+          },
+          "Version": "v2.4.0",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "AnalyzedBy": "gobinary"
+        }
+      ],
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2026-97054",
+          "VendorIDs": [
+            "GO-2026-6859"
+          ],
+          "PkgID": "stdlib@v1.27.3",
+          "PkgName": "stdlib",
+          "PkgIdentifier": {
+            "PURL": "pkg:golang/stdlib@v1.27.3",
+            "UID": "bb9c30d70f994d53"
+          },
+          "InstalledVersion": "v1.27.3",
+          "FixedVersion": "1.26.11, 1.27.4",
+          "Status": "fixed",
+          "Layer": {
+            "Digest": "sha256:5e5aba20fc98ba16b55c609eae048993b05b21293dd9ddfc5cf432900ab2f8c6",
+            "DiffID": "sha256:2573be0938439236d3e6ff6e37a67a59072482eb0c5813fa493d2d24662da19c"
+          },
+          "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-97054",
+          "DataSource": {
+            "ID": "govulndb",
+            "Name": "The Go Vulnerability Database",
+            "URL": "https://pkg.go.dev/vuln/"
+          },
+          "Fingerprint": "sha256:9d513d1c9328aa2358d7dffb135f6779c09183fb08833a31f8fb203fb2dddbef",
+          "Title": "net/http: golang: net/http: Denial of Service via race condition when handling oversized HTTP/1 requests",
+          "Description": "For HTTP/1 servers, when MaxBytesReader's limit is exceeded, \"Connection: close\" header is automatically set without synchronization, which might race with another header being set explicitly in the server handler. As a result, an HTTP/1 server that utilizes MaxBytesReader or MaxBytesHandler can crash due to runtime panic if its handler reads the request body concurrently with writing the response header.",
+          "Severity": "MEDIUM",
+          "CweIDs": [
+            "CWE-362",
+            "CWE-820"
+          ],
+          "VendorSeverity": {
+            "amazon": 2,
+            "photon": 2,
+            "redhat": 2
+          },
+          "CVSS": {
+            "redhat": {
+              "V3Vector": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:N/I:N/A:H",
+              "V3Score": 5.9
+            }
+          },
+          "References": [
+            "https://access.redhat.com/security/cve/CVE-2026-97054",
+            "https://go.dev/cl/862185",
+            "https://go.dev/issue/82563",
+            "https://groups.google.com/g/golang-announce/c/iY8TY0wWgbM",
+            "https://nvd.nist.gov/vuln/detail/CVE-2026-97054",
+            "https://pkg.go.dev/vuln/GO-2026-6859",
+            "https://www.cve.org/CVERecord?id=CVE-2026-97054"
+          ],
+          "PublishedDate": "2026-11-11T05:19:58.943Z",
+          "LastModifiedDate": "2026-11-16T16:17:56.29Z"
+        }
+      ]
+    }
+  ]
+}
