@@ -430,7 +430,7 @@ configs:
     file: ./configs/grafana/dashboards/platform.json
 
   grafana_dashboard_networking:
-    name: observability_grafana_dashboard_networking_v11
+    name: observability_grafana_dashboard_networking_v12
     file: ./configs/grafana/dashboards/networking.json
 
   grafana_dashboard_security:

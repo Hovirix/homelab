@@ -24,7 +24,7 @@
         "name": "network",
         "label": "Network",
         "type": "custom",
-        "query": "WAN IPv4 : wan, WAN IPv6 : wan6, Management : vlan10, Proxmox : vlan20, Homelab : vlan30, Kubelab : vlan40, Cyberlab : vlan50, Clients : vlan60",
+        "query": "WAN IPv4 : wan, WAN IPv6 : wan6, Management : vlan10, IncusOS : vlan20, Homelab : vlan30, Kubelab : vlan40, Cyberlab : vlan50, Clients : vlan60",
         "multi": true,
         "includeAll": true,
         "allValue": ".+",
