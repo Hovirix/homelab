@@ -35,16 +35,24 @@ container=$(docker ps --filter label=com.docker.swarm.service.name=postgres_back
   exit 1
 }
 
-listing=$(docker exec "$container" find /backups -type f -name '*.sql.gz' | sort -r)
+listing=$(docker exec -e TZ=UTC "$container" find /backups -type f -name '*.sql.gz' \
+  -printf '%T@\t%D:%i\t%TY-%Tm-%Td %TH:%TM\t%p\n' |
+  sort -t $'\t' -k1,1nr -k4,4)
 [[ -n $listing ]] || { printf 'No SQL dumps found.\n' >&2; exit 1; }
-mapfile -t dumps <<<"$listing"
-printf '\nChoose a PostgreSQL cluster dump:\n'
-for index in "${!dumps[@]}"; do
-  printf '%d. %s\n' "$((index + 1))" "${dumps[index]}"
-done
+dumps=()
+declare -A seen=()
+printf '\nAvailable backups (UTC):\n'
+while IFS=$'\t' read -r _ identity stamp path; do
+  [[ ! ${seen[$identity]+exists} ]] || continue
+  seen[$identity]=1
+  dumps+=("$path")
+  printf '  %d) %s\n' "${#dumps[@]}" "$stamp"
+done <<<"$listing"
 count=${#dumps[@]}
+printf '\n'
 while true; do
-  read -r -p 'Choose one: ' selection
+  read -r -p 'Select backup [1]: ' selection
+  selection=${selection:-1}
   if [[ $selection =~ ^[1-9][0-9]*$ ]] &&
     ((${#selection} <= ${#count} && 10#$selection <= count)); then
     dump=${dumps[10#$selection - 1]}
@@ -53,21 +61,54 @@ while true; do
   printf 'Invalid selection.\n' >&2
 done
 
-printf '\nRestore ALL databases from %s using the PostgreSQL backup container.\n' "$dump"
-printf 'Stop database clients and suspend SQL dump scheduling; keep PostgreSQL and its backup container running.\n'
-printf 'This imports SQL, not a clean replacement. Existing roles or objects can cause errors.\n'
-printf 'Failure can leave a partial import. No automatic rollback is performed.\n'
+printf '\n  Source:  %s\n' "$dump"
+printf '  Target:  postgres\n'
+printf '  Action:  replace all non-template databases and application roles\n\n'
 read -r -p 'Type RESTORE to confirm: ' confirmation
 [[ $confirmation == RESTORE ]] || exit 0
+printf '\n'
 
-# shellcheck disable=SC2016
-if ! docker exec "$container" bash -euo pipefail -c '
-    gzip -t -- "$1"
-    export PGPASSWORD
-    PGPASSWORD=$(cat /run/secrets/postgres_superuser_password)
-    gzip -dc -- "$1" | psql -X --host=postgres --username=postgres --dbname=postgres --set=ON_ERROR_STOP=1
-  ' bash "$dump"; then
-  printf 'SQL import failed. Keep applications stopped and inspect the database before retrying.\n' >&2
+if ! docker exec -i "$container" bash -euo pipefail -s -- "$dump" <<'BASH'
+umask 077
+sql=$(mktemp)
+trap '
+  status=$?
+  if ((status)); then
+    printf "failed\n" >&2
+    [[ ! -f $sql.log ]] || cat "$sql.log" >&2
+  fi
+  rm -f -- "$sql" "$sql.log" "$sql.filtered"
+' EXIT
+printf '[1/3] Validating backup... '
+gzip -dc -- "$1" > "$sql"
+grep -q '^-- PostgreSQL database cluster dump$' "$sql"
+grep -q '^-- PostgreSQL database cluster dump complete$' "$sql"
+# Keep the live administrator usable, including across dump \connect commands.
+sed -i '/^CREATE ROLE postgres;$/d; /^ALTER ROLE postgres /d' "$sql"
+export PGPASSWORD
+PGPASSWORD=$(cat /run/secrets/postgres_superuser_password)
+export PGHOST=postgres PGUSER=postgres
+# OID 10 is the pinned bootstrap superuser, which may not be named postgres.
+bootstrap=$(psql -XAt --dbname=template1 --set=ON_ERROR_STOP=1 \
+  --command="SELECT format('CREATE ROLE %I;', rolname) FROM pg_roles WHERE oid = 10" 2>"$sql.log")
+grep -Fvx -- "$bootstrap" "$sql" > "$sql.filtered"
+mv -- "$sql.filtered" "$sql"
+printf 'done\n[2/3] Removing existing databases and roles... '
+psql -X --dbname=template1 --set=ON_ERROR_STOP=1 > "$sql.log" 2>&1 <<'SQL'
+SELECT format('DROP DATABASE %I WITH (FORCE)', datname)
+FROM pg_database WHERE NOT datistemplate
+\gexec
+SELECT format('DROP ROLE %I', rolname)
+FROM pg_roles WHERE oid <> 10 AND rolname <> current_user AND rolname !~ '^pg_'
+\gexec
+CREATE DATABASE postgres OWNER postgres TEMPLATE template0;
+SQL
+printf 'done\n[3/3] Restoring backup... '
+psql -X --dbname=postgres --set=ON_ERROR_STOP=1 --file="$sql" > "$sql.log" 2>&1
+printf 'done\n'
+BASH
+then
+  printf 'Restore failed.\n' >&2
   exit 1
 fi
-printf 'SQL import complete. Verify databases before restarting applications.\n'
+printf '\nRestore complete.\n'
