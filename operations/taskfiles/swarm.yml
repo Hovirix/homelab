@@ -15,6 +15,16 @@ tasks:
     cmds:
       - operations/scripts/swarm.sh status
 
+  drain:
+    desc: Drain all nodes and wait for Swarm services to stop
+    prompt: Drain all Swarm nodes? Services stop and nodes remain drained.
+    cmd: operations/scripts/swarm.sh drain
+
+  activate:
+    desc: Reactivate all nodes so Swarm services can resume
+    prompt: Reactivate all Swarm nodes? Services will resume.
+    cmd: operations/scripts/swarm.sh activate
+
   init:
     desc: Initialize the cluster
     cmds:

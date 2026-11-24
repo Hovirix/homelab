@@ -93,6 +93,19 @@ drain() {
   return 1
 }
 
+activate() {
+  local manager listing node
+  manager=$(swarm_manager_host)
+  listing=$(docker --host "$manager" node ls --quiet)
+  if [[ -z "$listing" ]]; then
+    printf 'No Swarm nodes found.\n' >&2
+    return 1
+  fi
+  while IFS= read -r node; do
+    docker --host "$manager" node update --availability active "$node"
+  done <<<"$listing"
+}
+
 services_remove() {
   local manager listing name count answer number
   local -a stacks=() selected=() numbers=()
@@ -149,14 +162,14 @@ case "${1:-}" in
   "")
     swarm_manager_host
     ;;
-  init | status | rebuild | drain)
+  init | status | rebuild | drain | activate)
     "$1"
     ;;
   services-remove)
     services_remove "${@:2}"
     ;;
   *)
-    printf 'Usage: %s {init|status|rebuild|drain|services-remove [STACK]}\n' "$0" >&2
+    printf 'Usage: %s {init|status|rebuild|drain|activate|services-remove [STACK]}\n' "$0" >&2
     exit 1
     ;;
 esac
