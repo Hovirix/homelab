@@ -28,7 +28,7 @@ init() {
   done
 
   if ! is_active "$primary_host"; then
-    printf 'Initializing swarm on %s\n' "$primary_host"
+    printf 'Initializing Swarm on %s\n' "$primary_host"
     docker --host "$primary_host" swarm init --advertise-addr "$advertise_addr"
   fi
 
@@ -107,7 +107,7 @@ activate() {
 }
 
 services_remove() {
-  local manager listing name count answer number
+  local manager listing name count answer number valid
   local -a stacks=() selected=() numbers=()
   manager="$(swarm_manager_host)"
   if [[ -n ${1:-} ]]; then
@@ -119,38 +119,44 @@ services_remove() {
     printf 'No deployed stacks.\n'
     return
   fi
-  printf 'Remove stacks\n\n'
+  printf '\nSelect stacks:\n\n'
   while IFS=$'\t' read -r name count; do
     stacks+=("$name")
     printf '  %d) %-24s services: %s\n' "${#stacks[@]}" "$name" "$count"
   done <<<"$listing"
   printf '\n'
-  read -r -p 'Choose numbers separated by spaces (e.g. 1 3), or Enter to cancel: ' answer || return 0
-  read -r -a numbers <<<"$answer"
-  ((${#numbers[@]})) || return 0
   count=${#stacks[@]}
-  for number in "${numbers[@]}"; do
-    if [[ ! $number =~ ^[1-9][0-9]*$ ]] || ((${#number} > ${#count})) || ((number > count)); then
-      printf 'Invalid selection: %s\n' "$number" >&2
-      return 1
-    fi
-    name=${stacks[number - 1]}
-    [[ " ${selected[*]} " == *" $name "* ]] || selected+=("$name")
+  while true; do
+    read -r -p 'Select numbers separated by spaces (Enter to cancel): ' answer || return 0
+    read -r -a numbers <<<"$answer"
+    ((${#numbers[@]})) || return 0
+    selected=()
+    valid=true
+    for number in "${numbers[@]}"; do
+      if [[ ! $number =~ ^[1-9][0-9]*$ ]] || ((${#number} > ${#count})) || ((10#$number > count)); then
+        printf 'Invalid selection. Enter numbers from 1 to %s.\n' "$count" >&2
+        valid=false
+        break
+      fi
+      name=${stacks[10#$number - 1]}
+      [[ " ${selected[*]} " == *" $name "* ]] || selected+=("$name")
+    done
+    [[ $valid == true ]] && break
   done
-  printf '\nRemove these stacks:\n'
+  printf '\nStacks:\n'
   printf '  %s\n' "${selected[@]}"
-  printf '\nAll their services will be removed. Persistent volumes are kept.\n'
-  read -r -p 'Remove selected stacks? [y/N] ' answer || return 0
+  printf 'Action:  Remove services; persistent volumes remain\n\n'
+  read -r -p 'Continue? [y/N]: ' answer || return 0
   [[ $answer =~ ^[yY]([eE][sS])?$ ]] || return 0
   docker --host "$manager" stack rm --detach=false -- "${selected[@]}"
-  printf 'Removed %d stacks.\n' "${#selected[@]}"
+  printf 'Stack removal complete: %d stacks removed.\n' "${#selected[@]}"
 }
 
 rebuild() {
   local primary_host="${PRIMARY_HOST:?required}"
   for host in "${manager_hosts[@]:1}" "$primary_host"; do
     if is_active "$host"; then
-      printf 'Leaving swarm on %s\n' "$host"
+      printf 'Leaving Swarm on %s\n' "$host"
       docker --host "$host" swarm leave --force
     fi
   done

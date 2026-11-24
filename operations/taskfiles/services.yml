@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  MENU_GROUP: SERVICES
+  MENU_GROUP: PLATFORM
   MENU_ORDER: 6
 
 tasks:
@@ -30,29 +30,30 @@ tasks:
       - operations/scripts/secrets.py
       - for: {var: STACKS}
         cmd: |
-          printf '\nDeploying %s\n' '{{.ITEM.name | upper}}:'
+          printf '\nDeploying stack: %s\n' '{{.ITEM.name}}'
           docker stack deploy --detach=false --prune --resolve-image changed --compose-file "{{.ITEM.file}}" "{{.ITEM.name}}"
       - operations/scripts/secrets.py clean
 
   status:
-    desc: Show replicas and images
+    desc: Show service replicas and images
     env: *docker-env
     cmds:
       - docker service ls --format 'table {{"{{"}}.Name{{"}}"}}\t{{"{{"}}.Replicas{{"}}"}}\t{{"{{"}}.Image{{"}}"}}'
 
   logs:
     desc: Follow service logs
-    summary: 'Usage: task services:logs -- authentik_server'
+    summary: 'Usage: task services:logs -- SERVICE'
     env: *docker-env
     preconditions:
       - sh: test -n {{.CLI_ARGS | shellQuote}}
-        msg: 'Usage: task services:logs -- authentik_server'
+        msg: 'Usage: task services:logs -- SERVICE'
     cmd: docker service logs --follow {{.CLI_ARGS | shellQuote}}
 
   remove:
-    desc: Remove stacks — stops their services
+    desc: Remove stacks and stop their services
     summary: |
       Remove a named stack, or select stacks interactively when no name is given.
+      A named stack is removed without confirmation.
       Usage: task services:remove -- STACK
       Usage: task services:remove
     interactive: true

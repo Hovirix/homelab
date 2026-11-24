@@ -1,7 +1,7 @@
 version: "3"
 
 vars:
-  MENU_GROUP: SWARM
+  MENU_GROUP: PLATFORM
   MENU_ORDER: 5
 
 env:
@@ -11,27 +11,27 @@ env:
 
 tasks:
   status:
-    desc: Show nodes and manager status
+    desc: Show Swarm nodes and manager status
     cmds:
       - operations/scripts/swarm.sh status
 
   drain:
     desc: Drain all nodes and wait for Swarm services to stop
-    prompt: Drain all Swarm nodes? Services stop and nodes remain drained.
+    prompt: All Swarm services will stop, and nodes will remain drained. Drain all Swarm nodes?
     cmd: operations/scripts/swarm.sh drain
 
   activate:
     desc: Reactivate all nodes so Swarm services can resume
-    prompt: Reactivate all Swarm nodes? Services will resume.
+    prompt: Swarm services can resume after nodes are activated. Activate all Swarm nodes?
     cmd: operations/scripts/swarm.sh activate
 
   init:
-    desc: Initialize the cluster
+    desc: Initialize the Swarm cluster
     cmds:
       - operations/scripts/swarm.sh init
 
   rebuild:
-    desc: Recreate the cluster — destructive
-    prompt: This forces all managers to leave Swarm and removes deployed services. Recreate the cluster?
+    desc: Recreate the Swarm cluster and remove services
+    prompt: All managers will leave Swarm, and deployed services will be removed. Recreate the Swarm cluster?
     cmds:
       - operations/scripts/swarm.sh rebuild

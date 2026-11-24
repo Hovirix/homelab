@@ -29,25 +29,26 @@ if ((${#archives[@]} == 0)); then
   exit 1
 fi
 
-printf '\nBorg archives — newest first:\n'
+printf '\nSelect an archive (newest first):\n\n'
 for index in "${!archives[@]}"; do
   record=$(printf '%s' "${archives[index]}" | base64 -d)
   name=$(jq -er '.name | select(type == "string" and length > 0)' <<<"$record")
   timestamp=$(jq -er '.time | select(type == "string" and length > 0)' <<<"$record")
   timestamp=$(TZ=UTC0 date -u -d "$timestamp" '+%Y-%m-%d %H:%M UTC')
-  printf '%d. %s — %s\n' "$((index + 1))" "$timestamp" "$name"
+  printf '  %d) %s — %s\n' "$((index + 1))" "$timestamp" "$name"
 done
 
 count=${#archives[@]}
 while true; do
-  read -r -p 'Choose one: ' selection
+  read -r -p 'Select a number (Enter to cancel): ' selection || exit 0
+  [[ -n $selection ]] || exit 0
   if [[ "$selection" =~ ^[1-9][0-9]*$ ]] &&
     ((${#selection} <= ${#count} && 10#$selection <= count)); then
     record=$(printf '%s' "${archives[10#$selection - 1]}" | base64 -d)
     archive=$(jq -er '.name' <<<"$record")
     break
   fi
-  printf 'Invalid selection.\n' >&2
+  printf 'Invalid selection. Enter a number from 1 to %s.\n' "$count" >&2
 done
 
 borgmatic --no-color list --archive "$archive" --short >"$listing"
@@ -64,14 +65,15 @@ if ((${#datasets[@]} == 0)); then
   exit 1
 fi
 
-printf '\nChoose a dataset:\n'
-printf '1. All datasets\n'
+printf '\nSelect a dataset:\n\n'
+printf '  1) All datasets\n'
 for index in "${!datasets[@]}"; do
-  printf '%d. %s\n' "$((index + 2))" "${datasets[index]}"
+  printf '  %d) %s\n' "$((index + 2))" "${datasets[index]}"
 done
 count=$((${#datasets[@]} + 1))
 while true; do
-  read -r -p 'Choose one: ' selection
+  read -r -p 'Select a number (Enter to cancel): ' selection || exit 0
+  [[ -n $selection ]] || exit 0
   if [[ "$selection" =~ ^[1-9][0-9]*$ ]] &&
     ((${#selection} <= ${#count} && 10#$selection <= count)); then
     if ((10#$selection == 1)); then
@@ -81,7 +83,7 @@ while true; do
     fi
     break
   fi
-  printf 'Invalid selection.\n' >&2
+  printf 'Invalid selection. Enter a number from 1 to %s.\n' "$count" >&2
 done
 
 check_target() {
@@ -102,9 +104,10 @@ for source in "${selected[@]}"; do
   fi
   targets["$target"]=1
   check_target "$source"
-  printf 'Source: %s -> %s\n' "$source" "$target"
+  printf 'Source:  %s\nTarget:  %s\n' "$source" "$target"
 done
-read -r -p 'Type RESTORE to confirm: ' confirmation
+printf 'Action:  Restore files into the target; existing files may be overwritten\n\n'
+read -r -p 'Type RESTORE to confirm: ' confirmation || exit 0
 [[ "$confirmation" == "RESTORE" ]] || exit 0
 
 for source in "${selected[@]}"; do
@@ -112,8 +115,8 @@ for source in "${selected[@]}"; do
   target="$destination/${source##*/}"
   if ! borgmatic --no-color extract --archive "$archive" --path "$source" \
     --destination "$destination" --strip-components 2 --progress; then
-    printf 'Restore failed; keep services stopped. Partial files may remain at %s.\n' "$target" >&2
+    printf 'Restore failed. Keep services stopped; partial files may remain at %s.\n' "$target" >&2
     exit 1
   fi
-  printf 'Restored %s.\n' "$target"
+  printf 'Restore complete: %s.\n' "$target"
 done
