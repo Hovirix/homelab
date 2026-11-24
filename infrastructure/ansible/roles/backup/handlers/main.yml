@@ -1,8 +1,0 @@
-- name: Reload systemd
-  ansible.builtin.systemd_service:
-    daemon_reload: true
-
-- name: Restart Borgmatic timer
-  ansible.builtin.systemd_service:
-    name: borgmatic.timer
-    state: restarted
