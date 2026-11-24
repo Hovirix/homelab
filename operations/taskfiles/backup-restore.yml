@@ -1,19 +1,37 @@
 version: "3"
 
 vars:
-  PVE: root@pve.home.hovirix.dev
   MENU_GROUP: BACKUP & RESTORE
   MENU_ORDER: 7
 
 tasks:
   backup:
-    desc: Run an off-site backup
-    cmds:
-      - ssh -T -o BatchMode=yes -o ConnectTimeout=10 {{.PVE}} systemctl start borgmatic.service
+    desc: Run an off-site backup now
+    cmd: incus exec incus:backup -- systemctl start borgmatic.service
 
   restore:
-    desc: Restore snapshots, backups, or PostgreSQL
+    desc: Restore application files from an off-site Borg archive
     interactive: true
+    prompt: Have you stopped all writers for the selected data? Raw PostgreSQL files also require PostgreSQL to be stopped.
+    cmds:
+      - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
+      - defer: incus exec incus:backup -- systemctl start borgmatic.timer
+      - incus exec incus:backup -- /usr/local/sbin/restore
+
+  restore:local:
+    desc: Restore an application directory from a local Swarm volume snapshot
+    interactive: true
+    prompt: Have you stopped all writers for the selected app? Raw PostgreSQL files also require PostgreSQL to be stopped.
+    cmds:
+      - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
+      - defer: incus exec incus:backup -- systemctl start borgmatic.timer
+      - operations/scripts/restore-local.sh
+
+  restore:postgres:
+    desc: Restore all PostgreSQL databases from a local SQL dump
+    interactive: true
+    prompt: Have you stopped all database clients and suspended SQL dump scheduling? Keep PostgreSQL and its backup container running.
     env:
-      PVE: '{{.PVE}}'
-    cmd: operations/scripts/restore.py
+      DOCKER_HOST:
+        sh: operations/scripts/swarm.sh
+    cmd: operations/scripts/restore-postgres.sh

@@ -24,9 +24,9 @@
 
 ## Infrastructure
 
-The homelab runs on a Minisforum A2 powered by [Proxmox VE](https://www.proxmox.com/en/proxmox-virtual-environment/overview).
+The homelab runs on a Minisforum A2 powered by [IncusOS](https://linuxcontainers.org/incus-os/).
 
-[OpenTofu](https://opentofu.org/) provisions infrastructure, while [Ansible](https://docs.ansible.com/) configures the host. Network infrastructure is managed separately in [Netlab](https://github.com/Hovirix/netlab).
+[OpenTofu](https://opentofu.org/) provisions infrastructure, while [Ansible](https://docs.ansible.com/) configures the backup container. Network infrastructure is managed separately in [Netlab](https://github.com/Hovirix/netlab).
 
 [Cloudflare](https://www.cloudflare.com/) provides public edge services, [Resend](https://resend.com/) delivers email through SMTP, and [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/) stores off-site backups.
 
@@ -40,7 +40,7 @@ All three VMs run on one physical host. The cluster does not provide host-level 
 
 [OpenZFS](https://openzfs.org/) provides persistent storage, shared with Swarm nodes through [VirtioFS](https://virtio-fs.gitlab.io/). Persistent application data lives outside the VMs and survives their recreation, provided the host datasets remain intact.
 
-[Sanoid](https://github.com/jimsalterjrs/sanoid) manages local snapshots. [borgmatic](https://torsion.org/borgmatic/) backs up Paperless, PostgreSQL, and Vaultwarden data to Hetzner Storage Box using [Borg](https://www.borgbackup.org/) over SSH. These off-site backups do not cover every persistent dataset.
+Incus manages local volume snapshots. [borgmatic](https://torsion.org/borgmatic/) backs up Immich, OpenClaw, Paperless, PostgreSQL, and Vaultwarden data to Hetzner Storage Box using [Borg](https://www.borgbackup.org/) over SSH. These off-site backups do not cover every persistent directory.
 
 ## Security
 

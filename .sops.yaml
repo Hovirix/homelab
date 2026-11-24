@@ -1,6 +1,8 @@
 creation_rules:
-  # Domain-level secret files used by tools, scripts, OpenTofu, Ansible, etc.
+  # Domain-level secrets and IncusOS recovery exports.
   # Encrypt all values, but keep top-level keys visible.
-  - path_regex: ^secrets/.*\.sops\.env$
+  - path_regex: ^secrets/.*\.sops\.(env|yaml)$
     encrypted_regex: ^.*$
+    pgp: 82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F
+  - path_regex: ^secrets/incusos-backup\.tar\.gz\.sops$
     pgp: 82F33E760DDCEB7BB83E2EC3AAC0F2E854677A6F

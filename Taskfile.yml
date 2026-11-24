@@ -21,9 +21,6 @@ includes:
   infra:
     taskfile: operations/taskfiles/infra.yml
 
-  pve:
-    taskfile: operations/taskfiles/pve.yml
-
   swarm:
     taskfile: operations/taskfiles/swarm.yml
 

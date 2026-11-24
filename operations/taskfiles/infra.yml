@@ -5,10 +5,58 @@ vars:
   MENU_ORDER: 3
 
 tasks:
+  incusos:backup:
+    desc: Export and SOPS-encrypt IncusOS configuration and state
+    cmd: operations/scripts/incusos-backup.sh backup
+
+  incusos:keys:
+    desc: Export and SOPS-encrypt IncusOS recovery and pool keys
+    cmd: operations/scripts/incusos-backup.sh keys
+
+  incusos:image:
+    desc: Build IncusOS USB image
+    cmd: secretspec run -P production -S incusos -- operations/scripts/incusos-image.sh
+
+  fcos:render:
+    internal: true
+    dir: infrastructure/opentofu/stacks/incus
+    cmds:
+      - mkdir -p build
+      - for: [swarm-01, swarm-02, swarm-03]
+        cmd: butane --strict --files-dir fcos fcos/{{.ITEM}}.bu > build/{{.ITEM}}.ign
+
+  fcos:build:
+    internal: true
+    deps: ['fcos:render']
+    desc: Build Fedora CoreOS image
+    sources:
+      - operations/scripts/fcos-image.sh
+    generates:
+      - infrastructure/opentofu/stacks/incus/build/fcos-proxmoxve.qcow2
+      - infrastructure/opentofu/stacks/incus/build/metadata.tar
+    cmds:
+      - operations/scripts/fcos-image.sh
+
+  incus:plan:
+    desc: Preview Incus infrastructure changes
+    deps: ['fcos:build']
+    dir: infrastructure/opentofu/stacks/incus
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
+  incus:apply:
+    desc: Apply Incus infrastructure changes
+    deps: ['fcos:build']
+    dir: infrastructure/opentofu/stacks/incus
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
   plan:
     desc: Preview infrastructure changes
     deps:
-      - proxmox:plan
+      - incus:plan
       - cloudflare:plan
       - hetzner:plan
 
@@ -16,69 +64,42 @@ tasks:
     desc: Apply infrastructure changes
     prompt: Apply infrastructure changes?
     cmds:
-      - task: proxmox:apply
+      - task: incus:apply
       - task: cloudflare:apply
       - task: hetzner:apply
 
-  proxmox:plan:
-    deps: [fcos-render]
-    cmds:
-      - task: stack:run
-        vars: {STACK: proxmox, ARGS: plan}
-
-  proxmox:apply:
-    deps: [fcos-render]
-    cmds:
-      - task: stack:run
-        vars: {STACK: proxmox, ARGS: apply -auto-approve}
-
-  proxmox:destroy:
-    cmds:
-      - task: stack:run
-        vars: {STACK: proxmox, ARGS: destroy -auto-approve}
-
   cloudflare:plan:
-    cmds:
-      - task: stack:run
-        vars: {STACK: cloudflare, ARGS: plan}
-
-  cloudflare:apply:
-    cmds:
-      - task: stack:run
-        vars: {STACK: cloudflare, ARGS: apply -auto-approve}
-
-  cloudflare:destroy:
-    cmds:
-      - task: stack:run
-        vars: {STACK: cloudflare, ARGS: destroy -auto-approve}
-
-  hetzner:apply:
-    cmds:
-      - task: stack:run
-        vars: {STACK: hetzner, ARGS: apply -auto-approve}
-
-  hetzner:plan:
-    cmds:
-      - task: stack:run
-        vars: {STACK: hetzner, ARGS: plan}
-
-  hetzner:destroy:
-    cmds:
-      - task: stack:run
-        vars: {STACK: hetzner, ARGS: destroy -auto-approve}
-
-  stack:run:
-    internal: true
-    dir: infrastructure/opentofu/stacks/{{.STACK}}
+    dir: infrastructure/opentofu/stacks/cloudflare
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
-      - secretspec run -P production -S opentofu -- tofu {{.ARGS}}
+      - secretspec run -P production -S opentofu -- tofu plan
 
-  fcos-render:
-    internal: true
-    dir: infrastructure/opentofu/stacks/proxmox
+  cloudflare:apply:
+    dir: infrastructure/opentofu/stacks/cloudflare
     cmds:
-      - mkdir -p build
-      - butane --strict --files-dir fcos fcos/swarm-01.bu > build/swarm-01.ign
-      - butane --strict --files-dir fcos fcos/swarm-02.bu > build/swarm-02.ign
-      - butane --strict --files-dir fcos fcos/swarm-03.bu > build/swarm-03.ign
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  cloudflare:destroy:
+    dir: infrastructure/opentofu/stacks/cloudflare
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
+
+  hetzner:apply:
+    dir: infrastructure/opentofu/stacks/hetzner
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu apply -auto-approve
+
+  hetzner:plan:
+    dir: infrastructure/opentofu/stacks/hetzner
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu plan
+
+  hetzner:destroy:
+    dir: infrastructure/opentofu/stacks/hetzner
+    cmds:
+      - secretspec run -P production -S opentofu -- tofu init >/dev/null
+      - secretspec run -P production -S opentofu -- tofu destroy -auto-approve

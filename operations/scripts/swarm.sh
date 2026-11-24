@@ -24,7 +24,7 @@ init() {
   local advertise_addr="${ADVERTISE_ADDR:?required}"
   local manager_endpoint="${MANAGER_ENDPOINT:?required}"
   for host in "${manager_hosts[@]}"; do
-    ssh -o StrictHostKeyChecking=accept-new "${host#ssh://}" true
+    ssh -o StrictHostKeyChecking=accept-new "$host" true
   done
 
   if ! is_active "$primary_host"; then
@@ -44,6 +44,66 @@ init() {
 
 status() {
   docker --host "$(swarm_manager_host)" node ls --format 'table {{.Hostname}}\t{{.Status}}\t{{.Availability}}\t{{.ManagerStatus}}\t{{.EngineVersion}}'
+}
+
+drain() {
+  local manager listing node state tasks attempt busy
+  local -a nodes=()
+  manager=$(swarm_manager_host)
+  listing=$(docker --host "$manager" node ls --quiet)
+  mapfile -t nodes <<<"$listing"
+  if [[ -z $listing ]]; then
+    printf 'No Swarm nodes found.\n' >&2
+    return 1
+  fi
+
+  for node in "${nodes[@]}"; do
+    state=$(docker --host "$manager" node inspect --format '{{.Status.State}}' "$node")
+    if [[ $state != ready ]]; then
+      printf 'Node %s is %s; cannot verify its tasks have stopped.\n' "$node" "$state" >&2
+      return 1
+    fi
+  done
+
+  for node in "${nodes[@]}"; do
+    docker --host "$manager" node update --availability drain "$node"
+  done
+
+  for ((attempt = 0; attempt < 300; attempt++)); do
+    busy=false
+    for node in "${nodes[@]}"; do
+      state=$(docker --host "$manager" node inspect --format '{{.Status.State}}|{{.Spec.Availability}}' "$node")
+      if [[ $state != 'ready|drain' ]]; then
+        printf 'Node %s is no longer ready and drained: %s\n' "$node" "$state" >&2
+        return 1
+      fi
+      tasks=$(docker --host "$manager" node ps --no-trunc --format '{{.CurrentState}}' "$node")
+      if grep -Eq '^(New|Pending|Assigned|Accepted|Preparing|Ready|Starting|Running)( |$)' <<<"$tasks"; then
+        busy=true
+      fi
+    done
+    if [[ $busy == false ]]; then
+      printf 'All Swarm nodes are drained. Reactivate them manually after recovery.\n'
+      printf 'Standalone containers and the backup timer are not stopped.\n'
+      return
+    fi
+    sleep 1
+  done
+  printf 'Timed out waiting for Swarm tasks to stop. Nodes remain drained.\n' >&2
+  return 1
+}
+
+activate() {
+  local manager listing node
+  manager=$(swarm_manager_host)
+  listing=$(docker --host "$manager" node ls --quiet)
+  if [[ -z "$listing" ]]; then
+    printf 'No Swarm nodes found.\n' >&2
+    return 1
+  fi
+  while IFS= read -r node; do
+    docker --host "$manager" node update --availability active "$node"
+  done <<<"$listing"
 }
 
 services_remove() {
@@ -102,14 +162,14 @@ case "${1:-}" in
   "")
     swarm_manager_host
     ;;
-  init | status | rebuild)
+  init | status | rebuild | drain | activate)
     "$1"
     ;;
   services-remove)
     services_remove "${@:2}"
     ;;
   *)
-    printf 'Usage: %s {init|status|rebuild|services-remove [STACK]}\n' "$0" >&2
+    printf 'Usage: %s {init|status|rebuild|drain|activate|services-remove [STACK]}\n' "$0" >&2
     exit 1
     ;;
 esac

@@ -1,0 +1,6 @@
+pools:
+  - name: data
+    type: zfs-raid1
+    devices:
+      - /dev/disk/by-id/nvme-WD_BLACK_SN850X_2000GB_23215P800490
+      - /dev/disk/by-id/nvme-WD_BLACK_SN850X_2000GB_24517E4ABM06

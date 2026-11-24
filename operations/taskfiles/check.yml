@@ -39,13 +39,13 @@ tasks:
 
   lint:ansible:
     internal: true
-    dir: infrastructure/ansible
-    cmd: ansible-lint -q
+    cmd: ansible-lint -q platform/backup/playbook.yml
 
   lint:tofu:
     internal: true
     cmds:
-      - for: [proxmox, cloudflare, hetzner]
+      - task: infra:fcos:render
+      - for: [cloudflare, hetzner, incus]
         cmd: |
           export TF_DATA_DIR=".artifacts/tofu/{{.ITEM}}"
           cd infrastructure/opentofu/stacks/{{.ITEM}}
@@ -55,7 +55,7 @@ tasks:
 
   lint:butane:
     internal: true
-    dir: infrastructure/opentofu/stacks/proxmox
+    dir: infrastructure/opentofu/stacks/incus
     method: none
     sources:
       - fcos/swarm-*.bu

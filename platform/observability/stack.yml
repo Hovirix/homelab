@@ -95,7 +95,6 @@ services:
     networks:
       - postgres
       - observability
-      - traefik
 
     volumes:
       - type: bind
@@ -116,6 +115,7 @@ services:
 
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=observability
         - traefik.http.routers.grafana.rule=Host(`grafana.hovirix.dev`) && !PathPrefix(`/metrics`)
         - traefik.http.routers.grafana.entrypoints=websecure
         - traefik.http.services.grafana.loadbalancer.server.port=3000
@@ -172,7 +172,6 @@ services:
 
     networks:
       - observability
-      - traefik
 
     volumes:
       - type: bind
@@ -184,6 +183,7 @@ services:
 
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=observability
         - traefik.http.routers.loki-push.rule=Host(`loki.hovirix.dev`) && Path(`/loki/api/v1/push`) && Method(`POST`)
         - traefik.http.routers.loki-push.entrypoints=websecure
         - traefik.http.routers.loki-push.service=loki-ingest
@@ -340,9 +340,11 @@ services:
 
     networks:
       - observability
-      - traefik
       - authentik
       - cloudflared
+      - immich
+      - miniflux
+      - paperless
 
     volumes:
       # Unix exporter
@@ -402,10 +404,16 @@ networks:
     name: observability
     attachable: true
 
-  traefik:
+  socket-proxy:
     external: true
 
-  socket-proxy:
+  immich:
+    external: true
+
+  miniflux:
+    external: true
+
+  paperless:
     external: true
 
 configs:
@@ -418,11 +426,11 @@ configs:
     file: ./configs/grafana/provisioning/dashboards/dashboards.yml
 
   grafana_dashboard_platform:
-    name: observability_grafana_dashboard_platform_v19
+    name: observability_grafana_dashboard_platform_v20
     file: ./configs/grafana/dashboards/platform.json
 
   grafana_dashboard_networking:
-    name: observability_grafana_dashboard_networking_v11
+    name: observability_grafana_dashboard_networking_v12
     file: ./configs/grafana/dashboards/networking.json
 
   grafana_dashboard_security:
@@ -466,7 +474,7 @@ configs:
     file: ./configs/grafana/provisioning/alerting/blackbox.yml
 
   grafana_alerting_backups:
-    name: observability_grafana_alerting_backups_v6
+    name: observability_grafana_alerting_backups_v7
     file: ./configs/grafana/provisioning/alerting/backups.yml
 
   grafana_alerting_cloudflared:
@@ -506,7 +514,7 @@ configs:
     file: ./configs/alloy/containers.alloy
 
   alloy_traefik:
-    name: observability_alloy_traefik_v1
+    name: observability_alloy_traefik_v2
     file: ./configs/alloy/traefik.alloy
 
   alloy_swarm:
@@ -514,7 +522,7 @@ configs:
     file: ./configs/alloy/swarm.alloy
 
   alloy_services:
-    name: observability_alloy_services_v1
+    name: observability_alloy_services_v2
     file: ./configs/alloy/services.alloy
 
   alloy_blackbox:

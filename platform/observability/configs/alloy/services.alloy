@@ -10,7 +10,7 @@ discovery.relabel "services" {
 	rule {
 		action        = "keep"
 		source_labels = ["__meta_docker_container_label_com_docker_swarm_service_name", "__meta_docker_network_name"]
-		regex         = "(immich_server|miniflux_web|paperless_web|observability_(grafana|loki|victoriametrics|postgres-exporter|valkey-exporter));observability|authentik_(server|worker);authentik|cloudflared_tunnel;cloudflared"
+		regex         = "immich_server;immich|miniflux_web;miniflux|paperless_web;paperless|observability_(grafana|loki|victoriametrics|postgres-exporter|valkey-exporter);observability|authentik_(server|worker);authentik|cloudflared_tunnel;cloudflared"
 	}
 
 	rule {

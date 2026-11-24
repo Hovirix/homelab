@@ -28,8 +28,7 @@ services:
 
     networks:
       - postgres
-      - traefik
-      - observability
+      - miniflux
 
     healthcheck:
       test:
@@ -47,6 +46,7 @@ services:
 
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=miniflux
         - traefik.http.routers.miniflux.rule=Host(`miniflux.hovirix.dev`) && !PathPrefix(`/metrics`)
         - traefik.http.routers.miniflux.entrypoints=websecure
         - traefik.http.services.miniflux.loadbalancer.server.port=8080
@@ -58,13 +58,10 @@ services:
         condition: any
 
 networks:
-  observability:
-    external: true
+  miniflux:
+    name: miniflux
 
   postgres:
-    external: true
-
-  traefik:
     external: true
 
 secrets:

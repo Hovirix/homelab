@@ -1,0 +1,32 @@
+source_directories:
+  - /mnt/swarm/immich
+  - /mnt/swarm/openclaw
+  - /mnt/swarm/paperless
+  - /mnt/swarm/postgres
+  - /mnt/swarm/vaultwarden
+
+repositories:
+  - path: ssh://u683062-sub1@u683062.your-storagebox.de:23/./homelab
+
+remote_path: borg-1.4
+numeric_ids: true
+ssh_command: >-
+  sshpass -f /etc/borgmatic/storagebox-password ssh -o StrictHostKeyChecking=accept-new
+encryption_passcommand: cat /etc/borgmatic/passphrase
+
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 12
+
+loki:
+  url: https://loki.hovirix.dev/loki/api/v1/push
+  labels:
+    app: borgmatic
+    hostname: backup
+    config: __config
+
+before_backup:
+  - /usr/local/sbin/check-storagebox-capacity
+  - /usr/local/sbin/check-postgres-dump /mnt/swarm/postgres/backups/daily/postgres-latest.sql.gz
+after_backup:
+  - echo borgmatic_archive_created

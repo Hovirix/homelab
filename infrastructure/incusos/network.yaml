@@ -1,0 +1,28 @@
+dns:
+  hostname: incus
+  domain: home.hovirix.dev
+  search_domains:
+    - home.hovirix.dev
+  nameservers:
+    - 10.30.0.1
+
+interfaces:
+  - name: uplink
+    hwaddr: "38:05:25:3b:04:4b"
+    ethernet:
+      wakeonlan: true
+    roles:
+      - instances
+    vlan_tags: [20, 30, 40, 50]
+
+vlans:
+  - name: management
+    parent: uplink
+    id: 20
+    roles:
+      - management
+    addresses:
+      - 10.20.0.11/24
+    routes:
+      - to: 0.0.0.0/0
+        via: 10.20.0.1

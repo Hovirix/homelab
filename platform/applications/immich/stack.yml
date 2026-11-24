@@ -22,8 +22,6 @@ services:
       - immich
       - postgres
       - valkey
-      - traefik
-      - observability
 
     volumes:
       - type: bind
@@ -42,6 +40,7 @@ services:
 
       labels:
         - traefik.enable=true
+        - traefik.swarm.network=immich
         - traefik.http.routers.immich.rule=Host(`immich.hovirix.dev`)
         - traefik.http.routers.immich.entrypoints=websecure
         - traefik.http.services.immich.loadbalancer.server.port=2283
@@ -81,19 +80,14 @@ services:
         condition: any
 
 networks:
-  observability:
-    external: true
-
   immich:
+    name: immich
     driver: overlay
 
   postgres:
     external: true
 
   valkey:
-    external: true
-
-  traefik:
     external: true
 
 volumes:
