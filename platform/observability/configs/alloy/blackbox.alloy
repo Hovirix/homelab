@@ -4,6 +4,20 @@ prometheus.exporter.blackbox "services" {
 	config_file = "/etc/alloy/blackbox.yml"
 
 	target {
+		name    = "mail_archiver_public"
+		address = "https://mail-archiver.hovirix.dev/Auth/Login"
+		module  = "http_2xx"
+		labels  = {service = "mail-archiver", path = "public"}
+	}
+
+	target {
+		name    = "mail_archiver"
+		address = "https://traefik_proxy:443/Auth/Login"
+		module  = "http_2xx"
+		labels  = {service = "mail-archiver"}
+	}
+
+	target {
 		name    = "immich_public"
 		address = "https://immich.hovirix.dev/api/server/ping"
 		module  = "http_2xx"

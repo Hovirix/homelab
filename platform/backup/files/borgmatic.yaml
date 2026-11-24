@@ -1,5 +1,6 @@
 source_directories:
   - /mnt/swarm/immich
+  - /mnt/swarm/mail-archiver
   - /mnt/swarm/openclaw
   - /mnt/swarm/paperless
   - /mnt/swarm/postgres
