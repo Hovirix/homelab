@@ -28,7 +28,7 @@ The homelab runs on a Minisforum A2 powered by [IncusOS](https://linuxcontainers
 
 [OpenTofu](https://opentofu.org/) provisions infrastructure, while [Ansible](https://docs.ansible.com/) configures the backup container. Network infrastructure is managed separately in [Netlab](https://github.com/Hovirix/netlab).
 
-[Cloudflare](https://www.cloudflare.com/) provides public edge services, [Resend](https://resend.com/) delivers email through SMTP, and [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/) stores off-site backups.
+[Cloudflare](https://www.cloudflare.com/) provides public edge services, [ntfy](https://ntfy.sh/) delivers alerts, and [Hetzner Storage Box](https://www.hetzner.com/storage/storage-box/) stores off-site backups.
 
 ## Platform
 

@@ -49,6 +49,7 @@ services:
       - vaultwarden
       - paperless
       - miniflux
+      - ntfy
       - mail-archiver
       - immich
       - openclaw
@@ -89,6 +90,9 @@ services:
         condition: any
 
 networks:
+  ntfy:
+    external: true
+
   mail-archiver:
     external: true
 

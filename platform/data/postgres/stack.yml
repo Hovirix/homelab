@@ -113,6 +113,7 @@ services:
       - postgres_grafana_password
       - postgres_immich_password
       - postgres_miniflux_password
+      - postgres_ntfy_password
       - postgres_mail_archiver_password
       - postgres_paperless_password
       - postgres_vaultwarden_password
@@ -143,14 +144,18 @@ configs:
     file: ./configs/postgresql.conf
 
   postgres_hba:
-    name: data_postgres_hba_v9
+    name: data_postgres_hba_v10
     file: ./configs/pg_hba.conf
 
   postgres_reconcile:
-    name: data_postgres_reconcile_v10
+    name: data_postgres_reconcile_v11
     file: ./configs/postgres-reconcile.sh
 
 secrets:
+  postgres_ntfy_password:
+    external: true
+    name: "postgres_ntfy_password_08844e93b38f"
+
   postgres_mail_archiver_password:
     external: true
     name: "postgres_mail_archiver_password_4a6aeccff704"
