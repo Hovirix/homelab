@@ -5,6 +5,14 @@ vars:
   MENU_ORDER: 3
 
 tasks:
+  incusos:backup:
+    desc: Export and SOPS-encrypt IncusOS configuration and state
+    cmd: operations/scripts/incusos-backup.sh backup
+
+  incusos:keys:
+    desc: Export and SOPS-encrypt IncusOS recovery and pool keys
+    cmd: operations/scripts/incusos-backup.sh keys
+
   incusos:image:
     desc: Build IncusOS USB image
     cmd: secretspec run -P production -S incusos -- operations/scripts/incusos-image.sh
