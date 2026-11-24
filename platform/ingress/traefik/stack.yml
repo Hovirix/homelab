@@ -52,6 +52,8 @@ services:
       - immich
       - openclaw
 
+    # Accept ingress routing-mesh SNAT: direct LAN client IPs are not preserved.
+    # Do not rely on the observed source IP for per-client LAN access controls.
     ports:
       - target: 80
         published: 80
