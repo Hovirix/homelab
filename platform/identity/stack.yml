@@ -142,7 +142,7 @@ networks:
 
 configs:
   authentik_notifications:
-    name: identity_authentik_notifications_v1
+    name: identity_authentik_notifications_v2
     file: ./blueprints/notifications.yaml
 
   authentik_stages:
