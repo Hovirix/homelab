@@ -19,17 +19,18 @@ fi
 mapfile -t snapshots <<<"$snapshots_json"
 mapfile -t timestamps < <(jq -r 'sort_by(.created_at) | reverse | .[].created_at' <<<"$listing")
 
-printf '\nChoose a snapshot:\n'
+printf '\nSelect a snapshot:\n\n'
 
 for index in "${!snapshots[@]}"; do
   snapshot_dates[index]=$(date -u -d "${timestamps[index]}" '+%Y-%m-%d %H:%M UTC')
-  printf '%d. %s — %s\n' "$((index + 1))" "${snapshot_dates[index]}" "${snapshots[index]##*/}"
+  printf '  %d) %s — %s\n' "$((index + 1))" "${snapshot_dates[index]}" "${snapshots[index]##*/}"
 done
 
 count=${#snapshots[@]}
 
 while true; do
-  read -r -p 'Choose one: ' selection
+  read -r -p 'Select a number (Enter to cancel): ' selection || exit 0
+  [[ -n $selection ]] || exit 0
 
   if [[ "$selection" =~ ^[1-9][0-9]*$ ]] &&
     ((${#selection} <= ${#count} && 10#$selection <= count)); then
@@ -38,7 +39,7 @@ while true; do
     break
   fi
 
-  printf 'Invalid selection.\n' >&2
+  printf 'Invalid selection. Enter a number from 1 to %s.\n' "$count" >&2
 done
 
 temporary="restore-$(date +%s)-$RANDOM"
@@ -62,7 +63,7 @@ cleanup() {
       printf 'Cleanup failed: temporary volume data/%s remains.\n' "$temporary" >&2
       result=1
     else
-      printf '✓ Temporary volume removed\n'
+      printf 'Temporary volume removed.\n'
     fi
   fi
 
@@ -88,16 +89,17 @@ fi
 
 mapfile -t apps < <(printf '%s\n' "$listing" | LC_ALL=C sort)
 
-printf '\nChoose an application:\n'
+printf '\nSelect an application:\n\n'
 
 for index in "${!apps[@]}"; do
-  printf '%d. %s\n' "$((index + 1))" "${apps[index]}"
+  printf '  %d) %s\n' "$((index + 1))" "${apps[index]}"
 done
 
 count=${#apps[@]}
 
 while true; do
-  read -r -p 'Choose one: ' selection
+  read -r -p 'Select a number (Enter to cancel): ' selection || exit 0
+  [[ -n $selection ]] || exit 0
 
   if [[ "$selection" =~ ^[1-9][0-9]*$ ]] &&
     ((${#selection} <= ${#count} && 10#$selection <= count)); then
@@ -105,7 +107,7 @@ while true; do
     break
   fi
 
-  printf 'Invalid selection.\n' >&2
+  printf 'Invalid selection. Enter a number from 1 to %s.\n' "$count" >&2
 done
 
 if [[ ! "$app" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]]; then
@@ -113,10 +115,9 @@ if [[ ! "$app" =~ ^[a-zA-Z0-9][a-zA-Z0-9_-]*$ ]]; then
   exit 1
 fi
 
-printf '\nRestore:  %s\nSnapshot: %s — %s\nTarget:   /mnt/swarm/%s\n\n' "$app" "$snapshot_date" "$snapshot" "$app"
-printf 'Existing files will be overwritten. Destination-only files remain.\n'
+printf '\nSource:  %s — %s / %s\nTarget:  /mnt/swarm/%s\nAction:  Overwrite existing files; destination-only files remain\n\n' "$snapshot_date" "$snapshot" "$app" "$app"
 
-read -r -p 'Type RESTORE to confirm: ' confirmation
+read -r -p 'Type RESTORE to confirm: ' confirmation || exit 0
 
 if [[ "$confirmation" != RESTORE ]]; then
   exit 0
@@ -136,4 +137,4 @@ incus exec incus:backup -- bash -euo pipefail -c '
     rsync -aHAX --checksum --numeric-ids -- "$source/$app/" "/mnt/swarm/$app/"
 ' bash "$source" "$app"
 
-printf '\n✓ %s restored\n' "$app"
+printf '\nRestore complete: %s.\n' "$app"

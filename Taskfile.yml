@@ -29,7 +29,7 @@ includes:
 
 tasks:
   status:
-    desc: Show cluster and service status
+    desc: Show Swarm nodes and services
     cmds:
       - printf "\n"
       - task: swarm:status
@@ -37,14 +37,13 @@ tasks:
       - task: services:status
 
   deploy:
-    desc: Deploy all application stacks
+    desc: Deploy application stacks
     cmds:
       - task: services:deploy
 
   default:
     cmd: |
       tab="$(printf '\t')"
-      printf 'HX Lab — Available Tasks\n'
       task --list --json |
         jq -r '.tasks[] | select(.desc != "") | [.name, .desc, .location.taskfile] | @tsv' |
         while IFS="$tab" read -r name desc taskfile; do

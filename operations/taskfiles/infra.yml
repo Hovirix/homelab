@@ -38,6 +38,7 @@ tasks:
       - operations/scripts/fcos-image.sh
 
   incus:plan:
+    internal: true
     desc: Preview Incus infrastructure changes
     deps: ['fcos:build']
     dir: infrastructure/incus
@@ -46,6 +47,7 @@ tasks:
       - secretspec run -P production -S opentofu -- tofu plan
 
   incus:apply:
+    internal: true
     desc: Apply Incus infrastructure changes
     deps: ['fcos:build']
     dir: infrastructure/incus
@@ -69,36 +71,42 @@ tasks:
       - task: hetzner:apply
 
   cloudflare:plan:
+    internal: true
     dir: infrastructure/cloudflare
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
       - secretspec run -P production -S opentofu -- tofu plan
 
   cloudflare:apply:
+    internal: true
     dir: infrastructure/cloudflare
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
       - secretspec run -P production -S opentofu -- tofu apply -auto-approve
 
   cloudflare:destroy:
+    internal: true
     dir: infrastructure/cloudflare
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
       - secretspec run -P production -S opentofu -- tofu destroy -auto-approve
 
   hetzner:apply:
+    internal: true
     dir: infrastructure/hetzner
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
       - secretspec run -P production -S opentofu -- tofu apply -auto-approve
 
   hetzner:plan:
+    internal: true
     dir: infrastructure/hetzner
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
       - secretspec run -P production -S opentofu -- tofu plan
 
   hetzner:destroy:
+    internal: true
     dir: infrastructure/hetzner
     cmds:
       - secretspec run -P production -S opentofu -- tofu init >/dev/null
