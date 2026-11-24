@@ -5,12 +5,13 @@ HX Lab is a desired-state homelab repository treated as production.
 ## Map
 
 - `infrastructure/opentofu/` manages infrastructure.
-- `infrastructure/ansible/` configures Proxmox VE.
+- `infrastructure/incusos/` contains IncusOS installation seeds.
+- `platform/backup/` configures the backup container with Ansible.
 - `platform/` contains Docker Swarm desired state.
 - `operations/` contains Task workflows and worker scripts.
 - `secrets/` contains encrypted production secrets.
 
-- Infra = PVE, Fedora CoreOS, Cloudflare, Hetzner (backups)
+- Infra = IncusOS, Fedora CoreOS, Cloudflare, Hetzner (backups)
 - Platform = Docker Swarm
 - Operations = Taskfile
 
