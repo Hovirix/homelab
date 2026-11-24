@@ -49,6 +49,14 @@
         group: root
         mode: "0600"
 
+    - name: Install Storage Box capacity check
+      ansible.builtin.copy:
+        src: files/check-storagebox-capacity.sh
+        dest: /usr/local/sbin/check-storagebox-capacity
+        owner: root
+        group: root
+        mode: "0750"
+
     - name: Install PostgreSQL dump validation
       ansible.builtin.copy:
         src: files/check-postgres-dump.sh
