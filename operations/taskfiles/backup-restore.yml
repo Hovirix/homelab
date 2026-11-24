@@ -15,8 +15,8 @@ tasks:
     prompt: Have you stopped all writers for the selected data? Raw PostgreSQL files also require PostgreSQL to be stopped.
     cmds:
       - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
+      - defer: incus exec incus:backup -- systemctl start borgmatic.timer
       - incus exec incus:backup -- /usr/local/sbin/restore
-      - incus exec incus:backup -- systemctl start borgmatic.timer
 
   restore:local:
     desc: Restore an application directory from a local Swarm volume snapshot
@@ -24,8 +24,8 @@ tasks:
     prompt: Have you stopped all writers for the selected app? Raw PostgreSQL files also require PostgreSQL to be stopped.
     cmds:
       - incus exec incus:backup -- systemctl stop borgmatic.timer borgmatic.service
+      - defer: incus exec incus:backup -- systemctl start borgmatic.timer
       - operations/scripts/restore-local.sh
-      - incus exec incus:backup -- systemctl start borgmatic.timer
 
   restore:postgres:
     desc: Restore all PostgreSQL databases from a local SQL dump
