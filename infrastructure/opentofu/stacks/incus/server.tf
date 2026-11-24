@@ -1,5 +1,5 @@
 variable "incus_acme_token" {
-  description = "Cloudflare DNS token shared with the Proxmox ACME configuration."
+  description = "Cloudflare DNS token for Incus ACME certificates."
   type        = string
   sensitive   = true
 }
