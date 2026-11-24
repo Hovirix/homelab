@@ -4,7 +4,7 @@ HX Lab is a desired-state homelab repository treated as production.
 
 ## Map
 
-- `infrastructure/opentofu/` manages infrastructure.
+- `infrastructure/` manages infrastructure.
 - `infrastructure/incusos/` contains IncusOS installation seeds.
 - `platform/backup/` configures the backup container with Ansible.
 - `platform/` contains Docker Swarm desired state.
