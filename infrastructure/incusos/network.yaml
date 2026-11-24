@@ -9,6 +9,8 @@ dns:
 interfaces:
   - name: uplink
     hwaddr: "38:05:25:3b:04:4b"
+    ethernet:
+      wakeonlan: true
     roles:
       - instances
     vlan_tags: [20, 30, 40, 50]
