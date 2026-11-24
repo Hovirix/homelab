@@ -52,6 +52,16 @@ def render(versions):
                 rendered,
                 flags=re.MULTILINE,
             )
+        declared = json.loads(run("yq", "-o=json", ".secrets // {}", input=rendered))
+        for name, version in versions.items():
+            if name in declared and (
+                not isinstance(declared[name], dict)
+                or declared[name].get("external") is not True
+                or declared[name].get("name") != version
+            ):
+                raise RuntimeError(
+                    f"Secret reference was not rendered: {stack}: {name}"
+                )
         if rendered != original:
             stack.write_text(rendered)
 
