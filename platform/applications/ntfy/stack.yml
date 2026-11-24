@@ -1,0 +1,93 @@
+services:
+  server:
+    image: binwiederhier/ntfy:v2.38.2@sha256:ca35419d29a834824db2440fa9320897fbe40b026c5fc2360c76ed3501b5e716
+    user: "1000:1000"
+
+    # Native authentication: approved exception to Authentik SSO for push clients.
+    entrypoint: ["/bin/sh", "/etc/ntfy/start.sh"]
+
+    environment:
+      NTFY_BASE_URL: https://ntfy.hovirix.dev
+      NTFY_LISTEN_HTTP: ":8080"
+      NTFY_AUTH_DEFAULT_ACCESS: deny-all
+      NTFY_AUTH_ACCESS: grafana:grafana:wo,authentik:authentik:wo,reader:grafana:ro,reader:authentik:ro
+      NTFY_ENABLE_LOGIN: "true"
+      NTFY_REQUIRE_LOGIN: "true"
+      NTFY_ENABLE_SIGNUP: "false"
+      NTFY_ENABLE_RESERVATIONS: "false"
+      NTFY_BEHIND_PROXY: "true"
+      NTFY_CACHE_DURATION: 72h
+      NTFY_UPSTREAM_BASE_URL: https://ntfy.sh
+      NTFY_WEB_PUSH_EMAIL_ADDRESS: homelab@hovirix.dev
+
+    configs:
+      - source: ntfy_start
+        target: /etc/ntfy/start.sh
+        mode: 0555
+
+    secrets:
+      - ntfy_database_url
+      - ntfy_grafana_token
+      - ntfy_authentik_token
+      - ntfy_reader_password
+      - ntfy_web_push_keys
+
+    networks:
+      - ntfy
+      - postgres
+
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/v1/ready"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=ntfy
+        - traefik.http.routers.ntfy.rule=Host(`ntfy.hovirix.dev`)
+        - traefik.http.routers.ntfy.entrypoints=websecure
+        - traefik.http.services.ntfy.loadbalancer.server.port=8080
+
+      update_config:
+        failure_action: rollback
+
+      restart_policy:
+        condition: any
+
+networks:
+  ntfy:
+    name: ntfy
+
+  postgres:
+    external: true
+
+configs:
+  ntfy_start:
+    name: ntfy_start_v1
+    file: ./configs/start.sh
+
+secrets:
+  ntfy_database_url:
+    external: true
+    name: "ntfy_database_url_a7e9e0554861"
+
+  ntfy_grafana_token:
+    external: true
+    name: "ntfy_grafana_token_adfb8c16c428"
+
+  ntfy_authentik_token:
+    external: true
+    name: "ntfy_authentik_token_3a474d57f860"
+
+  ntfy_reader_password:
+    external: true
+    name: "ntfy_reader_password_5091f43f84e7"
+
+  ntfy_web_push_keys:
+    external: true
+    name: "ntfy_web_push_keys_71fd764caef9"

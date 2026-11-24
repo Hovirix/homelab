@@ -1,0 +1,74 @@
+# yaml-language-server: $schema=https://goauthentik.io/blueprints/schema.json
+
+version: 1
+
+metadata:
+  name: ntfy notifications
+
+entries:
+  - model: authentik_events.notificationwebhookmapping
+    id: ntfy-body
+    identifiers:
+      name: ntfy body
+    attrs:
+      expression: |
+        notification = request.context["notification"]
+        return {
+            "topic": "authentik",
+            "title": "Authentik: " + notification.severity,
+            "message": notification.body[:2000],
+            "priority": 4 if notification.severity == "alert" else 3,
+            "click": "https://authentik.hovirix.dev/if/admin/#/events/log",
+        }
+
+  - model: authentik_events.notificationwebhookmapping
+    id: ntfy-headers
+    identifiers:
+      name: ntfy authorization
+    attrs:
+      expression: !Format
+        - 'return {"Authorization": "Bearer %s"}'
+        - !File /run/secrets/ntfy_authentik_token
+
+  - model: authentik_events.notificationtransport
+    id: ntfy
+    identifiers:
+      name: ntfy
+    attrs:
+      mode: webhook
+      send_once: true
+      webhook_url: https://ntfy.hovirix.dev
+      webhook_mapping_body: !KeyOf ntfy-body
+      webhook_mapping_headers: !KeyOf ntfy-headers
+
+  - model: authentik_policies_expression.expressionpolicy
+    id: ntfy-events
+    identifiers:
+      name: ntfy security and system events
+    attrs:
+      expression: |
+        return request.context["event"].action in (
+            "login_failed", "suspicious_request", "password_set",
+            "impersonation_started", "secret_view", "secret_rotate",
+            "policy_exception", "property_mapping_exception",
+            "system_task_exception", "system_exception",
+            "configuration_error", "configuration_warning",
+        )
+
+  - model: authentik_events.notificationrule
+    id: ntfy-rule
+    identifiers:
+      name: homelab-ntfy
+    attrs:
+      severity: alert
+      destination_group: !Find [authentik_core.group, [name, authentik Admins]]
+      transports:
+        - !KeyOf ntfy
+        - !Find [authentik_events.notificationtransport, [name, default-local-transport]]
+
+  - model: authentik_policies.policybinding
+    identifiers:
+      target: !KeyOf ntfy-rule
+      order: 0
+    attrs:
+      policy: !KeyOf ntfy-events

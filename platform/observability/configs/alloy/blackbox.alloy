@@ -4,6 +4,20 @@ prometheus.exporter.blackbox "services" {
 	config_file = "/etc/alloy/blackbox.yml"
 
 	target {
+		name    = "ntfy_public"
+		address = "https://ntfy.hovirix.dev/v1/ready"
+		module  = "http_2xx"
+		labels  = {service = "ntfy", path = "public"}
+	}
+
+	target {
+		name    = "ntfy"
+		address = "https://traefik_proxy:443/v1/ready"
+		module  = "http_2xx"
+		labels  = {service = "ntfy"}
+	}
+
+	target {
 		name    = "immich_public"
 		address = "https://immich.hovirix.dev/api/server/ping"
 		module  = "http_2xx"

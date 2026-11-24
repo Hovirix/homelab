@@ -126,6 +126,7 @@
             curl
             go-task
             jq
+            ntfy-sh
             xz
             yq-go
           ];

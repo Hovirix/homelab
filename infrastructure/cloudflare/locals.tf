@@ -9,6 +9,7 @@ locals {
       "grafana",
       # "immich", # Internal-only until upstream images are patched.
       "miniflux",
+      "ntfy",
       "paperless",
       "vaultwarden",
     ] : "${app}.${local.domain}"

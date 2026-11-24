@@ -11,6 +11,7 @@ authentik_password="$(</run/secrets/postgres_authentik_password)"
 grafana_password="$(</run/secrets/postgres_grafana_password)"
 immich_password="$(</run/secrets/postgres_immich_password)"
 miniflux_password="$(</run/secrets/postgres_miniflux_password)"
+ntfy_password="$(</run/secrets/postgres_ntfy_password)"
 paperless_password="$(</run/secrets/postgres_paperless_password)"
 vaultwarden_password="$(</run/secrets/postgres_vaultwarden_password)"
 exporter_password="$(</run/secrets/postgres_exporter_password)"
@@ -27,11 +28,24 @@ psql -X \
   --set=grafana_password="$grafana_password" \
   --set=immich_password="$immich_password" \
   --set=miniflux_password="$miniflux_password" \
+  --set=ntfy_password="$ntfy_password" \
   --set=paperless_password="$paperless_password" \
   --set=vaultwarden_password="$vaultwarden_password" \
   --set=exporter_password="$exporter_password" <<'SQL'
 
 ALTER ROLE postgres PASSWORD :'superuser_password';
+
+SELECT 'CREATE ROLE ntfy LOGIN'
+WHERE NOT EXISTS (
+  SELECT FROM pg_roles WHERE rolname = 'ntfy'
+)\gexec
+
+ALTER ROLE ntfy PASSWORD :'ntfy_password';
+
+SELECT 'CREATE DATABASE ntfy OWNER ntfy'
+WHERE NOT EXISTS (
+  SELECT FROM pg_database WHERE datname = 'ntfy'
+)\gexec
 
 SELECT 'CREATE ROLE postgres_exporter LOGIN'
 WHERE NOT EXISTS (

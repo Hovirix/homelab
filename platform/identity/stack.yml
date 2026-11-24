@@ -13,20 +13,12 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
-      AUTHENTIK_EMAIL__HOST: smtp.resend.com
-      AUTHENTIK_EMAIL__PORT: "587"
-      AUTHENTIK_EMAIL__USERNAME: resend
-      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/authentik_smtp_api_key
-      AUTHENTIK_EMAIL__FROM: authentik@hovirix.dev
-      AUTHENTIK_EMAIL__USE_TLS: "true"
-      AUTHENTIK_EMAIL__USE_SSL: "false"
       AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
 
     secrets:
       - authentik_secret_key
       - postgres_authentik_password
-      - authentik_smtp_api_key
 
     networks:
       - authentik
@@ -76,18 +68,13 @@ services:
       AUTHENTIK_POSTGRESQL__USER: authentik
       AUTHENTIK_POSTGRESQL__PASSWORD: file:///run/secrets/postgres_authentik_password
       AUTHENTIK_POSTGRESQL__SSLMODE: disable
-      AUTHENTIK_EMAIL__HOST: smtp.resend.com
-      AUTHENTIK_EMAIL__PORT: "587"
-      AUTHENTIK_EMAIL__USERNAME: resend
-      AUTHENTIK_EMAIL__PASSWORD: file:///run/secrets/authentik_smtp_api_key
-      AUTHENTIK_EMAIL__FROM: authentik@hovirix.dev
-      AUTHENTIK_EMAIL__USE_TLS: "true"
-      AUTHENTIK_EMAIL__USE_SSL: "false"
       AUTHENTIK_DISABLE_UPDATE_CHECK: "true"
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_OUTPOSTS__DISCOVER: "false"
 
     configs:
+      - source: authentik_notifications
+        target: /blueprints/notifications.yaml
       - source: authentik_stages
         target: /blueprints/stages.yaml
       - source: authentik_provider_grafana
@@ -106,7 +93,7 @@ services:
     secrets:
       - authentik_secret_key
       - postgres_authentik_password
-      - authentik_smtp_api_key
+      - ntfy_authentik_token
       - grafana_client_id
       - grafana_client_secret
       - miniflux_client_id
@@ -150,6 +137,10 @@ networks:
     external: true
 
 configs:
+  authentik_notifications:
+    name: identity_authentik_notifications_v1
+    file: ./blueprints/notifications.yaml
+
   authentik_stages:
     name: identity_authentik_stages_20261121
     file: ./blueprints/stages.yaml
@@ -203,9 +194,9 @@ secrets:
     external: true
     name: "postgres_authentik_password_7b6c7b2d278e"
 
-  authentik_smtp_api_key:
+  ntfy_authentik_token:
     external: true
-    name: "authentik_smtp_api_key_b7b5cef33729"
+    name: "ntfy_authentik_token_3a474d57f860"
 
   grafana_client_id:
     external: true

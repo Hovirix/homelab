@@ -1,19 +1,28 @@
 apiVersion: 1
 
+deleteContactPoints:
+  - orgId: 1
+    uid: email
+
 contactPoints:
   - orgId: 1
-    name: Email
+    name: ntfy
     receivers:
-      - uid: email
-        type: email
+      - uid: ntfy
+        type: webhook
         disableResolveMessage: false
         settings:
-          addresses: homelab@hovirix.dev
-          singleEmail: true
+          url: https://ntfy.hovirix.dev/grafana?template=grafana
+          httpMethod: POST
+          authorization_scheme: Bearer
+          authorization_credentials: $NTFY_GRAFANA_TOKEN
+          message: |-
+            {{ range .Alerts }}{{ .Status | toUpper }}: {{ .Annotations.summary }}
+            {{ end }}
 
 policies:
   - orgId: 1
-    receiver: Email
+    receiver: ntfy
     group_by:
       - alertname
     group_wait: 30s

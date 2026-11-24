@@ -49,6 +49,7 @@ services:
       - vaultwarden
       - paperless
       - miniflux
+      - ntfy
       - immich
       - openclaw
 
@@ -88,6 +89,9 @@ services:
         condition: any
 
 networks:
+  ntfy:
+    external: true
+
   openclaw:
     external: true
 

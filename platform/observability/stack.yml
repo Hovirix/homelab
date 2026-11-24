@@ -2,6 +2,8 @@ services:
   grafana:
     image: grafana/grafana:13.2.4@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f
 
+    entrypoint: ["/bin/sh", "/etc/grafana/ntfy-start.sh"]
+
     environment:
       GF_DATABASE_TYPE: postgres
       GF_DATABASE_HOST: postgres:5432
@@ -26,21 +28,20 @@ services:
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: "true"
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'grafana-admins') && 'GrafanaAdmin' || 'Viewer'"
       GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: "true"
-      GF_SMTP_ENABLED: "true"
-      GF_SMTP_HOST: smtp.resend.com:587
-      GF_SMTP_USER: resend
-      GF_SMTP_PASSWORD__FILE: /run/secrets/grafana_smtp_api_key
-      GF_SMTP_FROM_ADDRESS: grafana@hovirix.dev
-      GF_SMTP_STARTTLS_POLICY: MandatoryStartTLS
+      GF_SMTP_ENABLED: "false"
 
     secrets:
       - postgres_grafana_password
       - grafana_admin_password
       - grafana_client_id
       - grafana_client_secret
-      - grafana_smtp_api_key
+      - ntfy_grafana_token
 
     configs:
+      - source: grafana_ntfy_start
+        target: /etc/grafana/ntfy-start.sh
+        mode: 0555
+
       - source: grafana_datasources
         target: /etc/grafana/provisioning/datasources/datasources.yml
 
@@ -417,6 +418,10 @@ networks:
     external: true
 
 configs:
+  grafana_ntfy_start:
+    name: observability_grafana_ntfy_start_v1
+    file: ./configs/grafana/ntfy-start.sh
+
   grafana_datasources:
     name: observability_grafana_datasources_v4
     file: ./configs/grafana/provisioning/datasources.yml
@@ -442,7 +447,7 @@ configs:
     file: ./configs/grafana/provisioning/alerting/openwrt.yml
 
   grafana_alerting_notifications:
-    name: observability_grafana_alerting_notifications_v1
+    name: observability_grafana_alerting_notifications_v2
     file: ./configs/grafana/provisioning/alerting/notifications.yml
 
   grafana_alerting_nodes:
@@ -470,7 +475,7 @@ configs:
     file: ./configs/grafana/provisioning/alerting/authentik.yml
 
   grafana_alerting_blackbox:
-    name: observability_grafana_alerting_blackbox_v4
+    name: observability_grafana_alerting_blackbox_ntfy_20261124
     file: ./configs/grafana/provisioning/alerting/blackbox.yml
 
   grafana_alerting_backups:
@@ -526,7 +531,7 @@ configs:
     file: ./configs/alloy/services.alloy
 
   alloy_blackbox:
-    name: observability_alloy_blackbox_v6
+    name: observability_alloy_blackbox_ntfy_20261124
     file: ./configs/alloy/blackbox.alloy
 
   alloy_blackbox_modules:
@@ -554,6 +559,6 @@ secrets:
     external: true
     name: "grafana_client_secret_6c13624a3f9b"
 
-  grafana_smtp_api_key:
+  ntfy_grafana_token:
     external: true
-    name: "grafana_smtp_api_key_c3d7929657f9"
+    name: "ntfy_grafana_token_adfb8c16c428"
