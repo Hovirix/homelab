@@ -20,6 +20,9 @@ def run(*args, input=None):
     ).stdout
 
 
+# PostgreSQL password rotation is manual (#150): role passwords persist in the
+# database; replacing Swarm secrets alone breaks authentication. Keep rotation
+# outside generic sync so database changes, recovery, and rollouts stay ordered.
 def check(versions, existing):
     for name, version in versions.items():
         if (
