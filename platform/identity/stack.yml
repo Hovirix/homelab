@@ -94,6 +94,8 @@ services:
         target: /blueprints/provider_grafana.yaml
       - source: authentik_provider_miniflux
         target: /blueprints/provider_miniflux.yaml
+      - source: authentik_provider_mail_archiver
+        target: /blueprints/provider_mail_archiver.yaml
       - source: authentik_provider_immich
         target: /blueprints/provider_immich.yaml
       - source: authentik_provider_paperless
@@ -111,6 +113,8 @@ services:
       - grafana_client_secret
       - miniflux_client_id
       - miniflux_client_secret
+      - mail_archiver_client_id
+      - mail_archiver_client_secret
       - immich_client_id
       - immich_client_secret
       - paperless_client_id
@@ -171,14 +175,26 @@ configs:
     file: ./blueprints/provider_vaultwarden.yaml
 
   authentik_memberships:
-    name: identity_authentik_memberships_20261109_2
+    name: identity_authentik_memberships_20261124
     file: ./blueprints/memberships.yaml
 
   authentik_provider_immich:
     name: identity_authentik_provider_immich_20261109
     file: ./blueprints/provider_immich.yaml
 
+  authentik_provider_mail_archiver:
+    name: identity_authentik_provider_mail_archiver_20261124
+    file: ./blueprints/provider_mail_archiver.yaml
+
 secrets:
+  mail_archiver_client_id:
+    external: true
+    name: "mail_archiver_client_id_273b6e0eb438"
+
+  mail_archiver_client_secret:
+    external: true
+    name: "mail_archiver_client_secret_baf29069272e"
+
   immich_client_id:
     external: true
     name: "immich_client_id_670a4a97a907"

@@ -1,0 +1,33 @@
+vulnerabilities:
+  - id: CVE-2026-109518
+    owner: Hovirix
+    statement: >-
+      Not affected during normal Mail-Archiver operation: APT is not invoked. Exploitation requires package installation and attacker-controlled download traffic. Reviewed 2611.2 digest sha256:4baca9cb9dc6f97f2824f62489ba649ededc1095c4555f4d8b87da71349f7ebc in https://github.com/Hovirix/homelab/pull/234. Evidence: https://ubuntu.com/security/CVE-2026-109518. Vulnerable packages remain installed; reassess before package operations, image changes or expiry.
+    expired_at: 2026-12-24
+    purls:
+      - pkg:deb/ubuntu/apt@2.8.3?arch=amd64&distro=ubuntu-24.04
+      - pkg:deb/ubuntu/libapt-pkg6.0t64@2.8.3?arch=amd64&distro=ubuntu-24.04
+
+  - id: CVE-2026-114146
+    owner: Hovirix
+    statement: >-
+      Not affected in the reviewed Mail-Archiver 2611.2 configuration: no SignalR hubs are registered. Reviewed digest sha256:4baca9cb9dc6f97f2824f62489ba649ededc1095c4555f4d8b87da71349f7ebc in https://github.com/Hovirix/homelab/pull/234. Evidence: https://github.com/dotnet/aspnetcore/security/advisories/GHSA-67wp-ghc2-fw2g and https://github.com/s1t5/mail-archiver/blob/2611.2/Program.cs. Vulnerable runtime remains installed; reassess on SignalR enablement, image or exposure changes, or expiry.
+    expired_at: 2026-12-24
+    purls:
+      - pkg:nuget/Microsoft.AspNetCore.App.Runtime.linux-x64@10.0.14
+
+  - id: CVE-2026-114147
+    owner: Hovirix
+    statement: >-
+      Not affected in the reviewed Mail-Archiver 2611.2 configuration: no SignalR Redis backplane is configured. Reviewed digest sha256:4baca9cb9dc6f97f2824f62489ba649ededc1095c4555f4d8b87da71349f7ebc in https://github.com/Hovirix/homelab/pull/234. Evidence: https://github.com/dotnet/aspnetcore/security/advisories/GHSA-wr8v-9x5q-ggcm and https://github.com/s1t5/mail-archiver/blob/2611.2/Program.cs. Vulnerable runtime remains installed; reassess on Redis backplane enablement, image or exposure changes, or expiry.
+    expired_at: 2026-12-24
+    purls:
+      - pkg:nuget/Microsoft.AspNetCore.App.Runtime.linux-x64@10.0.14
+
+  - id: CVE-2026-114149
+    owner: Hovirix
+    statement: >-
+      Accepted temporarily by the owner for internal-only Mail-Archiver 2611.2 after Cloudflare DNS and tunnel ingress removal. Multipart parsing remains affected before authentication; trusted-network clients can exhaust resources, and no container memory limit protects other swarm-01 workloads. Reviewed digest sha256:4baca9cb9dc6f97f2824f62489ba649ededc1095c4555f4d8b87da71349f7ebc in https://github.com/Hovirix/homelab/pull/234. Evidence: https://github.com/dotnet/aspnetcore/security/advisories/GHSA-x33c-w48q-qrgc. Replace with a verified image using ASP.NET Core 10.0.15 or newer; reassess before public access, image or privilege changes, or expiry.
+    expired_at: 2026-12-24
+    purls:
+      - pkg:nuget/Microsoft.AspNetCore.App.Runtime.linux-x64@10.0.14

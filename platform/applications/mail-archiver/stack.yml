@@ -1,0 +1,71 @@
+services:
+  web:
+    image: s1t5/mailarchiver:2611.2@sha256:4baca9cb9dc6f97f2824f62489ba649ededc1095c4555f4d8b87da71349f7ebc
+
+    environment:
+      AllowedHosts: mail-archiver.hovirix.dev
+      Authentication__CookieSameSite: Lax
+      OAuth__Enabled: "true"
+      OAuth__Authority: https://authentik.hovirix.dev/application/o/mail-archiver/
+      OAuth__DisplayName: Authentik
+      OAuth__ClientScopes__0: openid
+      OAuth__ClientScopes__1: profile
+      OAuth__ClientScopes__2: email
+      OAuth__AutoRedirect: "true"
+      OAuth__AutoApproveUsers: "true"
+
+    secrets:
+      - source: mail_archiver_config
+        target: /app/appsettings.Production.json
+
+    networks:
+      - postgres
+      - mail-archiver
+
+    volumes:
+      - type: bind
+        source: /var/mnt/swarm/mail-archiver
+        target: /app/DataProtection-Keys
+
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -ec
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/5000
+          printf 'GET /Auth/Login HTTP/1.1\r\nHost: mail-archiver.hovirix.dev\r\nConnection: close\r\n\r\n' >&3
+          IFS= read -r status <&3
+          [[ "$$status" == "HTTP/"*" 200 "* ]]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+
+    deploy:
+      replicas: 1
+
+      labels:
+        - traefik.enable=true
+        - traefik.swarm.network=mail-archiver
+        - traefik.http.routers.mail-archiver.rule=Host(`mail-archiver.hovirix.dev`)
+        - traefik.http.routers.mail-archiver.entrypoints=websecure
+        - traefik.http.services.mail-archiver.loadbalancer.server.port=5000
+
+      update_config:
+        failure_action: rollback
+
+      restart_policy:
+        condition: any
+
+networks:
+  mail-archiver:
+    name: mail-archiver
+
+  postgres:
+    external: true
+
+secrets:
+  mail_archiver_config:
+    external: true
+    name: "mail_archiver_config_98f8047a1eaa"
