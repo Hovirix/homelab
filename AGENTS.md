@@ -34,6 +34,10 @@ Networking is managed separately at `https://github.com/hovirix/netlab`.
 - Taskfiles call the script directly no need for bash python prefix before or path fidings in worker scripts.
 - Task should orchestrate workers; workers should not call each other.
 
+## Operator UX
+
+- Keep operator wording concise and consistent with existing Task descriptions, prompts, and script output.
+
 ## Git
 
 Prefix every git commands with rtk.
