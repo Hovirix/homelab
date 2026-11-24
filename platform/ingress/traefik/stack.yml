@@ -1,6 +1,6 @@
 services:
   proxy:
-    image: traefik:v3.7@sha256:b7b1b31e6440de0b1f7c4e0f6cf0a0f3f004866761d30c025fe00c80daaf7d9c
+    image: traefik:v3.7@sha256:8301d6f60957a422f98918aacf2b01482abde3e74ead3719aabdb7c64045fe28
 
     command:
       - --global.checknewversion=false
