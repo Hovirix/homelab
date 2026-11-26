@@ -6,6 +6,7 @@ services:
 
     environment:
       OPENCLAW_INCLUDE_ROOTS: /etc/openclaw
+      OPENCLAW_NO_AUTO_UPDATE: "1"
 
     configs:
       - source: openclaw_start
