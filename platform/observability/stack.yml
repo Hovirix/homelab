@@ -197,7 +197,7 @@ services:
         condition: any
 
   swarm-exporter:
-    image: ghcr.io/leinardi/swarm-scheduler-exporter:v3.1.0@sha256:9ef395c7a79edba0532323a55b2a653dc92a73f1e009321944800ec6e89b1163
+    image: ghcr.io/leinardi/swarm-scheduler-exporter:v3.2.0@sha256:5b1d3f908c172f353975f375d0207e60c420371c99ebe72cd597d504559a47dd
 
     environment:
       DOCKER_HOST: tcp://socket-proxy:2375
