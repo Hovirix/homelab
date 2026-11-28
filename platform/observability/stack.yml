@@ -261,7 +261,7 @@ services:
         condition: any
 
   valkey-exporter:
-    image: oliver006/redis_exporter:v1.97.0@sha256:f5f903fbe77571d455ede0453b084d6840bc62fc105efac001034421cab83b99
+    image: oliver006/redis_exporter:v1.99.0@sha256:2c0cdc2452096b5af460d870e72fa6ee2ebb971780f443a616885685d2c0ebad
 
     command:
       - --redis.addr=redis://valkey:6379
